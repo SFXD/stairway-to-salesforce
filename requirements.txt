@@ -1,0 +1,2 @@
+simple-salesforce>=1.12.4
+dlt[postgres]>=0.5.1

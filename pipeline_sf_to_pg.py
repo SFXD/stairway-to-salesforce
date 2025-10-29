@@ -7,7 +7,7 @@ from sources.salesforce_bulk2 import build_resource
 def load() -> None:
     
     """ Configure """    
-    pipeline_name = "sync-accounts-test3"
+    pipeline_name = "pipeline_sf_to_pg"
 
     source_sobject = "Account"
     source_fields=["Id", "Name", "LastModifiedDate", "Description", "CreatedDate", "Active__c",	"Number_of_Contacts__c", "CurrencyIsoCode", "Website", "Match_Billing_Address__c" , "Owner.Name" ]
@@ -24,13 +24,15 @@ def load() -> None:
     target_schema = "public"
     target_table_name = "tb_accounts"
     target_primary_key = "account_id"
+
+    #Fixing field type for special fields ( like URL )
     target_columns ={"website": {"data_type": "text"}}
 
 
     """run the pipeline"""    
     ressource_sobject =  build_resource( target_name=target_table_name, target_primary_key=target_primary_key, 
                                 source_sobject=source_sobject, source_fields=source_fields, field_aliases=field_aliases, source_filter=source_filter,
-                                write_disposition=write_disposition, source_replication_key= source_replication_key )
+                                write_disposition=write_disposition, source_replication_key= source_replication_key, target_columns=target_columns )
     #ressource_sobject.add_map(format_columns)        
     pipeline = dlt.pipeline(pipeline_name=pipeline_name, destination=target_destination, dataset_name=target_schema, 
                             import_schema_path="schemas/import", export_schema_path="schemas/export")

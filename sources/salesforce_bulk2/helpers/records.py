@@ -1,74 +1,60 @@
-"""Salesforce source helpers"""
-
 import pendulum
-
-from typing import Optional, Iterable, Dict, Set, Any, cast
-
+from typing import Optional, Iterable
 from simple_salesforce.exceptions import SalesforceMalformedRequest
 from simple_salesforce import Salesforce
 from dlt.common.typing import TDataItem
 
-from io import StringIO
-import csv
+import io
+import pandas as pd
 
 from ..settings import IS_PRODUCTION
 
-def get_records(
-    sf: Salesforce,
-    sobject: str,
-    fields: list[str],
-    filter: Optional[str] = None,    
-    replication_key: Optional[str] = None,
-    last_state: Optional[str] = None,
-) -> Iterable[TDataItem]:
-    """
-    Retrieves records from Salesforce for a specified sObject and a specific soql query
-
-    Args:
-        sf (Salesforce): An instance of the Salesforce API client.
-        sobject (str): The name of the sObject to retrieve records from.
-        soql_query (str): The soql query with SELECT <field to retrieve> FROM <same as sobject parameter>  WHERE <filtering criteria>
-        last_state (str, optional): The last known state for incremental loading. Defaults to None.
-        replication_key (str, optional): The replication key for incremental loading. Defaults to None.
-
-    Yields:
-        Dict[TDataItem]: A dictionary representing a record from the Salesforce sObject.
-    """
+def _build_soql_query(source_sobject: str, source_fields: list[str], source_filter: Optional[str] = None, source_replication_key: Optional[str] = None,  last_state: Optional[str] = None) -> str:
     predicate, order_by, limit = "", "", ""
-    
-    if filter: 
-        predicate += f"{filter}"
-    if replication_key is not None:
+    if source_filter:
+        predicate += f"{source_filter}"
+    if source_replication_key is not None:
         if last_state is not None:
             if predicate:
-                predicate += ' AND '
-            predicate += f" {replication_key} > {last_state}"
-        order_by += f" ORDER BY {replication_key} ASC"
+                predicate += " AND "
+            predicate += f" {source_replication_key} > {last_state}"
+        order_by += f" ORDER BY {source_replication_key} ASC"
     if predicate:
-        predicate = f" WHERE {predicate}" 
+        predicate = f" WHERE {predicate}"
     if not IS_PRODUCTION:
-        limit = " LIMIT 100"        
+        limit = " LIMIT 100"
+    return f"SELECT {', '.join(source_fields)} FROM {source_sobject} {predicate} {order_by} {limit}"
 
-    soql_query = f"SELECT {', '.join(fields)} FROM {sobject} {predicate} {order_by} {limit}"
+def get_records(
+    sf: Salesforce,
+    source_sobject: str,
+    source_fields: list[str],    
+    source_replication_key: Optional[str] = None,
+    last_state: Optional[str] = None,
+    source_filter: Optional[str] = None,
+    field_aliases: Optional[dict[str, str]] = None,
+) -> Iterable[TDataItem]:
 
-    # Try BULK API V2.0 only
+    soql_query = _build_soql_query(source_sobject, source_fields, source_filter, source_replication_key, last_state)    
+    print(f"SOQL Query: {soql_query}")
+
     try:
-        n_records =  0
-        for chunk in getattr(sf.bulk2, sobject).query(soql_query):
-            chunk_records =[]
-            headers = None
+        for chunk in getattr(sf.bulk2, source_sobject).query(soql_query):
+            records = []
             if isinstance(chunk, str):
-                f = StringIO(chunk)
-                reader = csv.DictReader(f)
-                # For the first chunk, save headers
-                if not headers and reader.fieldnames:
-                    headers = reader.fieldnames
-                for row in reader:
-                    chunk_records.append(row)
+                f = io.BytesIO(chunk.encode("utf-8"))
+                df = pd.read_csv(f)
             elif isinstance(chunk, list):
-                # If simple-salesforce returns a list: append directly
-                chunk_records.extend(chunk)            
-            yield from chunk_records
-            n_records += len(chunk_records)
+                df = pd.DataFrame(chunk)
+            else:
+                df = None
+
+            if df is not None:
+                if field_aliases:
+                    df.rename(columns=field_aliases, inplace=True)
+                records = df.to_dict(orient="records")
+
+            if records:
+                yield records
     except SalesforceMalformedRequest as e:
         raise

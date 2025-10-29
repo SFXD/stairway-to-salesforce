@@ -1,0 +1,9 @@
+> cmd as administrator
+net start postgresql-x64-18
+
+> VSCode 
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+ & .venv\scripts\activate 
+ 
+    
+ & .venv\Scripts\python.exe salesforce_pipeline.py

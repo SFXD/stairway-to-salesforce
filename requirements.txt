@@ -1,2 +1,5 @@
 simple-salesforce>=1.12.4
 dlt[postgres]>=0.5.1
+pyarrow>=22.0.0
+numpy>=2.3.4
+pandas>=2.3.3

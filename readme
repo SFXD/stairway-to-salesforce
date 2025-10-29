@@ -1,0 +1,4 @@
+
+
+Install
+- run scripts/download_tzdata.py   to download tzdata in the folder "Downloads" of your user.  (Requirement for pyArrow conversion)

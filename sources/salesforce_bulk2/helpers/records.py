@@ -9,10 +9,12 @@ import pandas as pd
 
 from ..settings import IS_PRODUCTION
 
-def _build_soql_query(source_sobject: str, source_fields: list[str], source_filter: Optional[str] = None, source_replication_key: Optional[str] = None,  last_state: Optional[str] = None) -> str:
+def _build_soql_query(source_sobject: str, fields: dict[str,str], source_query_filter: Optional[str] = None, source_replication_key: Optional[str] = None,  last_state: Optional[str] = None) -> str:
     predicate, order_by, limit = "", "", ""
-    if source_filter:
-        predicate += f"{source_filter}"
+    source_fields = list(fields.keys())
+
+    if source_query_filter:
+        predicate += f"{source_query_filter}"
     if source_replication_key is not None:
         if last_state is not None:
             if predicate:
@@ -28,14 +30,14 @@ def _build_soql_query(source_sobject: str, source_fields: list[str], source_filt
 def get_records(
     sf: Salesforce,
     source_sobject: str,
-    source_fields: list[str],    
+    fields: dict[str,str],    
     source_replication_key: Optional[str] = None,
     last_state: Optional[str] = None,
-    source_filter: Optional[str] = None,
+    source_query_filter: Optional[str] = None,
     field_aliases: Optional[dict[str, str]] = None,
 ) -> Iterable[TDataItem]:
 
-    soql_query = _build_soql_query(source_sobject, source_fields, source_filter, source_replication_key, last_state)    
+    soql_query = _build_soql_query(source_sobject, fields, source_query_filter, source_replication_key, last_state)    
     print(f"SOQL Query: {soql_query}")
 
     try:
@@ -50,8 +52,7 @@ def get_records(
                 df = None
 
             if df is not None:
-                if field_aliases:
-                    df.rename(columns=field_aliases, inplace=True)
+                df.rename(columns=fields, inplace=True)
                 records = df.to_dict(orient="records")
 
             if records:

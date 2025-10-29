@@ -30,27 +30,27 @@ def salesforce_bulk2_source(
     yield from ()  # Empty yield to keep structure valid
 
 def build_resource( target_name: str, target_primary_key: str, 
-                    source_sobject: str, source_fields: list[str], 
+                    source_sobject: str, fields: dict[str,str], 
                     write_disposition: str, source_replication_key: Optional[str] = None, 
-                    source_filter: Optional[str] = None,  field_aliases: Optional[dict[str, str]] = None, 
-                    target_columns: Optional[list[column]] = None):
+                    source_query_filter: Optional[str] = None, 
+                    target_column_types: Optional[list[column]] = None):
     """Factory for DLT resource dynamically wrapping Salesforce client."""
     incremental_cursor = None
     if source_replication_key:
-        replication_key = field_aliases[source_replication_key] if (field_aliases and source_replication_key in field_aliases) else source_replication_key
+        replication_key = fields[source_replication_key] if (fields and source_replication_key in fields) else source_replication_key
         incremental_cursor = dlt.sources.incremental(replication_key, initial_value=None)
 
     @dlt.resource(
         name=target_name,
         primary_key=target_primary_key,
         write_disposition=write_disposition,
-        columns=target_columns
+        columns=target_column_types
     )
     def sf_dynamic_resource(credentials: SalesforceAuth = dlt.secrets.value,session: Optional[Session] = None, incremental_load=incremental_cursor):
         client = make_salesforce_client(credentials, session)
         last_value = incremental_load.last_value if incremental_cursor and replication_key else None
-        yield from get_records( sf=client, source_sobject=source_sobject, source_fields=source_fields, 
+        yield from get_records( sf=client, source_sobject=source_sobject, fields=fields, 
                                source_replication_key= source_replication_key, last_state=last_value, 
-                               source_filter=source_filter, field_aliases=field_aliases )
+                               source_query_filter=source_query_filter )
 
     return sf_dynamic_resource()

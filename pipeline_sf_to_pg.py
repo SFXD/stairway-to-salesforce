@@ -35,11 +35,12 @@ def load() -> None:
 
 
     """run the pipeline"""    
-    ressource_sobject =  build_resource( target_name=target_table_name, target_primary_key=target_primary_key, 
-                                source_sobject=source_sobject, fields=fields, source_query_filter=source_query_filter,
-                                write_disposition=write_disposition, source_replication_key= source_replication_key, target_column_types=target_column_types )       
-    pipeline = dlt.pipeline(pipeline_name=pipeline_name, destination="postgres", dataset_name=target_schema, 
-                            import_schema_path="schemas/import", export_schema_path="schemas/export")
+    ressource_sobject =  build_resource(    write_disposition=write_disposition,
+                                            target_name=target_table_name, target_primary_key=target_primary_key, target_column_types=target_column_types,
+                                            source_sobject=source_sobject, fields=fields, source_query_filter=source_query_filter,source_replication_key= source_replication_key,
+                                        )       
+    pipeline = dlt.pipeline(    pipeline_name=pipeline_name, destination="postgres", dataset_name=target_schema, 
+                                import_schema_path="schemas/import", export_schema_path="schemas/export")
     load_info = pipeline.run([ressource_sobject])
     print(load_info)
 

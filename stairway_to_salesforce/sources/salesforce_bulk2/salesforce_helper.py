@@ -1,4 +1,3 @@
-import pendulum
 from typing import Optional, Iterable
 from simple_salesforce.exceptions import SalesforceMalformedRequest
 from simple_salesforce import Salesforce
@@ -7,7 +6,7 @@ from dlt.common.typing import TDataItem
 import io
 import pandas as pd
 
-from ..settings import IS_PRODUCTION
+from .settings import IS_PRODUCTION
 
 def _build_soql_query(source_sobject: str, fields: dict[str,str], source_query_filter: Optional[str] = None, source_replication_key: Optional[str] = None,  last_state: Optional[str] = None) -> str:
     predicate, order_by, limit = "", "", ""
@@ -27,7 +26,22 @@ def _build_soql_query(source_sobject: str, fields: dict[str,str], source_query_f
         limit = " LIMIT 100"
     return f"SELECT {', '.join(source_fields)} FROM {source_sobject} {predicate} {order_by} {limit}"
 
-def get_records(
+def _process_result(chunk, fields: dict[str,str]) -> Iterable[TDataItem]:
+    results = []
+    if isinstance(chunk, str):
+        f = io.BytesIO(chunk.encode("utf-8"))
+        df = pd.read_csv(f)
+    elif isinstance(chunk, list):
+        df = pd.DataFrame(chunk)
+    else:
+        df = None
+
+    if df is not None:
+        df.rename(columns=fields, inplace=True)
+        results = df.to_dict(orient="records")
+    return results
+
+def fetch_data(
     sf: Salesforce,
     source_sobject: str,
     fields: dict[str,str],    
@@ -37,24 +51,10 @@ def get_records(
     field_aliases: Optional[dict[str, str]] = None,
 ) -> Iterable[TDataItem]:
 
-    soql_query = _build_soql_query(source_sobject, fields, source_query_filter, source_replication_key, last_state)    
-    print(f"SOQL Query: {soql_query}")
-
+    soql_query = _build_soql_query(source_sobject, fields, source_query_filter, source_replication_key, last_state)
     try:
         for chunk in getattr(sf.bulk2, source_sobject).query(soql_query):
-            records = []
-            if isinstance(chunk, str):
-                f = io.BytesIO(chunk.encode("utf-8"))
-                df = pd.read_csv(f)
-            elif isinstance(chunk, list):
-                df = pd.DataFrame(chunk)
-            else:
-                df = None
-
-            if df is not None:
-                df.rename(columns=fields, inplace=True)
-                records = df.to_dict(orient="records")
-
+            records = _process_result(chunk, fields)        
             if records:
                 yield records
     except SalesforceMalformedRequest as e:

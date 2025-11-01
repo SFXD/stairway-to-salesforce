@@ -6,4 +6,4 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
  & .venv\scripts\activate 
  
     
- & .venv\Scripts\python.exe salesforce_pipeline.py
+ & .venv\Scripts\python.exe pipeline_sf_to_pg.py

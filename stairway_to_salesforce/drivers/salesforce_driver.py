@@ -130,7 +130,7 @@ SalesforceAuth = Union[
 
 
 @with_config(spec=SalesforceClientConfiguration)
-def make_salesforce_client(
+def make_salesforce_driver(
     credentials: SalesforceAuth,
     session: Optional[Session] = None,
     config: SalesforceClientConfiguration = None,

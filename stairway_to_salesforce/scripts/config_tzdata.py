@@ -1,4 +1,4 @@
-def config_environment():
+def config_tzdata():
     import os
     import tzdata
     

@@ -2,9 +2,9 @@
 #!/usr/bin/env python3
 """Pipeline to load Salesforce data."""
 import dlt
-from sources.salesforce_bulk2 import build_resource
+from stairway_to_salesforce.sources.salesforce_bulk2 import build_sfbulk2_resource
 
-def load() -> None:
+def execute() -> None:
     """ Pipeline Example From Salesforce To PostGreSQL"""
     
     pipeline_name = "pipeline_sf_to_pg"    
@@ -35,14 +35,14 @@ def load() -> None:
 
 
     """run the pipeline"""    
-    ressource_sobject =  build_resource(    write_disposition=write_disposition,
+    ressource_sobject =  build_sfbulk2_resource(    write_disposition=write_disposition,
                                             target_name=target_table_name, target_primary_key=target_primary_key, target_column_types=target_column_types,
                                             source_sobject=source_sobject, fields=fields, source_query_filter=source_query_filter,source_replication_key= source_replication_key,
                                         )       
     pipeline = dlt.pipeline(    pipeline_name=pipeline_name, destination="postgres", dataset_name=target_schema, 
-                                import_schema_path="schemas/import", export_schema_path="schemas/export")
-    load_info = pipeline.run([ressource_sobject])
+                                import_schema_path=".dlt/schemas/import", export_schema_path=".dlt/schemas/export")    
+    load_info = pipeline.run([ressource_sobject])  # schema_contract="freeze"
     print(load_info)
 
 if __name__ == "__main__":
-    load()
+    execute()

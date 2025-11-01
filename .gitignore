@@ -11,3 +11,4 @@ secrets.toml
 .dlt
 .venv
 schemas/*
+.dlt/secrets.toml

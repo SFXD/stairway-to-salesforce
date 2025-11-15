@@ -5,11 +5,11 @@ from dlt.sources.helpers.requests import Session
 from sqlglot import column
 
 from .salesforce_helper import fetch_data
-from ...drivers.salesforce_driver import SalesforceAuth, make_salesforce_driver
+from ...drivers.salesforce_driver import SalesforceDriverAuth, make_salesforce_driver
 
 @dlt.source(name="salesforce_bulk2")
 def salesforce_bulk2_source(
-    credentials: SalesforceAuth = dlt.secrets.value,
+    credentials: SalesforceDriverAuth = dlt.secrets.value,
     session: Optional[Session] = None,
 ):    
     """Returns no resources by default. Developers must declare their own."""
@@ -32,7 +32,7 @@ def build_sfbulk2_resource( target_name: str, target_primary_key: str,
         write_disposition=write_disposition,
         columns=target_column_types
     )
-    def sf_dynamic_resource(credentials: SalesforceAuth = dlt.secrets.value,session: Optional[Session] = None, incremental_load=incremental_cursor):
+    def sf_dynamic_resource(credentials: SalesforceDriverAuth = dlt.secrets.value,session: Optional[Session] = None, incremental_load=incremental_cursor):
         driver = make_salesforce_driver(credentials, session)
         last_value = incremental_load.last_value if incremental_cursor and replication_key else None
         yield from fetch_data( sf=driver, source_sobject=source_sobject, fields=fields, 

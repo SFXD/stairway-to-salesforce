@@ -3,7 +3,8 @@ net start postgresql-x64-18
 
 > VSCode 
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
- & .venv\scripts\activate 
+& .venv\scripts\activate 
  
-    
- & .venv\Scripts\python.exe pipeline_sf_to_pg.py
+> Test    
+& .venv\Scripts\python.exe pipeline_sf_to_pg.py
+& .venv\Scripts\python.exe pipeline_test_sfdestination.py

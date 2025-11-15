@@ -17,7 +17,7 @@ from dlt.common.configuration.exceptions import ConfigurationValueError
 
 
 @configspec
-class SalesforceClientConfiguration(BaseConfiguration):
+class SalesforceDriverConfiguration(BaseConfiguration):
     domain: Optional[str] = None
     version: Optional[str] = DEFAULT_API_VERSION
     proxies: Optional[str] = None
@@ -119,7 +119,7 @@ class ConsumerKeySecretDomainAuth(SalesforceCredentialsBase):
     domain: str = None
 
 
-SalesforceAuth = Union[
+SalesforceDriverAuth = Union[
     SecurityTokenAuth,
     OrganizationIdAuth,
     ConsumerKeySecretAuth,
@@ -129,11 +129,11 @@ SalesforceAuth = Union[
 ]
 
 
-@with_config(spec=SalesforceClientConfiguration)
+@with_config(spec=SalesforceDriverConfiguration)
 def make_salesforce_driver(
-    credentials: SalesforceAuth,
+    credentials: SalesforceDriverAuth,
     session: Optional[Session] = None,
-    config: SalesforceClientConfiguration = None,
+    config: SalesforceDriverConfiguration = None,
 ) -> Salesforce:
     """This function passes only the necessary arguments to Salesforce depending on the authentication type.
     Note that version, domain, session and proxies are universal kwargs used for all authentication types in

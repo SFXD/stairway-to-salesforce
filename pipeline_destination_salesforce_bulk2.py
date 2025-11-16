@@ -13,7 +13,7 @@ from stairway_to_salesforce.destinations.salesforce_bulk2.salesforce_bulk2 impor
         "RecordLastModifiedDate__c": {"data_type": "text"}
     }
 )
-def salesforce_accounts() -> Iterator[Dict[str, Any]]:
+def mock_accounts() -> Iterator[Dict[str, Any]]:
     """
     Simple source with hardcoded Salesforce Account records
     """
@@ -37,13 +37,24 @@ def salesforce_accounts() -> Iterator[Dict[str, Any]]:
     
     yield from accounts
 
-def execute() -> None:    
+def execute(environment: str = "dev") -> None:  
+
+    #source_system_key = "mock"
+    target_system_key = "salesforce"
+
+    # Load credentials based on environment
+    #source_credentials = dlt.secrets[f"{source_system_key}.{environment}"]
+    target_credentials = dlt.secrets[f"{target_system_key}.{environment}"]
+
     """run the pipeline"""        
-    pipeline = dlt.pipeline(    pipeline_name= "pipeline_destination_salesforce_bulk2" , destination=salesforce_bulk2, 
+    pipeline = dlt.pipeline(    pipeline_name= "pipeline_destination_salesforce_bulk2" , destination=salesforce_bulk2(credentials=target_credentials), 
                                 import_schema_path=".dlt/schemas/import", export_schema_path=".dlt/schemas/export")    
     
-    load_info = pipeline.run([salesforce_accounts()])  # schema_contract="freeze"
+    load_info = pipeline.run([mock_accounts()])  # schema_contract="freeze"
     print(load_info)
 
 if __name__ == "__main__":
-    execute()
+    import sys
+    # Get environment from command line argument if provided
+    environment = sys.argv[1] if len(sys.argv) > 1 else "dev"
+    execute(environment)

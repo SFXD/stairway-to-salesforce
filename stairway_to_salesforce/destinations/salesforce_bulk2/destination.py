@@ -1,17 +1,27 @@
+"""
+Salesforce Bulk API v2 destination for DLT.
+
+Supports insert (append), upsert (merge), and replace write dispositions.
+"""
+
 import dlt
 from dlt.common.typing import TDataItems
 from dlt.common.schema import TTableSchema
+from dlt.common.destination import DestinationCapabilitiesContext
+
 from stairway_to_salesforce.drivers.salesforce_driver import (
-    make_salesforce_driver,
-    SalesforceDriverAuth
+    SalesforceDriverAuth,
+    resolve_salesforce_credentials,
 )
-from .data_builder import build_data, clean_data
+from .data_processor import prepare_data, cleanup_temp_file
+from .job_executor import execute_job
+
 
 @dlt.destination(
     name="salesforce_bulk2",
-    loader_file_format="parquet",  # Salesforce Bulk API expects CSV/JSON
+    loader_file_format="parquet",
     batch_size=10000,
-    naming_convention="direct"  # Preserve exact table names for Salesforce objects
+    naming_convention="direct"
 )
 def salesforce_bulk2(
     items: TDataItems,
@@ -19,75 +29,77 @@ def salesforce_bulk2(
     credentials: SalesforceDriverAuth = dlt.secrets.value
 ) -> None:
     """
-    DLT destination for Salesforce Bulk API v2
+    DLT destination for Salesforce Bulk API v2.
+    
+    Supports three write dispositions:
+    - append: Insert new records
+    - merge: Upsert records using external ID field
+    - replace: Delete all existing records, then insert new ones
     
     Args:
-        items: Data items to load (will be file path or iterable)
-        table: Table schema with metadata
+        items: Data items to load (file path, RecordBatch, or iterable)
+        table: Table schema with metadata including write_disposition
         credentials: Salesforce authentication credentials
-    """
     
-    # Validate required hints
+    Raises:
+        ValueError: If required metadata is missing or invalid
+        RuntimeError: If Salesforce API operations fail
+    
+    Example:
+        >>> @dlt.resource(
+        ...     name="Account",
+        ...     write_disposition="merge",
+        ...     primary_key="Id"
+        ... )
+        >>> def accounts():
+        ...     yield [{"Id": "001...", "Name": "Acme Corp"}]
+    """
+    # Validate required table metadata
     write_disposition = table.get("write_disposition")
-    if write_disposition is None:
+    if not write_disposition:
         raise ValueError(
-            f"write_disposition must be specified for table '{table.get('name', 'unknown')}'"
+            f"write_disposition must be specified for table '{table.get('name', 'unknown')}'. "
+            f"Valid values: 'append', 'merge', 'replace'"
         )
     
     target_name = table.get("name")
-    if target_name is None:
-        raise ValueError("Table name must be specified for Salesforce destination")    
+    if not target_name:
+        raise ValueError("Table name must be specified for Salesforce destination")
     
-    # Initialize Salesforce driver
-    try:
-        driver = make_salesforce_driver(credentials)
-        client = getattr(driver.bulk2, target_name)
-    except AttributeError:
+    # Validate write_disposition value
+    valid_dispositions = ["append", "merge", "replace"]
+    if write_disposition not in valid_dispositions:
         raise ValueError(
-            f"Invalid Salesforce object name: '{target_name}'. "
-            f"Ensure the object exists in your Salesforce org."
+            f"Invalid write_disposition '{write_disposition}' for table '{target_name}'. "
+            f"Must be one of: {', '.join(valid_dispositions)}"
         )
-    except Exception as e:
-        raise RuntimeError(f"Failed to initialize Salesforce driver: {type(e).__name__}") from e
     
-    # Handle different item types
-    file_path = build_data(items)
+    # Validate primary_key for merge operations
+    primary_key = table.get("primary_key")
+    if write_disposition == "merge" and not primary_key:
+        raise ValueError(
+            f"Primary key must be specified for merge operations on '{target_name}'"
+        )
     
+    # Resolve credentials (handles dict/string conversion)
+    resolved_credentials = resolve_salesforce_credentials(credentials)
+    
+    # Prepare data file
+    file_path = None
     try:
-        results = None
-        # Create and submit job
-        if write_disposition == "append":
-            results = client.insert(file_path)
-        elif write_disposition == "merge":
-            # Validate primary key exists for merge operations
-            primary_key = table.get("primary_key")
-            if not primary_key:
-                raise ValueError(f"Primary key must be specified for merge operations on '{target_name}'")
-            results = client.upsert(file_path, external_id_field=primary_key[0] if isinstance(primary_key, list) else primary_key)
-        else:
-            raise ValueError(
-                f"Unsupported write_disposition '{write_disposition}' for table '{target_name}'. "
-                f"Only 'append' (insert) and 'merge' (upsert) are supported."
-                )
-            
-        if not results is None:
-            for result in results:
-                job_id = result['job_id']
-                # also available: get_unprocessed_records, get_successful_records
-                data = client.get_failed_records(job_id)
-                # or save to file
-                #client.get_failed_records(job_id, path=f'{job_id}.csv')
-                print (f"failed records: {data}") 
-
-        # Clean up temporary file if created 
-        clean_data(file_path)
-
-    except Exception as e:
-        raise  RuntimeError(f"Failed to submit Salesforce Bulk API job: {type(e).__name__}")                
+        # Convert items to CSV file
+        file_path = prepare_data(items)
+        
+        # Execute Bulk API job with appropriate disposition
+        execute_job(
+            credentials=resolved_credentials,
+            target_name=target_name,
+            write_disposition=write_disposition,
+            primary_key=primary_key,
+            file_path=file_path
+        )
+        
     finally:
-        # Clean up temporary file if created and any left
-        try:
-            clean_data(file_path)
-        except Exception:
-            pass  # Best effort cleanup
-
+        # Always attempt cleanup
+        if file_path:
+            cleanup_temp_file(file_path)

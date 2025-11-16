@@ -7,7 +7,7 @@ from stairway_to_salesforce.destinations.salesforce_bulk2 import salesforce_bulk
 
 @dlt.resource(
     name="StairwayToSalesforce__c",  # Salesforce object name
-    write_disposition="append",  # or "replace", "merge"
+    write_disposition="replace",  # or "replace", "merge"
     primary_key="Name",  # Important for merge/upsert operations 
     columns={
         "RecordLastModifiedDate__c": {"data_type": "text"}
@@ -19,19 +19,22 @@ def mock_accounts() -> Iterator[Dict[str, Any]]:
     """
     accounts = [
         {
-            "Name": "DLT Account 1",
+            "Name": "Edge Communications 20251116",
             "OwnerId": "00524000001QUIY",  # Replace with valid Salesforce User ID
             "RecordLastModifiedDate__c": "2025-11-15T00:00:00Z",
+            "RecordId__c": "0012400000F6gkbAAB"
         },
         {
-            "Name": "DLT Account 2",
+            "Name": "chanson francaise 3",
             "OwnerId": "00524000001QUIY",
             "RecordLastModifiedDate__c": "2025-11-15T00:00:00Z",
+            "RecordId__c": "0012400000LS8jtAAD"
         },
         {
-            "Name": "DLT Account 3",
+            "Name": "Zentry Bulk Company",
             "OwnerId": "00524000001QUIY",
             "RecordLastModifiedDate__c": "2025-11-15T00:00:00Z",
+            "RecordId__c": "0011p000021zxm4AAA"
         },
     ]
     

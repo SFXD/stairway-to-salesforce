@@ -1,0 +1,19 @@
+"""
+Shared utilities for Salesforce operations.
+
+This package contains common utilities used across Salesforce sources and destinations.
+"""
+
+from .salesforce_validators import (
+    sanitize_sobject_name,
+    sanitize_field_name,
+    validate_soql_filter,
+    format_soql_value,
+)
+
+__all__ = [
+    "sanitize_sobject_name",
+    "sanitize_field_name",
+    "validate_soql_filter",
+    "format_soql_value",
+]

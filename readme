@@ -1,4 +1,17 @@
 
 
-Install
-- run scripts/download_tzdata.py   to download tzdata in the folder "Downloads" of your user.  (Requirement for pyArrow conversion)
+## Install
+# run scripts/download_tzdata.py   to download tzdata in the folder "Downloads" of your user.  (Requirement for pyArrow conversion)
+
+## Prepare python venv
+# Create new venv
+python -m venv .venv
+
+# Activate new venv
+.venv\Scripts\Activate.ps1
+
+# Upgrade pip
+python -m pip install --upgrade pip
+
+# Install requirement
+pip install -r requirements.txt

@@ -39,7 +39,7 @@ def salesforce_accounts() -> Iterator[Dict[str, Any]]:
 
 def execute() -> None:    
     """run the pipeline"""        
-    pipeline = dlt.pipeline(    pipeline_name= "pipeline_test_sfdestination2" , destination=salesforce_bulk2, 
+    pipeline = dlt.pipeline(    pipeline_name= "pipeline_destination_salesforce_bulk2" , destination=salesforce_bulk2, 
                                 import_schema_path=".dlt/schemas/import", export_schema_path=".dlt/schemas/export")    
     
     load_info = pipeline.run([salesforce_accounts()])  # schema_contract="freeze"

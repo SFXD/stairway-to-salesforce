@@ -17,5 +17,10 @@ retry_attempts = 0
 workers = 1
 raise_on_failed_jobs = true
 
+[salesforce.dev.config]
+domain = "login"
+version = "60.0"
+client_id = "dlt_salesforce_bulk2"
+
 [destination.postgres]
 create_indexes = false

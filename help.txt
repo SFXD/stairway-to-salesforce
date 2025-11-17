@@ -6,5 +6,5 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 & .venv\scripts\activate 
  
 > Test    
-& .venv\Scripts\python.exe pipeline_sf_to_pg.py
-& .venv\Scripts\python.exe pipeline_test_sfdestination.py
+& .venv\Scripts\python.exe pipeline_source_salesforce_bulk2.py
+& .venv\Scripts\python.exe pipeline_destination_salesforce_bulk2.py

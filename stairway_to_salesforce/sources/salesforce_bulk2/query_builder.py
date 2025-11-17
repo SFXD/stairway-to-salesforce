@@ -20,6 +20,11 @@ from stairway_to_salesforce.utils.salesforce_validators import (
     validate_soql_filter,
     format_soql_value,
 )
+# Import logging utilities
+from stairway_to_salesforce.utils.logger_config import get_salesforce_logger
+
+# Initialize logger
+logger = get_salesforce_logger('salesforce_bulk2.source', log_dir='.dlt/logs')
 
 
 def _build_soql_query(
@@ -31,20 +36,9 @@ def _build_soql_query(
 ) -> str:
     """
     Build a secure SOQL query with proper validation and escaping.
-    
-    Args:
-        source_sobject: Salesforce object name
-        fields: Dictionary of source field names to target field names
-        source_query_filter: Optional WHERE clause filter (will be validated)
-        source_replication_key: Field used for incremental loading
-        last_state: Last loaded value for incremental loading
-    
-    Returns:
-        Complete SOQL query string
-    
-    Raises:
-        ValueError: If inputs are invalid or potentially malicious
     """
+    logger.debug(f"Building SOQL query for {source_sobject}")
+    
     # Validate and sanitize object name
     source_sobject = sanitize_sobject_name(source_sobject)
     
@@ -53,6 +47,7 @@ def _build_soql_query(
         raise ValueError("Fields dictionary cannot be empty")
     
     source_fields = [sanitize_field_name(field) for field in fields.keys()]
+    logger.debug(f"Selected fields: {', '.join(source_fields[:5])}..." if len(source_fields) > 5 else f"Selected fields: {', '.join(source_fields)}")
     
     # Build WHERE clause
     predicates = []
@@ -61,6 +56,7 @@ def _build_soql_query(
     if source_query_filter:
         validate_soql_filter(source_query_filter)
         predicates.append(f"({source_query_filter})")
+        logger.debug(f"Applied filter: {source_query_filter}")
     
     # Build incremental predicate with proper escaping
     if source_replication_key and last_state is not None:
@@ -70,6 +66,7 @@ def _build_soql_query(
         # Format the value - assume datetime for replication keys
         formatted_value = format_soql_value(last_state, field_type="datetime")
         predicates.append(f"{source_replication_key} > {formatted_value}")
+        logger.info(f"Incremental load: {source_replication_key} > {formatted_value}")
     
     # Construct WHERE clause
     where_clause = ""
@@ -84,29 +81,22 @@ def _build_soql_query(
     # Construct final query
     query = f"SELECT {', '.join(source_fields)} FROM {source_sobject}{where_clause}{order_by_clause}"
     
+    logger.debug(f"Generated SOQL: {query}")
     return query
 
 
 def _process_result(chunk: Any, fields: dict[str, str]) -> Iterable[TDataItem]:
     """
     Process a chunk of results from Salesforce Bulk API.
-    
-    Args:
-        chunk: Result chunk (CSV string or list of records)
-        fields: Field mapping for renaming columns
-    
-    Returns:
-        List of processed records as dictionaries
-    
-    Raises:
-        ValueError: If chunk format is unexpected
     """
     # Handle different chunk types from Bulk API
     if isinstance(chunk, str):
         # CSV string response
         try:
             df = pd.read_csv(io.StringIO(chunk))
+            logger.debug(f"Parsed CSV chunk with {len(df)} rows")
         except Exception as e:
+            logger.error(f"Failed to parse CSV chunk: {str(e)}")
             raise ValueError(f"Failed to parse CSV chunk: {str(e)}") from e
     
     elif isinstance(chunk, list):
@@ -114,8 +104,10 @@ def _process_result(chunk: Any, fields: dict[str, str]) -> Iterable[TDataItem]:
         if not chunk:
             return []
         df = pd.DataFrame(chunk)
+        logger.debug(f"Converted list chunk with {len(df)} rows")
     
     else:
+        logger.error(f"Unexpected chunk type: {type(chunk).__name__}")
         raise ValueError(
             f"Unexpected chunk type: {type(chunk).__name__}. "
             f"Expected str (CSV) or list (records)"
@@ -123,6 +115,7 @@ def _process_result(chunk: Any, fields: dict[str, str]) -> Iterable[TDataItem]:
     
     # Handle empty results
     if df.empty:
+        logger.debug("Chunk is empty, skipping")
         return []
     
     # Rename columns based on field mapping
@@ -134,9 +127,12 @@ def _process_result(chunk: Any, fields: dict[str, str]) -> Iterable[TDataItem]:
     
     if rename_map:
         df.rename(columns=rename_map, inplace=True)
+        logger.debug(f"Renamed {len(rename_map)} columns")
     
     # Convert to list of dictionaries
-    return df.to_dict(orient="records")
+    records = df.to_dict(orient="records")
+    logger.debug(f"Processed {len(records)} records from chunk")
+    return records
 
 
 def fetch_data(
@@ -151,29 +147,19 @@ def fetch_data(
     Fetch data from Salesforce using Bulk API v2.
     
     All SOQL query validation and security checks are performed here.
-    
-    Args:
-        sf: Authenticated Salesforce client
-        source_sobject: Salesforce object name (e.g., 'Account', 'Contact')
-        fields: Dictionary mapping source field names to target field names
-        source_replication_key: Optional field name for incremental loading
-        last_state: Optional last loaded value for incremental loading
-        source_query_filter: Optional SOQL WHERE clause filter (will be validated)
-    
-    Yields:
-        Batches of records as lists of dictionaries
-    
-    Raises:
-        ValueError: If inputs are invalid or contain security issues
-        SalesforceMalformedRequest: If SOQL query is malformed
-        RuntimeError: If Salesforce API request fails
     """
+    logger.info(f"Starting data fetch from {source_sobject}")
+    
     # Validate inputs
     if not sf:
+        logger.error("Salesforce client is None")
         raise ValueError("Salesforce client cannot be None")
     
     if not fields:
+        logger.error("Fields mapping is empty")
         raise ValueError("Fields mapping cannot be empty")
+    
+    logger.info(f"Fetching {len(fields)} field(s) from {source_sobject}")
     
     # Build SOQL query with all security validations
     try:
@@ -185,10 +171,10 @@ def fetch_data(
             last_state
         )
     except ValueError as e:
+        logger.error(f"Failed to build SOQL query: {str(e)}")
         raise ValueError(f"Failed to build SOQL query: {str(e)}") from e
     
-    # Log the query for debugging
-    print(f"Executing SOQL: {soql_query}")
+    logger.info(f"Executing SOQL: {soql_query}")
     
     # Execute bulk query
     try:
@@ -199,24 +185,32 @@ def fetch_data(
         
         for chunk in bulk_handler.query(soql_query):
             chunk_count += 1
+            logger.debug(f"Processing chunk {chunk_count}")
             
             try:
                 records = _process_result(chunk, fields)
             except Exception as e:
+                logger.error(f"Failed to process chunk {chunk_count}: {str(e)}")
                 raise RuntimeError(
                     f"Failed to process chunk {chunk_count} for {source_sobject}: {str(e)}"
                 ) from e
             
             if records:
-                total_records += len(records)
+                record_count = len(records)
+                total_records += record_count
+                logger.debug(f"Yielding {record_count} records from chunk {chunk_count}")
                 yield records
         
         if chunk_count == 0:
-            print(f"No data returned for {source_sobject}")
+            logger.warning(f"No data returned for {source_sobject}")
         else:
-            print(f"Successfully fetched {total_records} records from {source_sobject} in {chunk_count} chunks")
+            logger.info(
+                f"Successfully fetched {total_records} record(s) from {source_sobject} "
+                f"in {chunk_count} chunk(s)"
+            )
     
     except SalesforceMalformedRequest as e:
+        logger.error(f"Malformed SOQL query for {source_sobject}: {str(e)}")
         raise SalesforceMalformedRequest(
             f"Malformed SOQL query for {source_sobject}. "
             f"Query: {soql_query}. "
@@ -224,12 +218,14 @@ def fetch_data(
         ) from e
     
     except AttributeError as e:
+        logger.error(f"Invalid Salesforce object: {source_sobject}")
         raise ValueError(
             f"Invalid Salesforce object: '{source_sobject}'. "
             f"Ensure the object exists and you have permission to access it."
         ) from e
     
     except Exception as e:
+        logger.error(f"Failed to fetch data from {source_sobject}: {str(e)}")
         raise RuntimeError(
             f"Failed to fetch data from {source_sobject}: {str(e)}"
         ) from e

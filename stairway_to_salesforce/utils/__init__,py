@@ -10,10 +10,16 @@ from .salesforce_validators import (
     validate_soql_filter,
     format_soql_value,
 )
+from .logger_config import (
+    get_salesforce_logger,
+    get_rejected_records_path,
+)
 
 __all__ = [
     "sanitize_sobject_name",
     "sanitize_field_name",
     "validate_soql_filter",
     "format_soql_value",
+    "get_salesforce_logger",
+    "get_rejected_records_path",
 ]

@@ -36,6 +36,12 @@ def mock_accounts() -> Iterator[Dict[str, Any]]:
             "RecordLastModifiedDate__c": "2025-11-15T00:00:00Z",
             "RecordId__c": "0011p000021zxm4AAA"
         },
+        {
+            "Name": "This record will be rejected",
+            "OwnerId": "00524000001QUIY",
+            "RecordLastModifiedDate__c": "2025-11-15T00:00:00Z",
+            "RecordId__c": "0011p000021zxm4AAA"
+        },        
     ]
     
     yield from accounts

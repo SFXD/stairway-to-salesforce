@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Pipeline to load Salesforce data."""
 import dlt
-from stairway_to_salesforce.sources.salesforce_bulk2 import salesforce_bulk2_source
+from dlt_salesforce_advanced.sources.salesforce_bulk2 import salesforce_bulk2_source
 
 
 def execute(environment: str = "dev") -> None:
@@ -24,13 +24,10 @@ def execute(environment: str = "dev") -> None:
                 "Id": "account_id",
                 "Name": "account_name",
                 "LastModifiedDate": "sf_modification_date",
-                "truncated_description__c": "Description",
+                "Description": "Description",
                 "CreatedDate": "CreatedDate",
-                "Active__c": "Active__c",
-                "Number_of_Contacts__c": "Number_of_Contacts__c",
                 "CurrencyIsoCode": "CurrencyIsoCode",
                 "Website": "Website",
-                "Match_Billing_Address__c": "Match_Billing_Address__c",
                 "Owner.Name": "sf_owner"
             },
             # Source replication key must exist in fields as key

@@ -9,7 +9,7 @@ from dlt.common.typing import TDataItems
 from dlt.common.schema import TTableSchema
 from dlt.common.destination import DestinationCapabilitiesContext
 
-from stairway_to_salesforce.drivers.salesforce_driver import (
+from dlt_salesforce_advanced.drivers.salesforce_driver import (
     SalesforceDriverAuth,
     resolve_salesforce_credentials,
 )

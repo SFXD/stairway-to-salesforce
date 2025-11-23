@@ -1,4 +1,8 @@
 
+Description
+
+Installation
+
 
 ## Install
 # run scripts/download_tzdata.py   to download tzdata in the folder "Downloads" of your user.  (Requirement for pyArrow conversion)
@@ -15,3 +19,8 @@ python -m pip install --upgrade pip
 
 # Install requirement
 pip install -r requirements.txt
+
+# Install dev requirements (for dev only)
+pip install -r requirements-dev.txt
+
+Usage

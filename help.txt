@@ -1,10 +1,25 @@
-> cmd as administrator
+#  cmd as administrator
 net start postgresql-x64-18
 
-> VSCode 
+#  VSCode 
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 & .venv\scripts\activate 
+
+# Install package in dev 
+python -m pip install -e ".[dev]"
+# Test install
+python -c "import dlt_salesforce_advanced; print(dlt_salesforce_advanced.__file__)"
  
-> Test    
-& .venv\Scripts\python.exe pipeline_source_salesforce_bulk2.py
-& .venv\Scripts\python.exe pipeline_destination_salesforce_bulk2.py
+# Launch test pipelines
+& .venv\Scripts\python.exe pipelines\sample_replace_mock_to_sf.py
+& .venv\Scripts\python.exe pipelines\sample_sync_sf_account_to_postgres.py
+
+# Run with coverage
+pytest --cov=dlt_salesforce_advanced --cov-report=html
+pytest tests/unit/ --cov=dlt_salesforce_advanced --cov-report=term
+
+# View coverage
+start htmlcov/index.html
+
+
+

@@ -14,14 +14,14 @@ import io
 import pandas as pd
 
 # Import shared validators
-from stairway_to_salesforce.utils.salesforce_validators import (
+from dlt_salesforce_advanced.utils.salesforce_validators import (
     sanitize_sobject_name,
     sanitize_field_name,
     validate_soql_filter,
     format_soql_value,
 )
 # Import logging utilities
-from stairway_to_salesforce.utils.logger_config import get_salesforce_logger
+from dlt_salesforce_advanced.utils.logger_config import get_salesforce_logger
 
 # Initialize logger
 logger = get_salesforce_logger('salesforce_bulk2.source', log_dir='.dlt/logs')

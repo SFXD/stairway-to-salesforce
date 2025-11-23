@@ -13,17 +13,17 @@ from typing import Optional, List, Union
 import pandas as pd
 from simple_salesforce import Salesforce
 
-from stairway_to_salesforce.drivers.salesforce_driver import (
+from dlt_salesforce_advanced.drivers.salesforce_driver import (
     make_salesforce_driver,
     SalesforceDriverAuth,
 )
 # Import shared validators
-from stairway_to_salesforce.utils.salesforce_validators import (
+from dlt_salesforce_advanced.utils.salesforce_validators import (
     sanitize_sobject_name,
     sanitize_field_name,
 )
 # Import logging utilities
-from stairway_to_salesforce.utils.logger_config import (
+from dlt_salesforce_advanced.utils.logger_config import (
     get_salesforce_logger,
     get_rejected_records_path,
 )

@@ -3,7 +3,7 @@
 """Pipeline to load Salesforce data."""
 import dlt
 from typing import Iterator, Dict, Any
-from stairway_to_salesforce.destinations.salesforce_bulk2 import salesforce_bulk2
+from dlt_salesforce_advanced.destinations.salesforce_bulk2 import salesforce_bulk2
 
 @dlt.resource(
     name="StairwayToSalesforce__c",  # Salesforce object name

@@ -1,26 +1,37 @@
 
 Description
 
-Installation
+## Installation
 
-
-## Install
 # run scripts/download_tzdata.py   to download tzdata in the folder "Downloads" of your user.  (Requirement for pyArrow conversion)
-
-## Prepare python venv
 # Create new venv
 python -m venv .venv
-
 # Activate new venv
 .venv\Scripts\Activate.ps1
-
 # Upgrade pip
 python -m pip install --upgrade pip
-
 # Install requirement
 pip install -r requirements.txt
-
 # Install dev requirements (for dev only)
 pip install -r requirements-dev.txt
+# Install package in dev 
+python -m pip install -e ".[dev]"
 
-Usage
+
+## Usage
+#  Start postgres -  (cmd as administrator)
+net start postgresql-x64-18
+#  Allow vscode command
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+& .venv\scripts\activate 
+ 
+# Launch test pipelines
+& .venv\Scripts\python.exe pipelines\sample_replace_mock_to_sf.py
+& .venv\Scripts\python.exe pipelines\sample_sync_sf_account_to_postgres.py
+
+# Run with coverage
+pytest --cov=dlt_salesforce_advanced --cov-report=html
+pytest tests/unit/ --cov=dlt_salesforce_advanced --cov-report=term
+
+# View coverage
+start htmlcov/index.html

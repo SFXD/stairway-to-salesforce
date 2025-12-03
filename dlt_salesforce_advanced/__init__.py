@@ -1,5 +1,5 @@
 """
-DLT Salesforce Advanced - Custom sources and destinations for Salesforce Bulk API v2.
+DLT Salesforce Advanced - Custom sources, destinations and components for Salesforce.
 
 This package provides production-ready DLT connectors for Salesforce with advanced
 features including SOQL injection prevention, comprehensive logging, and error handling.
@@ -20,5 +20,5 @@ __all__ = [
     "make_salesforce_driver",
     "resolve_salesforce_credentials",
     "SecurityTokenAuth",
-    "ConsumerKeySecretDomainAuth",
+    "ConsumerKeySecretDomainAuth",   
 ]

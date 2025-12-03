@@ -14,6 +14,9 @@ from .logger_config import (
     get_salesforce_logger,
     get_rejected_records_path,
 )
+from .salesforce_api_helper import (
+    process_csv_result
+)
 
 __all__ = [
     "sanitize_sobject_name",
@@ -22,4 +25,5 @@ __all__ = [
     "format_soql_value",
     "get_salesforce_logger",
     "get_rejected_records_path",
+    "process_csv_result"
 ]

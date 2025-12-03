@@ -13,7 +13,6 @@ from typing import Optional
 # DLT provides its own logger
 from dlt.common.logger import get_dlt_logger
 
-
 def get_salesforce_logger(
     name: str,
     log_dir: Optional[str] = None,

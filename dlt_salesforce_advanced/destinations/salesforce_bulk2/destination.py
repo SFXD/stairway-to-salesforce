@@ -7,7 +7,7 @@ Supports insert (append), upsert (merge), and replace write dispositions.
 import dlt
 from dlt.common.typing import TDataItems
 from dlt.common.schema import TTableSchema
-from dlt.common.destination import DestinationCapabilitiesContext
+from simple_salesforce import Salesforce
 
 from dlt_salesforce_advanced.drivers.salesforce_driver import (
     SalesforceDriverAuth,
@@ -26,7 +26,8 @@ from .job_executor import execute_job
 def salesforce_bulk2(
     items: TDataItems,
     table: TTableSchema,
-    credentials: SalesforceDriverAuth = dlt.secrets.value
+    credentials: SalesforceDriverAuth = dlt.secrets.value,
+    sf_driver: Salesforce = None
 ) -> None:
     """
     DLT destination for Salesforce Bulk API v2.
@@ -40,6 +41,7 @@ def salesforce_bulk2(
         items: Data items to load (file path, RecordBatch, or iterable)
         table: Table schema with metadata including write_disposition
         credentials: Salesforce authentication credentials
+        sf_driver: simple-salesforce driver
     
     Raises:
         ValueError: If required metadata is missing or invalid
@@ -80,9 +82,17 @@ def salesforce_bulk2(
         raise ValueError(
             f"Primary key must be specified for merge operations on '{target_name}'"
         )
-    
-    # Resolve credentials (handles dict/string conversion)
-    resolved_credentials = resolve_salesforce_credentials(credentials)
+
+    if sf_driver is None:
+        # Initialize Salesforce driver
+        resolved_credentials = resolve_salesforce_credentials(credentials)
+        try:
+            driver = make_salesforce_driver(resolved_credentials)
+        except Exception as e:
+            logger.error(f"Failed to initialize Salesforce driver: {str(e)}")
+            raise RuntimeError(
+                f"Failed to initialize Salesforce driver: {str(e)}"
+            ) from e    
     
     # Prepare data file
     file_path = None

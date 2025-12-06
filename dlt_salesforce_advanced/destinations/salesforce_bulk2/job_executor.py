@@ -33,7 +33,7 @@ logger = get_salesforce_logger('salesforce_bulk2.destination', log_dir='.dlt/log
 
 
 def execute_job(
-    credentials: SalesforceDriverAuth,
+    sf_driver: Salesforce,
     target_name: str,
     write_disposition: str,
     primary_key: Optional[Union[str, List[str]]],
@@ -47,21 +47,10 @@ def execute_job(
     # Validate and sanitize object name
     target_name = sanitize_sobject_name(target_name)
     logger.debug(f"Validated object name: {target_name}")
-    
-    # Initialize Salesforce driver
-    try:
-        logger.debug("Initializing Salesforce driver")
-        driver = make_salesforce_driver(credentials)
-        logger.info("Salesforce driver initialized successfully")
-    except Exception as e:
-        logger.error(f"Failed to initialize Salesforce driver: {str(e)}")
-        raise RuntimeError(
-            f"Failed to initialize Salesforce driver: {str(e)}"
-        ) from e
-    
+        
     # Get Bulk2 client for the object
     try:
-        client = getattr(driver.bulk2, target_name)
+        client = getattr(sf_driver.bulk2, target_name)
         logger.debug(f"Bulk2 client obtained for {target_name}")
     except AttributeError:
         logger.error(f"Invalid Salesforce object name: {target_name}")
@@ -79,7 +68,7 @@ def execute_job(
             _execute_upsert(client, target_name, primary_key, file_path)
         
         elif write_disposition == "replace":
-            _execute_replace(driver, client, target_name, file_path)
+            _execute_replace(client, target_name, file_path)
         
         else:
             logger.error(f"Unsupported write_disposition: {write_disposition}")
@@ -185,14 +174,14 @@ def _execute_delete(client, target_name: str, record_ids: List[str]) -> None:
                 pass
 
 
-def _execute_replace(driver: Salesforce, client, target_name: str, file_path: str) -> None:
+def _execute_replace(client, target_name: str, file_path: str) -> None:
     """Execute replace operation: delete all existing records, then insert new ones."""
     logger.warning(f"⚠️  REPLACE operation on {target_name}: This will DELETE all existing records!")
     
     # Step 1: Query all existing record IDs
     logger.info(f"Step 1: Querying existing records from {target_name}")
     try:
-        existing_ids = _query_all_record_ids(driver, target_name)
+        existing_ids = _query_all_record_ids(client, target_name)
     except Exception as e:
         logger.error(f"Replace operation failed during query phase: {str(e)}")
         raise RuntimeError(
@@ -229,15 +218,14 @@ def _execute_replace(driver: Salesforce, client, target_name: str, file_path: st
     logger.info(f"✓ Replace operation on {target_name} completed successfully")
 
 
-def _query_all_record_ids(driver: Salesforce, target_name: str) -> List[str]:
+def _query_all_record_ids(client, target_name: str) -> List[str]:
     """Query all record IDs for a Salesforce object using Bulk API v2."""
     logger.debug(f"Querying all record IDs from {target_name}")
     
     try:
         # Build SOQL query to get all IDs
         soql_query = f"SELECT Id FROM {target_name}"
-        
-        client = getattr(driver.bulk2, target_name)
+
         record_ids = []
         
         # Query returns chunks

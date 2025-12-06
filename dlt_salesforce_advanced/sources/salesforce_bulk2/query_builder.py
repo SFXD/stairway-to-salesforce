@@ -9,7 +9,7 @@ from typing import Optional, Iterable, Any
 from simple_salesforce.exceptions import SalesforceMalformedRequest
 from simple_salesforce import Salesforce
 from dlt.common.typing import TDataItem
-
+import logging
 import io
 import pandas as pd
 
@@ -20,11 +20,10 @@ from dlt_salesforce_advanced.utils.salesforce_validators import (
     validate_soql_filter,
     format_soql_value,
 )
-# Import logging utilities
-from dlt_salesforce_advanced.utils.logger_config import get_salesforce_logger
+
 
 # Initialize logger
-logger = get_salesforce_logger('salesforce_bulk2.source', log_dir='.dlt/logs')
+logger = logging.getLogger("dlt")
 
 
 def _build_soql_query(

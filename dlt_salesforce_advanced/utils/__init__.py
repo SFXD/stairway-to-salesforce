@@ -11,7 +11,6 @@ from .salesforce_validators import (
     format_soql_value,
 )
 from .logger_config import (
-    get_salesforce_logger,
     get_rejected_records_path,
 )
 from .salesforce_api_helper import (
@@ -23,7 +22,6 @@ __all__ = [
     "sanitize_field_name",
     "validate_soql_filter",
     "format_soql_value",
-    "get_salesforce_logger",
     "get_rejected_records_path",
     "process_csv_result"
 ]

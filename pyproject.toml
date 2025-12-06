@@ -25,6 +25,7 @@ dependencies = [
     "pandas>=2.0.0",
     "pyarrow>=12.0.0",
     "pyyaml>=6.0",
+    "cachetools>=6.2.2",
 ]
 
 [project.optional-dependencies]

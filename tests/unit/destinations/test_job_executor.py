@@ -23,16 +23,16 @@ from dlt_salesforce_advanced.destinations.salesforce_bulk2.job_executor import (
 class TestExecuteJob:
     """Tests for execute_job()"""
     
-    @patch('dlt_salesforce_advanced.destinations.salesforce_bulk2.job_executor.make_salesforce_driver')
+    @patch('dlt_salesforce_advanced.destinations.salesforce_bulk2.job_executor.get_salesforce_driver')
     def test_execute_append_operation(
         self,
-        mock_make_driver,
+        mock_get_driver,
         mock_salesforce_with_bulk2,
         mock_security_token_credentials,
         temp_csv_file
     ):
         """Test execute_job with append disposition."""
-        mock_make_driver.return_value = mock_salesforce_with_bulk2
+        mock_get_driver.return_value = mock_salesforce_with_bulk2
         
         execute_job(
             credentials=mock_security_token_credentials,
@@ -43,18 +43,18 @@ class TestExecuteJob:
         )
         
         # Verify driver was created
-        mock_make_driver.assert_called_once()
+        mock_get_driver.assert_called_once()
     
-    @patch('dlt_salesforce_advanced.destinations.salesforce_bulk2.job_executor.make_salesforce_driver')
+    @patch('dlt_salesforce_advanced.destinations.salesforce_bulk2.job_executor.get_salesforce_driver')
     def test_execute_merge_operation(
         self,
-        mock_make_driver,
+        mock_get_driver,
         mock_salesforce_with_bulk2,
         mock_security_token_credentials,
         temp_csv_file
     ):
         """Test execute_job with merge disposition."""
-        mock_make_driver.return_value = mock_salesforce_with_bulk2
+        mock_get_driver.return_value = mock_salesforce_with_bulk2
         
         execute_job(
             credentials=mock_security_token_credentials,
@@ -64,7 +64,7 @@ class TestExecuteJob:
             file_path=temp_csv_file
         )
         
-        mock_make_driver.assert_called_once()
+        mock_get_driver.assert_called_once()
     
     def test_invalid_disposition(
             self,
@@ -73,7 +73,7 @@ class TestExecuteJob:
         ):
             """Test that invalid disposition raises error."""
             # FIX: Expect the full RuntimeError with the complete error chain
-            with patch('dlt_salesforce_advanced.destinations.salesforce_bulk2.job_executor.make_salesforce_driver'):
+            with patch('dlt_salesforce_advanced.destinations.salesforce_bulk2.job_executor.get_salesforce_driver'):
                 with pytest.raises(RuntimeError) as exc_info:
                     execute_job(
                         credentials=mock_security_token_credentials,
@@ -94,7 +94,7 @@ class TestExecuteJob:
     ):
         """Test that invalid object name raises error."""
         with pytest.raises(ValueError, match="Invalid Salesforce object name"):
-            with patch('dlt_salesforce_advanced.destinations.salesforce_bulk2.job_executor.make_salesforce_driver'):
+            with patch('dlt_salesforce_advanced.destinations.salesforce_bulk2.job_executor.get_salesforce_driver'):
                 execute_job(
                     credentials=mock_security_token_credentials,
                     target_name="'; DROP TABLE--",

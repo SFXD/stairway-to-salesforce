@@ -28,6 +28,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 # Launch test pipelines
 & .venv\Scripts\python.exe pipelines\sample_replace_mock_to_sf.py
 & .venv\Scripts\python.exe pipelines\sample_sync_sf_account_to_postgres.py
+& .venv\Scripts\python.exe pipelines\sample_load_csv_contact_to_sf.py data/contacts.csv
 
 # Run with coverage
 pytest --cov=dlt_salesforce_advanced --cov-report=html

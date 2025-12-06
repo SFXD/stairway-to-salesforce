@@ -8,17 +8,10 @@ features including SOQL injection prevention, comprehensive logging, and error h
 __version__ = "0.1.0"
 __author__ = "Bertrand Leymarios"
 
-# Optional: Expose main components for easier imports
-from dlt_salesforce_advanced.drivers.salesforce_driver import (
-    make_salesforce_driver,
-    resolve_salesforce_credentials,
-    SecurityTokenAuth,
-    ConsumerKeySecretDomainAuth,
-)
+# dlt_salesforce_advanced/__init__.py
+from . import sources
+from . import destinations
+from . import components
+from . import drivers
 
-__all__ = [
-    "make_salesforce_driver",
-    "resolve_salesforce_credentials",
-    "SecurityTokenAuth",
-    "ConsumerKeySecretDomainAuth",   
-]
+__all__ = ['sources', 'destinations', 'components', 'drivers']

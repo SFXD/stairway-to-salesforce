@@ -4,7 +4,7 @@ Salesforce Bulk API v2 job execution and error handling.
 Handles insert, upsert, delete, and replace operations with proper validation
 and error reporting.
 """
-
+import logging
 import tempfile
 import os
 import csv
@@ -13,23 +13,16 @@ from typing import Optional, List, Union
 import pandas as pd
 from simple_salesforce import Salesforce
 
-from dlt_salesforce_advanced.drivers.salesforce_driver import (
-    make_salesforce_driver,
-    SalesforceDriverAuth,
-)
 # Import shared validators
 from dlt_salesforce_advanced.utils.salesforce_validators import (
     sanitize_sobject_name,
     sanitize_field_name,
 )
 # Import logging utilities
-from dlt_salesforce_advanced.utils.logger_config import (
-    get_salesforce_logger,
-    get_rejected_records_path,
-)
+from dlt_salesforce_advanced.utils.logger_config import get_rejected_records_path
 
 # Initialize logger
-logger = get_salesforce_logger('salesforce_bulk2.destination', log_dir='.dlt/logs')
+logger = logging.getLogger("dlt")
 
 
 def execute_job(

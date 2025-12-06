@@ -7,11 +7,10 @@ Supports insert (append), upsert (merge), and replace write dispositions.
 import dlt
 from dlt.common.typing import TDataItems
 from dlt.common.schema import TTableSchema
-from simple_salesforce import Salesforce
 
-from dlt_salesforce_advanced.drivers.salesforce_driver import (
+from dlt_salesforce_advanced.drivers.salesforce_driver.sfdriver import (
     SalesforceDriverAuth,
-    resolve_salesforce_credentials,
+    get_salesforce_driver
 )
 from .data_processor import prepare_data, cleanup_temp_file
 from .job_executor import execute_job
@@ -26,8 +25,7 @@ from .job_executor import execute_job
 def salesforce_bulk2(
     items: TDataItems,
     table: TTableSchema,
-    credentials: SalesforceDriverAuth = dlt.secrets.value,
-    sf_driver: Salesforce = None
+    credentials: str =""
 ) -> None:
     """
     DLT destination for Salesforce Bulk API v2.
@@ -40,21 +38,11 @@ def salesforce_bulk2(
     Args:
         items: Data items to load (file path, RecordBatch, or iterable)
         table: Table schema with metadata including write_disposition
-        credentials: Salesforce authentication credentials
-        sf_driver: simple-salesforce driver
+        credentials: dlt secret path to credential
     
     Raises:
         ValueError: If required metadata is missing or invalid
         RuntimeError: If Salesforce API operations fail
-    
-    Example:
-        >>> @dlt.resource(
-        ...     name="Account",
-        ...     write_disposition="merge",
-        ...     primary_key="Id"
-        ... )
-        >>> def accounts():
-        ...     yield [{"Id": "001...", "Name": "Acme Corp"}]
     """
     # Validate required table metadata
     write_disposition = table.get("write_disposition")
@@ -83,16 +71,13 @@ def salesforce_bulk2(
             f"Primary key must be specified for merge operations on '{target_name}'"
         )
 
-    if sf_driver is None:
-        # Initialize Salesforce driver
-        resolved_credentials = resolve_salesforce_credentials(credentials)
-        try:
-            driver = make_salesforce_driver(resolved_credentials)
-        except Exception as e:
-            logger.error(f"Failed to initialize Salesforce driver: {str(e)}")
-            raise RuntimeError(
-                f"Failed to initialize Salesforce driver: {str(e)}"
-            ) from e    
+    #check the credentials and create the sf driver if necessary (will be cached for further use)
+    try:
+        driver = get_salesforce_driver(credentials)
+    except Exception as e:
+        raise RuntimeError(
+            f"Failed to initialize Salesforce driver: {str(e)}"
+        ) from e    
     
     # Prepare data file
     file_path = None
@@ -102,7 +87,7 @@ def salesforce_bulk2(
         
         # Execute Bulk API job with appropriate disposition
         execute_job(
-            credentials=resolved_credentials,
+            sf_driver=driver,
             target_name=target_name,
             write_disposition=write_disposition,
             primary_key=primary_key,

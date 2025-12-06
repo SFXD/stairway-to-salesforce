@@ -5,7 +5,7 @@ Unit tests for Salesforce driver and credential resolution.
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
-from dlt_salesforce_advanced.drivers.salesforce_driver import (
+from dlt_salesforce_advanced.drivers.salesforce_driver.sfdriver import (
     resolve_salesforce_credentials,
     make_salesforce_driver,
     SecurityTokenAuth,

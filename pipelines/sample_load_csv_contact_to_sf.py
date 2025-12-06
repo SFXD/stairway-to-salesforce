@@ -9,98 +9,118 @@ Clean, modular pipeline using:
 """
 import argparse
 import sys
+import logging
 from typing import Iterator, Dict, Any
 
 import dlt
 from dlt.sources.filesystem import filesystem, read_csv
 
-from dlt_salesforce_advanced.destinations.salesforce_bulk2 import salesforce_bulk2
-from dlt_salesforce_advanced.components.salesforce_key_resolver import get_salesforce_key_resolver
+from dlt_salesforce_advanced.drivers.salesforce_driver.sfdriver import get_salesforce_driver
+from dlt_salesforce_advanced.destinations import salesforce_bulk2
+from dlt_salesforce_advanced.components import SalesforceKeyResolver
 # Import logging utilities
-from dlt_salesforce_advanced.utils.logger_config import get_salesforce_logger
 
-# Initialize logger
-logger = get_salesforce_logger('sample_load_csv_contact_to_sf', log_dir='.dlt/logs')
+PIPELINE_BASE_NAME = "sample_load_csv_contacts_to_salesforce"
 
-@dlt.transformer(
-    name="sf_contacts",
-    write_disposition="append",
-    table_name="Contact",
-)
-def transform_sf_contacts(
-    records: Iterator[Dict[str, Any]],
-    credentials=dlt.secrets.value
-) -> Iterator[Dict[str, Any]]:
-    """
-    Transform contacts to send them to Salesforce with
-        - column mapping
-        - external key resolution ( example for AccountId lookup)    
-    Args:
-        contacts: Iterator of contact dictionaries
-        credentials: Salesforce credentials (default: dlt.secrets.value)
+class PipelineDefinition:
+    def __init__(
+        self,
+        args
+    ):
+        ### init global
+        self.env =args.env
+        self.pipeline_name = f"{PIPELINE_BASE_NAME}_{self.env}"
+        self.logger = logging.getLogger("dlt")
+
+        ### Source init
+        self.csv_file_path = args.csv_file
+
+        ### Target init      
+        self.sf_credential_path= f"salesforce.{self.env}"
+    
+    def _create_transformer(self):
+        @dlt.transformer(
+            name="sf_contacts",
+            write_disposition="append",
+            table_name="Contact",
+        )
+        def transform(
+            records: Iterator[Dict[str, Any]],
+            credentials: str
+        ) -> Iterator[Dict[str, Any]]:
+            """
+            Transform contacts to send them to Salesforce with
+                - column mapping
+                - external key resolution ( example for AccountId lookup)    
+            Args:
+                contacts: Iterator of contact dictionaries
+                credentials: Salesforce credentials 
+                
+            Yields:
+                contacts ready to be imported into Salesforce
+            """
+            ### Step 1: Safety step to have a list
+            records_list = list(records)  
+
+            ### Step 2: Check CSV Columns (on the first record)
+            required_columns = ["Customer_Id", "First_Name", "Last_Name", "Email"]
+            missing = [col for col in required_columns if col not in records_list[0]]
+            if missing:
+                raise ValueError(f"Missing required columns in record: {missing}")
+
+            ### Step 3: Preparing the resolution of CustomerId as AccountId (with the external id field Customer_ID__c )
+            resolver = SalesforceKeyResolver(credentials=credentials)
+            account_sobject = "Account"
+            account_key_field = "Customer_ID__c"
+            # Extract all account key values from this dataset ( and deduplicate )
+            account_key_values = {str(record["Customer_Id"]) for record in records_list if "Customer_Id" in record and record["Customer_Id"]}
+            resolver.set_definition(sobject=account_sobject, key_field=account_key_field, key_values=account_key_values)
+
+            ### Step 4: Build sf_contact records
+            for record in records_list:
+                # Map fields
+                yield { 
+                    "FirstName": record["First_Name"],
+                    "LastName": record["Last_Name"],
+                    "Email": record["Email"],
+                    "AccountId" : resolver.try_resolve(account_sobject, account_key_field, record["Customer_Id"])
+                }
+
+        # End of create_transformer
+        # return the newly created @dlt.transform    
+        return transform
+
+    def execute(
+        self,
+    ) -> None:        
+
+        ### Step 1: Source
+        source = filesystem(
+            bucket_url=self.csv_file_path.rsplit('/', 1)[0],  # folder path
+            file_glob=self.csv_file_path.rsplit('/', 1)[1]   # filename
+        ) | read_csv()
+
+        ### Step 2:  Transform
+        transformer = self._create_transformer().bind(credentials=self.sf_credential_path)
+
+        ### Step 3  Destination
+        destination = salesforce_bulk2(credentials=f"{self.sf_credential_path}")
+
+        ### Step 4:  Build the pipeline
+        pipeline = dlt.pipeline(
+            pipeline_name=f"{self.pipeline_name}",
+            destination=destination,
+            dataset_name="contacts"
+        )
         
-    Yields:
-        contacts ready to be imported into Salesforce
-    """
-    # Step 1: Safety step to have a list
-    records_list = list(records)  
+        ### Step 5 : run pipeline
+        load_info = pipeline.run(source | transformer)
 
-    # Step 2: Check CSV Columns (on the first record)
-    required_columns = ["Customer_Id", "First_Name", "Last_Name", "Email"]
-    missing = [col for col in required_columns if col not in records_list[0]]
-    if missing:
-        raise ValueError(f"Missing required columns in record: {missing}")
-
-    # Step 3: Preparing the resolution of CustomerId as AccountId (with the external id field Customer_ID__c )
-    resolver = get_salesforce_key_resolver(credentials=credentials, logger=logger)
-    account_sobject = "Account"
-    account_key_field = "Customer_ID__c"
-    # Extract all account key values from this dataset ( and deduplicate )
-    account_key_values = {str(record["Customer_Id"]) for record in records_list if "Customer_Id" in record and record["Customer_Id"]}
-    resolver.set_definition(sobject=account_sobject, key_field=account_key_field, key_values=account_key_values)
-    # Step 4: Build sf_contact records
-    for record in records_list:
-        # Map fields
-        yield { 
-            "FirstName": record["First_Name"],
-            "LastName": record["Last_Name"],
-            "Email": record["Email"],
-            "AccountId" : resolver.try_resolve(account_sobject, account_key_field, record["Customer_Id"])
-        }
-
-def execute(
-    args
-) -> None:
-    # get arguments
-    env= args.env
-    csv_file_path = args.csv_file
-
-    target_system_key = "salesforce"
-    
-    # Load Salesforce credentials
-    target_credential = dlt.secrets[f"{target_system_key}.{env}"]
-      
-    # Build data pipeline: CSV → Enrichment → Destination
-    #source = filesystem(file_glob=csv_file_path) | read_csv()    
-    source = filesystem(
-        bucket_url=csv_file_path.rsplit('/', 1)[0],  # folder path
-        file_glob=csv_file_path.rsplit('/', 1)[1]   # filename
-    ) | read_csv()
-
-    transformer = transform_sf_contacts(credentials=target_credential)
-
-    # Create DLT pipeline
-    pipeline = dlt.pipeline(
-        pipeline_name=f"load_csv_contacts_{env}",
-        destination=salesforce_bulk2(credentials=target_credential),
-        dataset_name="contacts"
-    )
-    
-    load_info = pipeline.run(source | transformer)
-    print(f"  {load_info}")
+        ### Step 6 : post process
+        print(f"  {load_info}")
 
 
-def main():
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Stairway to Salesforce - specific pipeline",
         formatter_class=argparse.RawDescriptionHelpFormatter
@@ -117,13 +137,9 @@ def main():
     args = parser.parse_args()
     
     try:
-        execute(args)
+        PipelineDefinition(args).execute()
     except Exception as e:
         print(f"\n❌ Pipeline failed: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)
-
-
-if __name__ == "__main__":
-    main()

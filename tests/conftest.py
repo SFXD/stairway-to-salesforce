@@ -12,7 +12,7 @@ import os
 from datetime import datetime
 
 from simple_salesforce import Salesforce
-from dlt_salesforce_advanced.drivers.salesforce_driver import (
+from dlt_salesforce_advanced.drivers.salesforce_driver.sfdriver import (
     SecurityTokenAuth,
     ConsumerKeySecretDomainAuth,
 )

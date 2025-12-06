@@ -1,17 +1,16 @@
 """Main Salesforce Bulk API v2 source implementation."""
 
-from typing import Any, Optional, Union
+from typing import Any, Optional
 import dlt
 from dlt.sources.helpers.requests import Session
 
 from .resource_builder import build_resource, validate_resource_configs
 from .query_builder import fetch_data
-from ...drivers.salesforce_driver import SalesforceDriverAuth
 
 
 def salesforce_bulk2_source(
     resource_configs: list[dict[str, Any]],
-    credentials: Union[SalesforceDriverAuth, dict, str] = dlt.secrets.value,
+    credentials: str = "",
     session: Optional[Session] = None,
 ):
     """

@@ -1,14 +1,10 @@
 """DLT resource building and configuration validation for Salesforce sources."""
 
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional
 import dlt
 from dlt.sources.helpers.requests import Session
 
-from ...drivers.salesforce_driver import (
-    SalesforceDriverAuth,
-    resolve_salesforce_credentials,
-    make_salesforce_driver,
-)
+from ...drivers.salesforce_driver.sfdriver import get_salesforce_driver
 
 
 def validate_resource_configs(configs: list[dict[str, Any]]) -> None:
@@ -60,7 +56,7 @@ def validate_resource_configs(configs: list[dict[str, Any]]) -> None:
 def build_resource(
     config: dict[str, Any],
     fetch_data_fn: Callable,
-    credentials: Union[SalesforceDriverAuth, dict, str],
+    credentials: str, 
     session: Optional[Session]
 ):
     """
@@ -87,9 +83,6 @@ def build_resource(
         ... }
         >>> resource = build_resource(config, fetch_data, credentials, None)
     """
-    # Resolve credentials once at resource build time
-    resolved_credentials = resolve_salesforce_credentials(credentials)
-    
     # Extract config values
     target_name = config["target_name"]
     target_primary_key = config["target_primary_key"]
@@ -124,7 +117,7 @@ def build_resource(
         """
         # Create driver using resolved credentials
         try:
-            driver = make_salesforce_driver(resolved_credentials, session)
+            driver = get_salesforce_driver(credentials, session)
         except Exception as e:
             raise RuntimeError(
                 f"Failed to create Salesforce driver for {source_sobject}: {str(e)}"

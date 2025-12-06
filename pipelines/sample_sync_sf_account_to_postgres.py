@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 """Pipeline to load Salesforce data."""
 import dlt
-from dlt_salesforce_advanced.sources.salesforce_bulk2 import salesforce_bulk2_source
+from dlt_salesforce_advanced.sources import salesforce_bulk2_source
 
 
 def execute(environment: str = "dev") -> None:
     """Pipeline Example From Salesforce To PostgreSQL"""
     
     pipeline_name = "pipeline_source_salesforce_bulk2"
-    source_system_key = "salesforce"
-    target_system_key = "postgres"
     target_schema = "public"
     
     # Define resource configurations
@@ -42,8 +40,9 @@ def execute(environment: str = "dev") -> None:
     ]
     
     # Load credentials based on environment
-    source_credentials = dlt.secrets[f"{source_system_key}.{environment}"]
-    target_credentials = dlt.secrets[f"{target_system_key}.{environment}"]
+    source_credentials_path = f"salesforce.{environment}"
+    target_credentials_path = f"postgres.{environment}"    
+    target_credentials = dlt.secrets[target_credentials_path]
 
     # Create and run pipeline
     pipeline = dlt.pipeline(
@@ -55,7 +54,7 @@ def execute(environment: str = "dev") -> None:
     )
     
     # Run the source with configurations
-    load_info = pipeline.run(salesforce_bulk2_source(resource_configs, credentials=source_credentials))
+    load_info = pipeline.run(salesforce_bulk2_source(resource_configs, credentials=source_credentials_path))
     print(load_info)
 
 

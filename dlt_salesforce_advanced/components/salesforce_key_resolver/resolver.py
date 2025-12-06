@@ -2,16 +2,11 @@
 Main Salesforce lookup resolver class.
 """
 import logging
-from typing import Union, Optional, Set, List
-import dlt
+from typing import Optional, Set, List
 
-from dlt_salesforce_advanced.drivers.salesforce_driver import (
-    make_salesforce_driver,
-    resolve_salesforce_credentials,
-    SalesforceDriverAuth
-)
-from .cache_manager import CacheManager
-from .salesforce_repository import SalesforceRepository
+from dlt_salesforce_advanced.drivers.salesforce_driver.sfdriver import get_salesforce_driver
+from .resolver_cache_manager import CacheManager
+from .resolver_data_repository import SalesforceRepository
 
 class SalesforceKeyResolver:
     """
@@ -26,9 +21,8 @@ class SalesforceKeyResolver:
     """
     
     def __init__(
-        self,
-        logger: logging.Logger,
-        credentials: Union[SalesforceDriverAuth, dict, str] = dlt.secrets.value,
+        self,        
+        credentials: str ="",
     ):
         """
         Initialize the lookup resolver.
@@ -36,17 +30,13 @@ class SalesforceKeyResolver:
         Args:
             credentials: Salesforce credentials (SalesforceDriverAuth, dict, or secrets path)
         """
-        self.logger= logger
+        self.logger=  logging.getLogger("dlt")
+
         self.cache_manager = CacheManager()
-        self.sf_repository = SalesforceRepository()        
-        self.credentials = resolve_salesforce_credentials(credentials)    
-        # Create driver using resolved credentials  
-        try:
-            self.sf_driver = make_salesforce_driver(self.credentials)
-        except Exception as e:
-            raise RuntimeError(
-                f"Failed to create Salesforce driver for Salesforce Key Resolver: {str(e)}"
-            ) from e
+        self.sf_repository = SalesforceRepository()      
+
+        # init the driver if not pass through
+        self.sf_driver = get_salesforce_driver(credentials)
 
     def _load_data(
         self,

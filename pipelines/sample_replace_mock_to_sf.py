@@ -3,7 +3,7 @@
 """Pipeline to load Salesforce data."""
 import dlt
 from typing import Iterator, Dict, Any
-from dlt_salesforce_advanced.destinations.salesforce_bulk2 import salesforce_bulk2
+from dlt_salesforce_advanced.destinations import salesforce_bulk2
 
 @dlt.resource(
     name="StairwayToSalesforce__c",  # Salesforce object name
@@ -48,15 +48,11 @@ def mock_accounts() -> Iterator[Dict[str, Any]]:
 
 def execute(environment: str = "dev") -> None:  
 
-    #source_system_key = "mock"
-    target_system_key = "salesforce"
-
     # Load credentials based on environment
-    #source_credentials = dlt.secrets[f"{source_system_key}.{environment}"]
-    target_credentials = dlt.secrets[f"{target_system_key}.{environment}"]
+    target_credentials_path = f"salesforce.{environment}"
 
     """run the pipeline"""        
-    pipeline = dlt.pipeline(    pipeline_name= "pipeline_destination_salesforce_bulk2" , destination=salesforce_bulk2(credentials=target_credentials), 
+    pipeline = dlt.pipeline(    pipeline_name= "pipeline_destination_salesforce_bulk2" , destination=salesforce_bulk2(credentials=target_credentials_path), 
                                 import_schema_path=".dlt/schemas/import", export_schema_path=".dlt/schemas/export")    
     
     load_info = pipeline.run([mock_accounts()])  # schema_contract="freeze"

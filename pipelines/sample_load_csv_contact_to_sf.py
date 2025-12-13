@@ -15,10 +15,8 @@ from typing import Iterator, Dict, Any
 import dlt
 from dlt.sources.filesystem import filesystem, read_csv
 
-from dlt_salesforce_advanced.drivers.salesforce_driver.sfdriver import get_salesforce_driver
 from dlt_salesforce_advanced.destinations import salesforce_bulk2
 from dlt_salesforce_advanced.components import SalesforceKeyResolver
-# Import logging utilities
 
 PIPELINE_BASE_NAME = "sample_load_csv_contacts_to_salesforce"
 
@@ -41,8 +39,10 @@ class PipelineDefinition:
     def _create_transformer(self):
         @dlt.transformer(
             name="sf_contacts",
-            write_disposition="append",
+            write_disposition="merge",
+            primary_key="email",
             table_name="Contact",
+
         )
         def transform(
             records: Iterator[Dict[str, Any]],
@@ -77,12 +77,12 @@ class PipelineDefinition:
             resolver.set_definition(sobject=account_sobject, key_field=account_key_field, key_values=account_key_values)
 
             ### Step 4: Build sf_contact records
-            for record in records_list:
+            for record in records_list:                
                 # Map fields
                 yield { 
                     "FirstName": record["First_Name"],
                     "LastName": record["Last_Name"],
-                    "Email": record["Email"],
+                    "email": record["Email"],
                     "AccountId" : resolver.try_resolve(account_sobject, account_key_field, record["Customer_Id"])
                 }
 

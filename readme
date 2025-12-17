@@ -17,6 +17,20 @@ pip install -r requirements-dev.txt
 # Install package in dev 
 python -m pip install -e ".[dev]"
 
+# Functionalities
+- Salesforce Bulk2 as source
+- Salesforce Bulk2 as destination with the following capacities
+    - insert :  write_disposition = "append"  / x-salesforce-operation = "insert"
+    - upsert :  write_disposition = "append"  / x-salesforce-operation = "upsert" / primary_key = "<required>"
+    - delete :  write_disposition = "append"  / x-salesforce-operation = "delete" / primary_key = "<required>"
+        for an optimized pipeline, the primary_key should Id, as Salesforce Bulk2 does not support deletion on external Id
+        if the primary key is not "Id", a query will be performed to convert the external id into a Salesforce Id. 
+    - replace : write_disposition = "replace"
+        the entiere sobject records will deleted ( Query + delete) and the given data will be inserted
+- SalesforceKeyResolver as component
+    - resolve an External Key as a Salesforce Id -  useful for lookup
+
+
 
 ## Usage
 #  Start postgres -  (cmd as administrator)

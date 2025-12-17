@@ -37,13 +37,7 @@ class PipelineDefinition:
         self.sf_credential_path= f"salesforce.{self.env}"
     
     def _create_transformer(self):
-        @dlt.transformer(
-            name="sf_contacts",
-            write_disposition="merge",
-            primary_key="email",
-            table_name="Contact",
-
-        )
+        @dlt.transformer(name="sf_contacts")
         def transform(
             records: Iterator[Dict[str, Any]],
             credentials: str
@@ -82,7 +76,7 @@ class PipelineDefinition:
                 yield { 
                     "FirstName": record["First_Name"],
                     "LastName": record["Last_Name"],
-                    "email": record["Email"],
+                    "Email": record["Email"],
                     "AccountId" : resolver.try_resolve(account_sobject, account_key_field, record["Customer_Id"])
                 }
 
@@ -95,26 +89,34 @@ class PipelineDefinition:
     ) -> None:        
 
         ### Step 1: Source
-        source = filesystem(
+        source_resource = filesystem(
             bucket_url=self.csv_file_path.rsplit('/', 1)[0],  # folder path
             file_glob=self.csv_file_path.rsplit('/', 1)[1]   # filename
         ) | read_csv()
 
-        ### Step 2:  Transform
-        transformer = self._create_transformer().bind(credentials=self.sf_credential_path)
+        ### Step 2:  Transform to destination format
+        transformer_resource = self._create_transformer().bind(credentials=self.sf_credential_path)
+        transformer_resource.apply_hints(
+            table_name="Contact",
+            primary_key="Email",
+            write_disposition="append",
+            additional_table_hints={
+                "x-salesforce-operation": "upsert",   # custom hint
+            },
+        )
 
         ### Step 3  Destination
-        destination = salesforce_bulk2(credentials=f"{self.sf_credential_path}")
+        destination_resource = salesforce_bulk2(credentials=f"{self.sf_credential_path}")
 
         ### Step 4:  Build the pipeline
         pipeline = dlt.pipeline(
             pipeline_name=f"{self.pipeline_name}",
-            destination=destination,
+            destination=destination_resource,
             dataset_name="contacts"
         )
         
         ### Step 5 : run pipeline
-        load_info = pipeline.run(source | transformer)
+        load_info = pipeline.run(source_resource | transformer_resource)
 
         ### Step 6 : post process
         print(f"  {load_info}")

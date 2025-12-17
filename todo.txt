@@ -1,17 +1,20 @@
-Next steps
+Salesforce Key Resolver
 - Test Key Resolver with full load +  Unit tests
-- Review logs to print all in one log file by pipeline  -  and properly handle exception (with original error line) 
 - Valider the Salesforce Lookup Resolver: 
     Unit tests 
     extensive testing (through the sample pipeline)
 
+LOG Management
+- Review logs to print all in one log file by pipeline  -  and properly handle exception (with original error line) 
+
+Salesforce Destination
+- Gerer la suppression via External Id  ( en utlisant le Key Resolver ?)
+
+Pipeline Template
 - Create arg parser for pipeline (for simple or for csv)
 - Ajouter dans pipeline_tools un log sync permettant de choisir la destination ( une destination officielle )
 - Ajouter dans pipeline_tools un file sync pour decharger ou envoyer les fichiers avec Salesforce
 - Voir si pertinent d'ajouter Fast API pour avoir un déclenchement en temps réel d'un pipeline 
-
-
-
 
 AI Process to experiment
 - Ask a first step with the structure only - Each method should have a description of the expected behavior and return

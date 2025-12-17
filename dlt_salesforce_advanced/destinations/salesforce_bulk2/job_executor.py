@@ -28,14 +28,14 @@ logger = logging.getLogger("dlt")
 def execute_job(
     sf_driver: Salesforce,
     target_name: str,
-    write_disposition: str,
+    salesforce_operation: str,
     primary_key: Optional[Union[str, List[str]]],
     file_path: str
 ) -> None:
     """
     Execute Salesforce Bulk API v2 job with proper error handling.
     """
-    logger.info(f"Starting {write_disposition} operation on {target_name}")
+    logger.info(f"Starting {salesforce_operation} operation on {target_name}")
     
     # Validate and sanitize object name
     target_name = sanitize_sobject_name(target_name)
@@ -54,28 +54,32 @@ def execute_job(
     
     # Execute operation based on write_disposition
     try:
-        if write_disposition == "append":
+        if salesforce_operation == "insert":
             _execute_insert(client, target_name, file_path)
         
-        elif write_disposition == "merge":
+        elif salesforce_operation == "upsert":
             _execute_upsert(client, target_name, primary_key, file_path)
-        
-        elif write_disposition == "replace":
+
+        elif salesforce_operation == "delete":
+            _execute_delete_from_file(client, target_name, primary_key, file_path)
+
+        elif salesforce_operation == "replace":
             _execute_replace(client, target_name, file_path)
         
         else:
-            logger.error(f"Unsupported write_disposition: {write_disposition}")
+            logger.error(f"Unsupported salesforce_operation: {salesforce_operation}")
+            # Note: This list of supported dispositions is now strictly controlled by destination.py
             raise ValueError(
-                f"Unsupported write_disposition '{write_disposition}' for table '{target_name}'. "
-                f"Supported: 'append', 'merge', 'replace'"
+                f"Unsupported salesforce_operation '{salesforce_operation}' for table '{target_name}'. "
+                f"Supported: 'insert', 'upsert', 'update', 'delete', 'replace'"
             )
         
-        logger.info(f"Completed {write_disposition} operation on {target_name}")
+        logger.info(f"Completed {salesforce_operation} operation on {target_name}")
     
     except Exception as e:
-        logger.error(f"Failed to execute {write_disposition} operation: {str(e)}")
+        logger.error(f"Failed to execute {salesforce_operation} operation: {str(e)}")
         raise RuntimeError(
-            f"Failed to execute {write_disposition} operation on {target_name}: {str(e)}"
+            f"Failed to execute {salesforce_operation} operation on {target_name}: {str(e)}"
         ) from e
 
 
@@ -106,8 +110,38 @@ def _execute_upsert(
     _process_job_results(client, results, target_name, "upsert")
 
 
+def _execute_delete_from_file(
+    client,
+    target_name: str,
+    primary_key: Optional[Union[str, List[str]]],
+    file_path: str
+) -> None:
+    """
+    Execute delete (merge/delete_rows) operation from a file.
+    The file is expected to contain the IDs or External IDs of records to delete.
+    """
+    logger.info(f"Deleting records from {target_name} via Bulk API V2 file load.")
+    
+    # Determine the external ID field if provided. Otherwise, Salesforce assumes the 'Id' column.
+    external_id_field = None
+    if primary_key:
+        # For deletion, we pass the External ID field if provided by the DLT primary_key
+        external_id_field = primary_key[0] if isinstance(primary_key, list) else primary_key
+        external_id_field = sanitize_field_name(external_id_field, allow_relationship_notation=False)
+        logger.info(f"Using external ID field '{external_id_field}' for record identification in delete.")
+    
+    # Execute delete operation
+    # The simple-salesforce delete method handles the file path
+    results = client.delete(file_path, external_id_field=external_id_field)
+    
+    # Process results and check for failures
+    _process_job_results(client, results, target_name, "delete")
+    
+    logger.info(f"Delete operation on {target_name} completed.")
+
+
 def _execute_delete(client, target_name: str, record_ids: List[str]) -> None:
-    """Execute delete operation for a list of record IDs."""
+    """Execute delete operation for a list of record IDs (used internally by replace)."""
     if not record_ids:
         logger.info(f"No records to delete from {target_name}")
         return

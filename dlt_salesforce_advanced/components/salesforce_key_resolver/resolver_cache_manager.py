@@ -176,7 +176,7 @@ class CacheManager:
         if len(result) == 0:
             return None        
         if len(result) > 1:
-            raise ValueError(f"⚠️  Multiple IDs found for {cache_key}='{external_value}'. ")
+            raise ValueError(f"Multiple IDs found for {cache_key}='{external_value}'.")
                 
         return result.iloc[0]
 

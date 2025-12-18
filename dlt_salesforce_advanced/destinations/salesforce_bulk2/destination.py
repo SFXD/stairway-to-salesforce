@@ -10,14 +10,13 @@ import logging
 
 from dlt.common.typing import TDataItems
 from dlt.common.schema import TTableSchema
-
-from dlt_salesforce_advanced.drivers.salesforce_driver.sfdriver import get_salesforce_driver
-from dlt_salesforce_advanced.components import SalesforceKeyResolver
+from dlt_salesforce_advanced.drivers import get_salesforce_driver
+from dlt_salesforce_advanced.components import get_salesforce_key_resolver
 from .destination_config import SalesforceDestinationConfig
 from .data_processor import prepare_data, cleanup_temp_file
 from .job_executor import execute_job
 
-logger = logging.getLogger("dlt")
+logger = logging.getLogger(__name__)
 
 @dlt.destination(
     name="salesforce_bulk2",
@@ -38,11 +37,8 @@ def salesforce_bulk2(
     config = SalesforceDestinationConfig.from_table_schema(table)
     
     # 2. Component Initialization
-    try:
-        driver = get_salesforce_driver(credentials)
-        key_resolver = SalesforceKeyResolver(credentials=credentials)
-    except Exception as e:
-        raise RuntimeError(f"Failed to initialize Salesforce components: {str(e)}") from e    
+    driver = get_salesforce_driver(credentials)
+    key_resolver = get_salesforce_key_resolver(credentials=credentials)
     
     # 3. Preparation and Execution
     file_path = None
@@ -59,7 +55,9 @@ def salesforce_bulk2(
             file_path=file_path,
             key_resolver=key_resolver
         )
-        
+    except Exception as e:
+        logger.error(f"Critical failure during {config.salesforce_operation} on {config.target_object_name}: {str(e)}")
+
     finally:
         # Ensure cleanup of temporary CSV files
         if file_path:

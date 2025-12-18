@@ -17,7 +17,7 @@ from .operations import (
 )
 
 # Initialize logger
-logger = logging.getLogger("dlt")
+logger = logging.getLogger(__name__)
 
 def execute_job(
     sf_driver: Salesforce,
@@ -38,7 +38,7 @@ def execute_job(
         file_path: Path to the CSV data prepared by the data_processor.
         key_resolver: Component used to resolve External IDs to Salesforce IDs.
     """
-    logger.info(f"Dispatching {salesforce_operation} operation for {target_name}")
+    logger.debug("Dispatching %s operation for %s", salesforce_operation, target_name)
 
     # Mapping of operation strings to their service functions
     dispatch_map = {
@@ -50,28 +50,19 @@ def execute_job(
 
     # Verify that the requested operation is supported
     if salesforce_operation not in dispatch_map:
-        logger.error(f"Unsupported salesforce_operation: {salesforce_operation}")
         raise ValueError(
             f"Unsupported operation '{salesforce_operation}' for table '{target_name}'. "
             f"Supported: {list(dispatch_map.keys())}"
         )
 
     # Execute the operation
-    try:
-        operation_func = dispatch_map[salesforce_operation]
-        
-        operation_func(
-            sf_driver=sf_driver,
-            target_name=target_name,
-            file_path=file_path,
-            primary_key=primary_key,
-            key_resolver=key_resolver
-        )
-        
-        logger.info(f"Successfully finished {salesforce_operation} on {target_name}")
-
-    except Exception as e:
-        logger.error(f"Critical failure during {salesforce_operation} on {target_name}: {str(e)}")
-        raise RuntimeError(
-            f"Job Executor failed to complete {salesforce_operation} on {target_name}: {str(e)}"
-        ) from e
+    operation_func = dispatch_map[salesforce_operation]
+    
+    operation_func(
+        sf_driver=sf_driver,
+        target_name=target_name,
+        file_path=file_path,
+        primary_key=primary_key,
+        key_resolver=key_resolver
+    )
+    logger.debug("Successfully finished  %s on %s", salesforce_operation, target_name)

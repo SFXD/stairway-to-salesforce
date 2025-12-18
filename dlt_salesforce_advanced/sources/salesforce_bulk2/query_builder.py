@@ -23,7 +23,7 @@ from dlt_salesforce_advanced.utils.salesforce_validators import (
 
 
 # Initialize logger
-logger = logging.getLogger("dlt")
+logger = logging.getLogger(__name__)
 
 
 def _build_soql_query(

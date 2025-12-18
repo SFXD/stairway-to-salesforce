@@ -19,7 +19,7 @@ class BasePipeline(ABC):
         self.pipeline_base_name = pipeline_base_name
         self.default_csv_path = default_csv_path
         self.default_env = default_env
-        self.logger = logging.getLogger("dlt")
+        self.logger = logging.getLogger(__name__)
         
         # 1. Setup and parse arguments
         self.args = self._setup_and_parse_args()

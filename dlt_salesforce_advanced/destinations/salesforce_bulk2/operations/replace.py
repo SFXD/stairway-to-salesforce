@@ -7,11 +7,11 @@ from .delete import exec_delete
 from .insert import exec_insert
 from .common import get_bulk_client
 
-logger = logging.getLogger("dlt")
+logger = logging.getLogger(__name__)
 
 def exec_replace(sf_driver, target_name: str, file_path: str, **kwargs) -> None:
     """Execute replace: query all IDs, delete them, then insert new file."""
-    logger.warning(f"Starting REPLACE on {target_name}. Existing data will be removed.")
+    logger.warning("Starting REPLACE on %s. Existing data will be removed.", target_name)
     
     # 1. Query Phase: Get all existing IDs to wipe the table
     existing_ids = _query_all_ids(sf_driver, target_name)

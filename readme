@@ -26,10 +26,11 @@ python -m pip install -e ".[dev]"
         for an optimized pipeline, the primary_key should Id, as Salesforce Bulk2 does not support deletion on external Id
         if the primary key is not "Id", a query will be performed to convert the external id into a Salesforce Id. 
     - replace : write_disposition = "replace"
-        the entiere sobject records will deleted ( Query + delete) and the given data will be inserted
+        the entiere sobject records will deleted ( Query + delete) and the given data will be inserted.
+        To avoid if the source system can transmit incremental update, as it's consuming additional resources (especially with a large data volume) and preventing any historic in Salesforce
 - SalesforceKeyResolver as component
     - resolve an External Key as a Salesforce Id -  useful for lookup
-
+- Base pipeline as component
 
 
 ## Usage

@@ -2,8 +2,9 @@ from dataclasses import dataclass
 from typing import Optional, List, Union
 import logging
 from dlt.common.schema import TTableSchema
+from tomlkit import key
 
-logger = logging.getLogger("dlt")
+logger = logging.getLogger(__name__)
 
 @dataclass
 class SalesforceDestinationConfig:
@@ -71,6 +72,8 @@ class SalesforceDestinationConfig:
                 f"Invalid operation '{resolved_operation}'. "
                 f"Supported operations: {valid_salesforce_operations}"
             )
+        
+        logger.debug("Destination config received: write=%s, operation=%s, sobject=%s, key=%s", disposition,resolved_operation,target_name,key)
 
         return cls(
             target_object_name=target_name,

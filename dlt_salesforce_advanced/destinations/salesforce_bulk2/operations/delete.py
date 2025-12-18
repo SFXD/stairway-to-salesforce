@@ -5,7 +5,7 @@ import os
 from typing import Union, List, Optional
 from .common import get_bulk_client, process_results
 
-logger = logging.getLogger("dlt")
+logger = logging.getLogger(__name__)
 
 def exec_delete(
     sf_driver, 
@@ -23,7 +23,7 @@ def exec_delete(
 
     # Handle External ID to SFDC ID resolution
     if file_path and key_resolver and not _is_salesforce_id(primary_key):
-        logger.info(f"Resolving External IDs to Salesforce IDs for {sanitized_name}")
+        logger.info("Resolving External IDs to Salesforce IDs for %s", sanitized_name)
         
         # 1. Identify the primary key column name
         pk_col = primary_key[0] if isinstance(primary_key, list) else primary_key
@@ -58,17 +58,17 @@ def exec_delete(
                 df_to_delete.to_csv(temp_id_file.name, index=False)
                 final_path = temp_id_file.name
                 temp_id_file.close()
-                logger.info(f"Resolved {len(df_to_delete)} records for deletion.")
+                logger.info("Resolved %i records for deletion.", len(df_to_delete) )
             else:
                 final_path = None
-                logger.warning(f"None of the provided {pk_col} values could be resolved to a Salesforce ID.")
+                logger.warning("None of the provided %s values could be resolved to a Salesforce ID.",  pk_col)
 
     if not final_path:
-        logger.warning(f"No valid records to delete for {sanitized_name}")
+        logger.warning("No valid records to delete for %s", sanitized_name)
         return
 
     try:
-        logger.info(f"Executing Bulk Delete on {sanitized_name}")
+        logger.info("Executing Bulk Delete on %s", sanitized_name)
         results = client.delete(final_path)
         process_results(client, results, sanitized_name, "delete")
     finally:
@@ -77,7 +77,7 @@ def exec_delete(
             try:
                 os.unlink(temp_id_file.name)
             except Exception as e:
-                logger.debug(f"Could not delete temp file {temp_id_file.name}: {e}")
+                logger.error(f"Could not delete temp file {temp_id_file.name}: {e}")
 
 def _is_salesforce_id(primary_key: Optional[Union[str, List[str]]]) -> bool:
     """Check if the primary key is already the Salesforce 'Id' field."""

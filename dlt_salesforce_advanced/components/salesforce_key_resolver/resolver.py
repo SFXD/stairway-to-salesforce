@@ -4,9 +4,13 @@ Main Salesforce lookup resolver class.
 import logging
 from typing import Optional, Set, List
 
+from tomlkit import key
+
 from dlt_salesforce_advanced.drivers.salesforce_driver.sfdriver import get_salesforce_driver
 from .resolver_cache_manager import CacheManager
 from .resolver_data_repository import SalesforceRepository
+
+logger = logging.getLogger(__name__)
 
 class SalesforceKeyResolver:
     """
@@ -30,13 +34,12 @@ class SalesforceKeyResolver:
         Args:
             credentials: Salesforce credentials (SalesforceDriverAuth, dict, or secrets path)
         """
-        self.logger=  logging.getLogger("dlt")
-
         self.cache_manager = CacheManager()
         self.sf_repository = SalesforceRepository()      
 
         # init the driver if not pass through
         self.sf_driver = get_salesforce_driver(credentials)
+
 
     def _load_data(
         self,
@@ -81,10 +84,7 @@ class SalesforceKeyResolver:
             
             cache_size= self.cache_manager.update_cache(sobject,key_field,df_new)     
         except Exception as e:
-            self.logger.error(
-                f"Error while loading data from Salesforce for "
-                f"{sobject}.{key_field}: {e}"
-            )
+            logger.error(f"Error while loading data (full_load = {full_load}) for {sobject}.{key_field}: {e}")
             raise                
 
         return cache_size
@@ -115,40 +115,20 @@ class SalesforceKeyResolver:
         if not self.cache_manager.has_cache(sobject, key_field):
             self.cache_manager.initialize_cache(sobject, key_field)
         
-        # Full load mode
+        key_values_to_load = None
         if full_load:
-            try:
-                self._load_data(sobject, key_field,True)
-                self.logger.info(
-                    f"✓ full_loaded mapping for "
-                    f"{sobject}.{key_field}"
-                )
-            except Exception as e:
-                self.logger.error(
-                    f"✗ Failed to full_load mapping for "
-                    f"{sobject}.{key_field}: {e}"
-                )
-                return False
-        # Targeted load mode
+            pass
         elif key_values and len(key_values):
-            try:
-                self._load_data(sobject, key_field, False, key_values=key_values)
-                self.logger.info(
-                    f"✓ full_loaded mapping for "
-                    f"{sobject}.{key_field}"
-                )
-            except Exception as e:
-                self.logger.error(
-                    f"✗ Failed to full_load mapping for "
-                    f"{sobject}.{key_field}: {e}"
-                )
-                return False
-        # No load defined
-        else:  
-            self.logger.warning(
-                f"Salesforce Key resolution defined without data loading for "
-                f"{sobject}.{key_field}: {e}"
-            )            
+            key_values_to_load = key_values
+        else:
+            logger.warning(f"No data loaded for the key resolution for {sobject}.{key_field}. full load was not activated and no key value passed.")
+            return False
+        
+        try:
+            self._load_data(sobject, key_field,full_load,key_values_to_load)
+        except Exception as e:
+            logger.error("Error while key map loading for %s.%s (full=%b): %e",sobject,key_field,full_load,e)
+            return False
 
         return True
         
@@ -169,7 +149,7 @@ class SalesforceKeyResolver:
         
         Returns:
             Salesforce ID if resolved, None otherwise
-        """
+        """        
         resolved_id = self.cache_manager.resolve_single(sobject, key_field, external_value)
         return resolved_id if resolved_id else external_value
        

@@ -1,13 +1,15 @@
-from typing import Set, Tuple
-import dlt
-import io
+from typing import Set
+import logging
 import pandas as pd
+from simple_salesforce import SalesforceError, SalesforceResourceNotFound, SalesforceMalformedRequest
 from dlt_salesforce_advanced.utils.salesforce_validators import (
     sanitize_sobject_name,
     sanitize_field_name
 )
 from dlt_salesforce_advanced.utils.salesforce_api_helper import process_csv_result
-        
+
+logger = logging.getLogger(__name__)
+
 class SalesforceRepository:
     
     def _build_query(
@@ -65,10 +67,18 @@ class SalesforceRepository:
         all_data = []
         id_field = "Id"
         soql =  self._build_query(sobject,key_field)
-        bulk_handler = getattr(salesforce_driver.bulk2, sobject)
-        for chunk in bulk_handler.query(soql):         
-            df_chunk= process_csv_result(chunk)
-            all_data.append(df_chunk)
+
+        try:
+            bulk_handler = getattr(salesforce_driver.bulk2, sobject)
+            for chunk in bulk_handler.query(soql):         
+                df_chunk= process_csv_result(chunk)
+                all_data.append(df_chunk)
+        except SalesforceResourceNotFound as ne:
+            logger.error(f"Invalid sobject name : {sobject}, exception={ne}")
+            raise
+        except SalesforceMalformedRequest as me:
+            logger.error(f"Malformed soql query: '{soql}', exception={me}")
+            raise
 
         if not all_data:
             df= pd.DataFrame(columns=[id_field, key_field])
@@ -105,11 +115,20 @@ class SalesforceRepository:
         if len(key_list) > 400:
             raise ValueError(f"Error: fetch_with_keys can handle up to 400 filter values ( current = {len(key_list)})")
         
-        df_result= pd.DataFrame(columns=["Id", key_field])
+        df_result= pd.DataFrame(columns=["Id", key_field])        
         soql =  self._build_query(sobject,key_field)
-        rest_handler = getattr(salesforce_driver.bulk2, sobject)
-        results = list(rest_handler.query_all(soql))
-        df_all = [process_csv_result(csv_str) for csv_str in results]
-        df_result = pd.concat(df_all, ignore_index=True)
-        return df_result
-            
+        
+        try:
+            rest_handler = getattr(salesforce_driver.bulk2, sobject)
+            results = list(rest_handler.query_all(soql))
+            df_all = [process_csv_result(csv_str) for csv_str in results]
+            df_result = pd.concat(df_all, ignore_index=True)
+        
+        except SalesforceResourceNotFound as ne:
+            logger.error(f"Invalid sobject name : {sobject}, exception={ne}")
+            raise
+        except SalesforceMalformedRequest as me:
+            logger.error(f"Malformed soql query: '{soql}', exception={me}")
+            raise
+
+        return df_result    

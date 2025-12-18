@@ -8,7 +8,7 @@ from .resolver import SalesforceKeyResolver
 # Module-level singleton resolver to maintain state across datasets
 _resolver: Optional[SalesforceKeyResolver] = None
 
-def get_salesforce_key_resolver(logger: logging.Logger, credentials=dlt.secrets.value ) -> SalesforceKeyResolver:
+def get_salesforce_key_resolver(credentials=dlt.secrets.value ) -> SalesforceKeyResolver:
     """
     Get or create the singleton resolver instance.
     
@@ -20,5 +20,5 @@ def get_salesforce_key_resolver(logger: logging.Logger, credentials=dlt.secrets.
     """
     global _resolver
     if _resolver is None:
-        _resolver = SalesforceKeyResolver(logger=logger, credentials=credentials)
+        _resolver = SalesforceKeyResolver(credentials=credentials)
     return _resolver

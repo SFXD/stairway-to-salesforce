@@ -8,12 +8,10 @@ to CSV format required by Salesforce Bulk API.
 import tempfile
 import os
 import csv
-from typing import Iterator, List, Dict, Any
+from typing import Iterator, Any
 from pathlib import Path
 from dlt.common.typing import TDataItems
-
 import pyarrow as pa
-
 
 def prepare_data(items: TDataItems) -> str:
     """

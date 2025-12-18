@@ -2,7 +2,7 @@ import logging
 from dlt_salesforce_advanced.utils.logger_config import get_rejected_records_path
 from dlt_salesforce_advanced.utils.salesforce_validators import sanitize_sobject_name
 
-logger = logging.getLogger("dlt")
+logger = logging.getLogger(__name__)
 
 def get_bulk_client(sf_driver, target_name: str):
     """Utility to get and validate the Bulk2 client."""

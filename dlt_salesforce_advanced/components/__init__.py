@@ -6,10 +6,12 @@ with support for efficient caching and both REST and Bulk API queries.
 """
 from .salesforce_key_resolver.resolver import SalesforceKeyResolver
 from .salesforce_key_resolver.resolver_factory import get_salesforce_key_resolver
+from .base_pipeline.base_pipeline import BasePipeline
 
 __version__ = "1.0.0"
 
 __all__ = [
     "SalesforceKeyResolver",
     "get_salesforce_key_resolver",
+    "BasePipeline",
 ]

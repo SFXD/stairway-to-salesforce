@@ -1,24 +1,12 @@
-[build-system]
-requires = ["setuptools>=65.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
-# This is the package name for pip (can differ from folder name)
-name = "dlt-salesforce-advanced"
+name = "stairway-to-salesforce"
 version = "0.1.0"
-description = "Advanced DLT connectors for Salesforce (as source and estination)"
+description = "Python ETL for salesforce based on DLT"
 authors = [
     {name = "Bertrand Leymarios", email = "bertrand.leymarios@gmail.com"}
 ]
-readme = "README.md"
-requires-python = ">=3.9"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-]
-
+readme = "readme.md"
+requires-python = ">=3.12"
 dependencies = [
     "dlt[postgres]>=0.4.0",
     "simple-salesforce>=1.12.0",
@@ -27,6 +15,10 @@ dependencies = [
     "pyyaml>=6.0",
     "cachetools>=6.2.2",
 ]
+
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project.optional-dependencies]
 dev = [
@@ -43,7 +35,6 @@ dev = [
 ]
 
 [tool.setuptools]
-# CRITICAL FIX: This must match your actual folder name
 packages = ["dlt_salesforce_advanced"]
 
 [tool.pytest.ini_options]
@@ -52,3 +43,8 @@ python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
 addopts = "--verbose --cov=dlt_salesforce_advanced"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]

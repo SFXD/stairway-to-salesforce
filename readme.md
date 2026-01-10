@@ -4,18 +4,9 @@ Description
 ## Installation
 
 # run scripts/download_tzdata.py   to download tzdata in the folder "Downloads" of your user.  (Requirement for pyArrow conversion)
-# Create new venv
-python -m venv .venv
-# Activate new venv
-.venv\Scripts\Activate.ps1
-# Upgrade pip
-python -m pip install --upgrade pip
-# Install requirement
-pip install -r requirements.txt
-# Install dev requirements (for dev only)
-pip install -r requirements-dev.txt
-# Install package in dev 
-python -m pip install -e ".[dev]"
+uv sync
+uv add <package name>
+uv add --upgrade <package name>
 
 # Functionalities
 - Salesforce Bulk2 as source
@@ -41,13 +32,15 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 & .venv\scripts\activate 
  
 # Launch test pipelines
-& .venv\Scripts\python.exe pipelines\sample_replace_mock_to_sf.py
-& .venv\Scripts\python.exe pipelines\sample_sync_sf_account_to_postgres.py
-& .venv\Scripts\python.exe pipelines\sample_load_csv_contact_to_sf.py data/contacts.csv
+uv run pipelines\sample_delete_contact_to_sf.py
+uv run pipelines\sample_replace_fixedrecord_csv_to_sf.py
+uv run pipelines\sample_sync_account_sf_to_postgres.py
+uv run pipelines\sample_upsert_contact_csv_sf.py
 
 # Run with coverage
-pytest --cov=dlt_salesforce_advanced --cov-report=html
-pytest tests/unit/ --cov=dlt_salesforce_advanced --cov-report=term
+uv run --with pytest pytest
+uv run --with pytest pytest --cov=dlt_salesforce_advanced --cov-report=html
+uv run --with pytest pytest tests/unit/ --cov=dlt_salesforce_advanced --cov-report=term
 
 # View coverage
-start htmlcov/index.html
+uv run --with pytest pytest start htmlcov/index.html

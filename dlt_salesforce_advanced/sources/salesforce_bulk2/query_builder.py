@@ -13,16 +13,12 @@ import logging
 import io
 import pandas as pd
 
-# Import shared validators
 from dlt_salesforce_advanced.utils.salesforce_validators import (
     sanitize_sobject_name,
     sanitize_field_name,
     validate_soql_filter,
     format_soql_value,
 )
-
-
-# Initialize logger
 logger = logging.getLogger(__name__)
 
 
@@ -37,29 +33,22 @@ def _build_soql_query(
     Build a secure SOQL query with proper validation and escaping.
     """
     logger.debug(f"Building SOQL query for {source_sobject}")
-    
-    # Validate and sanitize object name
+
+    # Build SELECT/FROM Clause
     source_sobject = sanitize_sobject_name(source_sobject)
-    
-    # Validate and sanitize all field names (allow relationship notation)
     if not fields:
         raise ValueError("Fields dictionary cannot be empty")
     
     source_fields = [sanitize_field_name(field) for field in fields.keys()]
     logger.debug(f"Selected fields: {', '.join(source_fields[:5])}..." if len(source_fields) > 5 else f"Selected fields: {', '.join(source_fields)}")
     
-    # Build WHERE clause
+    # Build WHERE Clause
     predicates = []
-    
-    # Validate and add filter if present
     if source_query_filter:
         validate_soql_filter(source_query_filter)
         predicates.append(f"({source_query_filter})")
         logger.debug(f"Applied filter: {source_query_filter}")
-    
-    # Build incremental predicate with proper escaping
     if source_replication_key and last_state is not None:
-        # Validate replication key
         source_replication_key = sanitize_field_name(source_replication_key)
         
         # Format the value - assume datetime for replication keys
@@ -67,7 +56,6 @@ def _build_soql_query(
         predicates.append(f"{source_replication_key} > {formatted_value}")
         logger.info(f"Incremental load: {source_replication_key} > {formatted_value}")
     
-    # Construct WHERE clause
     where_clause = ""
     if predicates:
         where_clause = f" WHERE {' AND '.join(predicates)}"
@@ -77,9 +65,8 @@ def _build_soql_query(
     if source_replication_key:
         order_by_clause = f" ORDER BY {sanitize_field_name(source_replication_key)} ASC"
     
-    # Construct final query
-    query = f"SELECT {', '.join(source_fields)} FROM {source_sobject}{where_clause}{order_by_clause}"
-    
+    # Build final query
+    query = f"SELECT {', '.join(source_fields)} FROM {source_sobject}{where_clause}{order_by_clause}"    
     logger.debug(f"Generated SOQL: {query}")
     return query
 
@@ -90,7 +77,6 @@ def _process_result(chunk: Any, fields: dict[str, str]) -> Iterable[TDataItem]:
     """
     # Handle different chunk types from Bulk API
     if isinstance(chunk, str):
-        # CSV string response
         try:
             df = pd.read_csv(io.StringIO(chunk))
             logger.debug(f"Parsed CSV chunk with {len(df)} rows")
@@ -99,7 +85,6 @@ def _process_result(chunk: Any, fields: dict[str, str]) -> Iterable[TDataItem]:
             raise ValueError(f"Failed to parse CSV chunk: {str(e)}") from e
     
     elif isinstance(chunk, list):
-        # List of dictionaries response
         if not chunk:
             return []
         df = pd.DataFrame(chunk)
@@ -128,7 +113,7 @@ def _process_result(chunk: Any, fields: dict[str, str]) -> Iterable[TDataItem]:
         df.rename(columns=rename_map, inplace=True)
         logger.debug(f"Renamed {len(rename_map)} columns")
     
-    # Convert to list of dictionaries
+    # Prepare return values
     records = df.to_dict(orient="records")
     logger.debug(f"Processed {len(records)} records from chunk")
     return records
@@ -160,7 +145,7 @@ def fetch_data(
     
     logger.info(f"Fetching {len(fields)} field(s) from {source_sobject}")
     
-    # Build SOQL query with all security validations
+    # Build SOQL query
     try:
         soql_query = _build_soql_query(
             source_sobject,

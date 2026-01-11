@@ -54,7 +54,7 @@ class TestValidateResourceConfigs:
 class TestBuildResource:
     """Tests for build_resource()"""
     
-    @patch('dlt_salesforce_advanced.sources.salesforce_bulk2.resource_builder.resolve_salesforce_credentials')
+    @patch('dlt_salesforce_advanced.drivers.salesforce_driver.sfdriver.get_salesforce_driver')
     def test_build_resource_success(
         self,
         mock_resolve,

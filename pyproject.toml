@@ -47,4 +47,5 @@ addopts = "--verbose --cov=dlt_salesforce_advanced"
 [dependency-groups]
 dev = [
     "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
 ]

@@ -128,6 +128,10 @@ Filepath can be specified if your pipeline read or write data from a csv file : 
 # Drop pipeline ( to reset the state for instance )
 dlt pipeline sample_sync_account_sf_to_postgres drop
 
+# State of the pipeline
+States are stored as file by default in your <user>\.dlt\pipelines\
+A hard reset can done by deleting the pipeline specific subfolder. 
+
 ## Unit tests
 # Run pipeline tests
 uv run --with pytest pytest tests/pipelines/ -cov-report=term

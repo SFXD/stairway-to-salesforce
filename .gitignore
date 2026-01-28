@@ -8,12 +8,7 @@ __pycache__/
 dist/
 build/
 *.egg
-
-# Virtual environments
 .venv/
-venv/
-ENV/
-env/
 
 # DLT
 .dlt/
@@ -35,11 +30,4 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
-
-# Logs
-*.log
-logs/
-
-# Continue
-.continue/*
 

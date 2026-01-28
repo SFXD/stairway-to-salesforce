@@ -1,0 +1,21 @@
+# .dlt/config.toml
+# Configuration values for DLT pipeline
+
+[runtime]
+log_level = "INFO"
+dlthub_telemetry = false
+
+[extract]
+max_parallel_items = 1
+workers = 1
+
+[normalize]
+workers = 1
+
+[load]
+retry_attempts = 0
+workers = 1
+raise_on_failed_jobs = true
+
+[destination.postgres]
+create_indexes = false

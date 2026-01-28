@@ -12,20 +12,12 @@ build/
 
 # DLT
 .dlt/
-!.dlt/config.toml.example
-!.dlt/secrets.toml.example
 
 # Testing
 .pytest_cache/
 .coverage
 htmlcov/
 .tox/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
 
 # OS
 .DS_Store

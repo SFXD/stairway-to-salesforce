@@ -11,37 +11,36 @@ from dlt_salesforce_advanced.components import BasePipeline
 
 class DeleteContactPipeline(BasePipeline):
     def execute(self) -> None:     
-        ### Step 1: Source
+
+        # Step 1: Init pipeline
+        pipeline = dlt.pipeline(
+            pipeline_name=f"{self.pipeline_name}",
+            destination=salesforce_bulk2(credentials=self.sf_credential_path),  # specific to environment defined on runtime
+            dataset_name="contacts"
+        )
+
+        # Step 2: Source
         source_resource = filesystem(
             bucket_url=self.csv_file_path.rsplit('/', 1)[0],  # folder path
             file_glob=self.csv_file_path.rsplit('/', 1)[1]   # filename
         ) | read_csv()
 
-        ### Step 2:  Set destination format (without transformation)
+        # Step 3: Transform
+        # No transform needed
+
+        # Step 4 Destination ( directly applied to the source_resource as we don't have a transformer here)
         source_resource.apply_hints(
-            table_name="Contact",
-            primary_key="Email",
-            write_disposition="append",
+            table_name="Contact",           # Target SObject Name
+            primary_key="Email",            # Email will be converted in Id by Salesforce Key Resolver  ( additional API consumption, use directly with ID to avoid it)
+            write_disposition="append",     # Default write disposition handled, specialized with the operation below
             additional_table_hints={
-                "x-salesforce-operation": "delete",   # custom hint
+                "x-salesforce-operation": "delete",  # Will execute a delete job through the Bulk2 API
             },
         )
-
-        ### Step 3  Destination
-        destination_resource = salesforce_bulk2(credentials=self.sf_credential_path)
-
-        ### Step 4:  Build the pipeline
-        pipeline = dlt.pipeline(
-            pipeline_name=f"{self.pipeline_name}",
-            destination=destination_resource,
-            dataset_name="contacts"
-        )
         
-        ### Step 5 : run pipeline
+        # Step 5 : run pipeline
         load_info = pipeline.run(source_resource)
-
-        ### Step 6 : post process
-        print(f"  {load_info}")
+        print(f"Load details for {self.pipeline_name}:\n{load_info}")
 
 
 if __name__ == "__main__":

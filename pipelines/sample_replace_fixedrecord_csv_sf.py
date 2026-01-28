@@ -32,48 +32,49 @@ class ReplaceFixedRecordPipeline(BasePipeline):
         """
         Implementation of the DLT pipeline steps.
         """
-        # Step 1: Initialize Source from CSV
+        # Step 1: Init pipeline
+        pipeline = dlt.pipeline(
+            pipeline_name=self.pipeline_name,
+            destination=salesforce_bulk2(credentials=self.sf_credential_path),
+            dataset_name="fixedrecords"
+        )
+
+        # Step 2: Source
         source_resource = filesystem(
             bucket_url=self.csv_file_path.rsplit('/', 1)[0],
             file_glob=self.csv_file_path.rsplit('/', 1)[1]
         ) | read_csv()
 
-        # Step 2: Define Transformer directly
+        # Step 3: Transform
         @dlt.transformer(name="transform_fixedrecords_csv_to_sf")
         def transformer(records: Iterator[Dict[str, Any]]) -> Iterator[Dict[str, Any]]:
-            # Materialize list for resolution
-            records_list = list(records)  
-            if not records_list:
-                return
+            # Safety if the records are processed one by one
+            if isinstance(records,dict):
+                records=[records]
 
             # Validate Schema
             required_columns = ["name", "code", "description"]
-            missing = [col for col in required_columns if col not in records_list[0]]
+            missing = [col for col in required_columns if col not in records[0]]
             if missing:
                 raise ValueError(f"Missing required columns: {missing}")
 
             # Map fields
-            for record in records_list:                
+            for record in records:                
                 yield { 
                     "Name": record["name"],
                     "FixedCode__c": record["code"],
                     "FixedDescription__c": record["description"],
                 }
 
-        # Step 3: Apply Hints to the transformer
+        # Step 4: Destination
         transformer_resource = transformer
         transformer_resource.apply_hints(
-            table_name="FixedRecord__c",
-            write_disposition="replace"
+            # SObject name
+            table_name="FixedRecord__c",            
+            write_disposition="replace"         # Replace will execute a first delete bulk2 operation on the Sobject and then reload the data
         )
 
-        # Step 4: Build and Run Pipeline
-        pipeline = dlt.pipeline(
-            pipeline_name=self.pipeline_name,
-            destination=salesforce_bulk2(credentials=self.sf_credential_path),
-            dataset_name="fixedrecords"
-        )
-        
+        # Step 5: Run pipeline        
         load_info = pipeline.run(source_resource | transformer_resource)
         print(f"Load details for {self.pipeline_name}:\n{load_info}")
 

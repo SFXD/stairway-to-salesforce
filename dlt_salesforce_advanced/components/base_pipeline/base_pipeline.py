@@ -1,6 +1,7 @@
 import argparse
 import sys
 import logging
+import dlt
 from abc import ABC, abstractmethod
 from typing import Optional
 
@@ -63,13 +64,17 @@ class BasePipeline(ABC):
         self.add_custom_arguments(parser)
         
         return parser.parse_args()
-
+    
     def add_custom_arguments(self, parser: argparse.ArgumentParser) -> None:
         """
         Override this method in subclasses to add specific CLI arguments.
         Example: parser.add_argument('--limit', type=int)
         """
-        pass
+        pass    
+
+    def get_credentials(self, basepath : str):
+        credential_path = f"{basepath}.{self.env}"
+        return dlt.secrets[credential_path] 
 
     @abstractmethod
     def execute(self) -> None:
@@ -109,3 +114,5 @@ class BasePipeline(ABC):
             default_env=default_env
         )
         pipeline.run()
+
+

@@ -23,38 +23,38 @@ logger = logging.getLogger(__name__)
 
 
 def _build_soql_query(
-    source_sobject: str,
-    fields: dict[str, str],
-    source_query_filter: Optional[str] = None,
-    source_replication_key: Optional[str] = None,
+    sobject: str,
+    fields: list[str],
+    query_filter: Optional[str] = None,
+    replication_key: Optional[str] = None,
     last_state: Optional[Any] = None
 ) -> str:
     """
     Build a secure SOQL query with proper validation and escaping.
     """
-    logger.debug(f"Building SOQL query for {source_sobject}")
+    logger.debug(f"Building SOQL query for {sobject}")
 
     # Build SELECT/FROM Clause
-    source_sobject = sanitize_sobject_name(source_sobject)
+    sobject = sanitize_sobject_name(sobject)
     if not fields:
-        raise ValueError("Fields dictionary cannot be empty")
+        raise ValueError("Fields list cannot be empty")
     
-    source_fields = [sanitize_field_name(field) for field in fields.keys()]
+    source_fields = [sanitize_field_name(field) for field in fields]
     logger.debug(f"Selected fields: {', '.join(source_fields[:5])}..." if len(source_fields) > 5 else f"Selected fields: {', '.join(source_fields)}")
     
     # Build WHERE Clause
     predicates = []
-    if source_query_filter:
-        validate_soql_filter(source_query_filter)
-        predicates.append(f"({source_query_filter})")
-        logger.debug(f"Applied filter: {source_query_filter}")
-    if source_replication_key and last_state is not None:
-        source_replication_key = sanitize_field_name(source_replication_key)
+    if query_filter:
+        validate_soql_filter(query_filter)
+        predicates.append(f"({query_filter})")
+        logger.debug(f"Applied filter: {query_filter}")
+    if replication_key and last_state is not None:
+        replication_key = sanitize_field_name(replication_key)
         
         # Format the value - assume datetime for replication keys
         formatted_value = format_soql_value(last_state, field_type="datetime")
-        predicates.append(f"{source_replication_key} > {formatted_value}")
-        logger.info(f"Incremental load: {source_replication_key} > {formatted_value}")
+        predicates.append(f"{replication_key} > {formatted_value}")
+        logger.info(f"Incremental load: {replication_key} > {formatted_value}")
     
     where_clause = ""
     if predicates:
@@ -62,16 +62,16 @@ def _build_soql_query(
     
     # Build ORDER BY clause
     order_by_clause = ""
-    if source_replication_key:
-        order_by_clause = f" ORDER BY {sanitize_field_name(source_replication_key)} ASC"
+    if replication_key:
+        order_by_clause = f" ORDER BY {sanitize_field_name(replication_key)} ASC"
     
     # Build final query
-    query = f"SELECT {', '.join(source_fields)} FROM {source_sobject}{where_clause}{order_by_clause}"    
+    query = f"SELECT {', '.join(source_fields)} FROM {sobject}{where_clause}{order_by_clause} LIMIT 2"    
     logger.debug(f"Generated SOQL: {query}")
     return query
 
 
-def _process_result(chunk: Any, fields: dict[str, str]) -> Iterable[TDataItem]:
+def _normalize_result(chunk: Any) -> Iterable[TDataItem]:
     """
     Process a chunk of results from Salesforce Bulk API.
     """
@@ -101,38 +101,26 @@ def _process_result(chunk: Any, fields: dict[str, str]) -> Iterable[TDataItem]:
     if df.empty:
         logger.debug("Chunk is empty, skipping")
         return []
-    
-    # Rename columns based on field mapping
-    rename_map = {
-        source: target
-        for source, target in fields.items()
-        if source in df.columns
-    }
-    
-    if rename_map:
-        df.rename(columns=rename_map, inplace=True)
-        logger.debug(f"Renamed {len(rename_map)} columns")
-    
+
     # Prepare return values
     records = df.to_dict(orient="records")
     logger.debug(f"Processed {len(records)} records from chunk")
     return records
 
-
 def fetch_data(
     sf: Salesforce,
-    source_sobject: str,
-    fields: dict[str, str],
-    source_replication_key: Optional[str] = None,
+    sobject: str,
+    fields: list[str],
+    replication_key: Optional[str] = None,
     last_state: Optional[Any] = None,
-    source_query_filter: Optional[str] = None,
+    query_filter: Optional[str] = None,
 ) -> Iterable[TDataItem]:
     """
     Fetch data from Salesforce using Bulk API v2.
     
     All SOQL query validation and security checks are performed here.
     """
-    logger.info(f"Starting data fetch from {source_sobject}")
+    logger.info(f"Starting data fetch from {sobject}")
     
     # Validate inputs
     if not sf:
@@ -143,15 +131,15 @@ def fetch_data(
         logger.error("Fields mapping is empty")
         raise ValueError("Fields mapping cannot be empty")
     
-    logger.info(f"Fetching {len(fields)} field(s) from {source_sobject}")
+    logger.info(f"Fetching {len(fields)} field(s) from {sobject}")
     
     # Build SOQL query
     try:
         soql_query = _build_soql_query(
-            source_sobject,
+            sobject,
             fields,
-            source_query_filter,
-            source_replication_key,
+            query_filter,
+            replication_key,
             last_state
         )
     except ValueError as e:
@@ -162,54 +150,52 @@ def fetch_data(
     
     # Execute bulk query
     try:
-        bulk_handler = getattr(sf.bulk2, source_sobject)
-        
+        bulk_handler = getattr(sf.bulk2, sobject)
         chunk_count = 0
         total_records = 0
-        
+
+        # For each Bulk2 API file result (=chunk)
         for chunk in bulk_handler.query(soql_query):
             chunk_count += 1
             logger.debug(f"Processing chunk {chunk_count}")
             
+            # Normalize the result (to make sure the format is a dictionnary)
             try:
-                records = _process_result(chunk, fields)
+                records = _normalize_result(chunk)
             except Exception as e:
                 logger.error(f"Failed to process chunk {chunk_count}: {str(e)}")
                 raise RuntimeError(
-                    f"Failed to process chunk {chunk_count} for {source_sobject}: {str(e)}"
+                    f"Failed to process chunk {chunk_count} for {sobject}: {str(e)}"
                 ) from e
-            
-            if records:
-                record_count = len(records)
-                total_records += record_count
-                logger.debug(f"Yielding {record_count} records from chunk {chunk_count}")
-                yield records
-        
+                                    
+            # Return the group of records
+            yield records
+
         if chunk_count == 0:
-            logger.warning(f"No data returned for {source_sobject}")
+            logger.warning(f"No data returned for {sobject}")
         else:
             logger.info(
-                f"Successfully fetched {total_records} record(s) from {source_sobject} "
+                f"Successfully fetched {total_records} record(s) from {sobject} "
                 f"in {chunk_count} chunk(s)"
             )
     
     except SalesforceMalformedRequest as e:
-        logger.error(f"Malformed SOQL query for {source_sobject}: {str(e)}")
+        logger.error(f"Malformed SOQL query for {sobject}: {str(e)}")
         raise SalesforceMalformedRequest(
-            f"Malformed SOQL query for {source_sobject}. "
+            f"Malformed SOQL query for {sobject}. "
             f"Query: {soql_query}. "
             f"Error: {str(e)}"
         ) from e
     
     except AttributeError as e:
-        logger.error(f"Invalid Salesforce object: {source_sobject}")
+        logger.error(f"Invalid Salesforce object: {sobject}")
         raise ValueError(
-            f"Invalid Salesforce object: '{source_sobject}'. "
+            f"Invalid Salesforce object: '{sobject}'. "
             f"Ensure the object exists and you have permission to access it."
         ) from e
     
     except Exception as e:
-        logger.error(f"Failed to fetch data from {source_sobject}: {str(e)}")
+        logger.error(f"Failed to fetch data from {sobject}: {str(e)}")
         raise RuntimeError(
-            f"Failed to fetch data from {source_sobject}: {str(e)}"
+            f"Failed to fetch data from {sobject}: {str(e)}"
         ) from e

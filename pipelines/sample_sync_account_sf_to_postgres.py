@@ -6,9 +6,9 @@ Reworked to use BasePipeline for standardized CLI and environment management.
 import dlt
 from dlt_salesforce_advanced.sources import salesforce_bulk2_source
 from dlt_salesforce_advanced.components import BasePipeline
+from typing import Iterator, Dict, Any
 
-
-class SyncAccountSfToPostgresPipeline(BasePipeline):
+class SampleSyncAccountSfToPostgresPipeline(BasePipeline):
     """
     Defines the logic to sync Salesforce SObjects to a PostgreSQL destination.
     """
@@ -17,55 +17,62 @@ class SyncAccountSfToPostgresPipeline(BasePipeline):
         """
         Implementation of the Salesforce to Postgres sync logic.
         """
-        target_schema = "public"
-        
-        # Preserved resource configurations from original sample
-        resource_configs = [
+        # Step 1: Init pipeline
+        pipeline = dlt.pipeline(
+            pipeline_name=self.pipeline_name,                                                       # handle by base pipeline
+            destination=dlt.destinations.postgres(credentials=self.get_credentials("postgres")),    # get credentials based on the environment
+            dataset_name="public"                                                                   # This is the schema with postgres
+        )
+
+        # Step 2: Source
+        source_definition = [
             {
-                "target_name": "tb_accounts",
-                "target_primary_key": "account_id",
-                "source_sobject": "Account",
+                "name": "sf_accounts",
                 "write_disposition": "merge",
-                "fields": {
-                    "Id": "account_id",
-                    "Name": "account_name",
-                    "LastModifiedDate": "sf_modification_date",
-                    "Description": "Description",
-                    "CreatedDate": "CreatedDate",
-                    "CurrencyIsoCode": "CurrencyIsoCode",
-                    "Website": "Website",
-                    "Owner.Name": "sf_owner"
-                },
-                "source_replication_key": "LastModifiedDate",
-                "target_column_types": {
+                "sobject": "Account",
+                "primary_key": "Id",                
+                "replication_key": "LastModifiedDate",
+                "query_filter": None,
+                "fields": ["Id","Name","LastModifiedDate","Description","CreatedDate","CurrencyIsoCode","Website","Owner.Name"],                
+                "column_types": {
                     "website": {"data_type": "text"}
-                },
-                "source_query_filter": None
+                }                
             }
         ]
-        
-        # Use inherited credential paths based on the environment (--env)
-        # Note: self.sf_credential_path is automatically set to "salesforce.{env}"
-        target_credentials_path = f"postgres.{self.env}"
-        target_credentials = dlt.secrets[target_credentials_path]
+        source_resource= salesforce_bulk2_source(source_definition, credentials=self.sf_credential_path)
 
-        # Build pipeline using preserved names
-        pipeline = dlt.pipeline(
-            pipeline_name=self.pipeline_name,
-            destination=dlt.destinations.postgres(credentials=target_credentials),
-            dataset_name=target_schema
-        )
+        # Step 3: Transform
+        @dlt.transformer(name="tb_accounts")
+        def transformer(records: Iterator[Dict[str, Any]]) -> Iterator[Dict[str, Any]]:  
+            # Safety if the records are processed one by one
+            if isinstance(records,dict):
+                records=[records]
+
+            for record in records:            
+                yield { 
+                    "account_id": record["Id"],
+                    "account_name": record["Name"],
+                    "Description": record["Description"],
+                    "CreatedDate": record["CreatedDate"],
+                    "CurrencyIsoCode": record["CurrencyIsoCode"],
+                    "Website": record["Website"],
+                    "sf_owner": record["Owner.Name"]                                                                                                 
+                }        
+
+        # Step 4: Destination
+        transformer_resource = transformer
+        transformer_resource.apply_hints(            
+            table_name="tb_accounts", 
+            primary_key="account_id",            
+            write_disposition="merge" 
+        )            
         
-        # Run the sync
-        load_info = pipeline.run(
-            salesforce_bulk2_source(resource_configs, credentials=self.sf_credential_path)
-        )
-        
-        print(f"Sync complete for {self.pipeline_name}:")
-        print(load_info)
+        # Step 5: Run pipeline
+        load_info = pipeline.run(source_resource | transformer_resource)
+        print(f"Load details for {self.pipeline_name}:\n{load_info}")
 
 if __name__ == "__main__":
-    SyncAccountSfToPostgresPipeline.main(
-        pipeline_base_name="sample_sync_account_sf_to_postgres",
+    SampleSyncAccountSfToPostgresPipeline.main(
+        pipeline_base_name="sample_sync_accounts_sf_to_postgres",
         default_env="dev"
     )

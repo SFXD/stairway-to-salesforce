@@ -22,8 +22,7 @@ def validate_resource_configs(configs: list[dict[str, Any]]) -> None:
     if not configs:
         raise ValueError("At least one resource configuration is required")
     
-    required_fields = ["target_name", "target_primary_key", "source_sobject"]
-    
+    required_fields = ["name", "primary_key", "sobject"]    
     for i, config in enumerate(configs):
         # Check for required fields
         missing = [f for f in required_fields if not config.get(f)]
@@ -33,9 +32,8 @@ def validate_resource_configs(configs: list[dict[str, Any]]) -> None:
             )
         
         # Validate structure
-        if "fields" in config and not isinstance(config["fields"], dict):
-            raise ValueError(f"Config {i}: 'fields' must be a dictionary")
-        
+        if "fields" in config and not isinstance(config["fields"], list):
+            raise ValueError(f"Config {i}: 'fields' must be a list")        
         if "write_disposition" in config:
             valid_dispositions = ["append", "replace", "merge"]
             if config["write_disposition"] not in valid_dispositions:
@@ -44,14 +42,13 @@ def validate_resource_configs(configs: list[dict[str, Any]]) -> None:
                 )
         
         # Validate that replication key exists in fields if both are provided
-        if config.get("source_replication_key") and config.get("fields"):
-            replication_key = config["source_replication_key"]
+        if config.get("replication_key") and config.get("fields"):
+            replication_key = config["replication_key"]
             if replication_key not in config["fields"]:
                 raise ValueError(
-                    f"Config {i}: source_replication_key '{replication_key}' "
-                    f"must exist in fields dictionary"
+                    f"Config {i}: replication_key '{replication_key}' "
+                    f"must exist in fields list"
                 )
-
 
 def build_resource(
     config: dict[str, Any],
@@ -76,39 +73,36 @@ def build_resource(
     
     Example:
         >>> config = {
-        ...     "target_name": "accounts",
-        ...     "target_primary_key": "account_id",
-        ...     "source_sobject": "Account",
-        ...     "fields": {"Id": "account_id", "Name": "account_name"}
+        ...     "name": "accounts",
+        ...     "primary_key": "account_id",
+        ...     "sobject": "Account",
+        ...     "fields": {"Id", "Name",...}
         ... }
         >>> resource = build_resource(config, fetch_data, credentials, None)
     """
     # Extract config values
-    target_name = config["target_name"]
-    target_primary_key = config["target_primary_key"]
-    source_sobject = config["source_sobject"]
-    fields = config.get("fields", {})
+    name = config["name"]
+    primary_key = config["primary_key"]
+    sobject = config["sobject"]
+    fields = config.get("fields", [])
     write_disposition = config.get("write_disposition", "append")
-    source_replication_key = config.get("source_replication_key")
-    source_query_filter = config.get("source_query_filter")
-    target_column_types = config.get("target_column_types")
+    replication_key = config.get("replication_key")
+    query_filter = config.get("query_filter")
+    column_types = config.get("column_types")
     
     # Setup incremental loading
-    incremental_cursor = None
-    replication_key_field = None
-    
-    if source_replication_key:
-        replication_key_field = fields.get(source_replication_key, source_replication_key)
+    incremental_cursor = None    
+    if replication_key:
         incremental_cursor = dlt.sources.incremental(
-            replication_key_field,
+            replication_key,
             initial_value=None
         )
     
     @dlt.resource(
-        name=target_name,
-        primary_key=target_primary_key,
+        name=name,
+        primary_key=primary_key,
         write_disposition=write_disposition,
-        columns=target_column_types
+        columns=column_types
     )
     def sf_resource(incremental_load=incremental_cursor):
         """
@@ -120,26 +114,28 @@ def build_resource(
             driver = get_salesforce_driver(credentials, session)
         except Exception as e:
             raise RuntimeError(
-                f"Failed to create Salesforce driver for {source_sobject}: {str(e)}"
+                f"Failed to create Salesforce driver for {sobject}: {str(e)}"
             ) from e
         
         last_value = None
-        if incremental_cursor and replication_key_field and incremental_load:
+        if incremental_cursor and replication_key and incremental_load:
             last_value = incremental_load.last_value
         
         try:
-            # fetch_data_fn handles ALL SOQL validation and security
-            yield from fetch_data_fn(
+            # fetch_data_fn handles ALL SOQL validation and security            
+            for chunk in fetch_data_fn(
                 sf=driver,
-                source_sobject=source_sobject,
+                sobject=sobject,
                 fields=fields,
-                source_replication_key=source_replication_key,
+                replication_key=replication_key,
                 last_state=last_value,
-                source_query_filter=source_query_filter
-            )
+                query_filter=query_filter
+            ):
+                print("resource.chunk=",chunk)
+                yield chunk            
         except Exception as e:
             raise RuntimeError(
-                f"Failed to fetch data from {source_sobject}: {str(e)}"
+                f"Failed to fetch data from {sobject}: {str(e)}"
             ) from e
     
     return sf_resource

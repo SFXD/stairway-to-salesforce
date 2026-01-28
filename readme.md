@@ -41,8 +41,7 @@ Official DLT documentation can be found https://dlthub.com/docs/intro
     - resolve an External Key as a Salesforce Id -  useful for lookup
 - Base pipeline as component
 
-## How to use it ?
-# First installation
+## First installation
 - Make sure you have Python and pip 
 python --version
 pip --version
@@ -61,14 +60,79 @@ run scripts/download_tzdata.py   to download tzdata in the folder "Downloads" of
 uv add dlt[<Connector name>]  
 Example : uv add dlt[postgres]
 
-# Run a pipeline
-uv run pipelines\<pipeline name>.py
+## Environment setup
+# Environments
+You will probably not test your scripts against your production environments. Environments are defined through suffix in credentials, for instance salesforce.dev, salesforce.production, postgres.dev, postgres.production,.... 
+dev environment is the default one if none is precised when running the pipeline. You can define any environment as long as the credentials matchs the pipeline parameter.
 
+# Credentials
+DLT will check for the credential in environment variables, then in secret.toml (within a subfolder .dlt).
+In the repo, the .dlt folder contains a secrets_sample file, with sample credentials used by the sample pipeline.  To activate it, you should rename it as secrets.toml. 
+
+Regarding Salesforce credentials, you can choose the connection flow and setup the required attributes as defined in dlt_salesforce_advanced\drivers\salesforce_driver\sfdriver_specs.py
+In the sample, we are using a connected app with a client credentials.
+
+
+## Sample pipelines
+To illustrate the possibilities, a few samples have been defined. 
+All the samples are using the BasePipeline components and have the following logic : 
+- Step 1: Init Pipeline
+- Step 2: Source
+- Step 3: Transform
+- Step 4: Destination
+- Step 5: Execution
+It can be adjust to your needs or preferences
+
+# sample_sync_account_sf_to_postgres
+Sample showing the synchronisation of the update accounts (based on LastModifiedDate) from Salesforce to postgres. 
+Principles:
+- Incremental synchronisation 
+- Salesforce Bulk2 as source
+- Transform between Source and destination with a simple field mapping
+- Postgres as destination
+
+Notes on the postgres destination:
+- Official postgres destination documentation : https://dlthub.com/docs/dlt-ecosystem/destinations/postgres
+- You will need to install the postgres destination  ( either with uv add or uv pip)
+- The synchonisation state is directly handled by the destination postgres ( and stored within the postgres database).
+
+# sample_upsert_contact_csv_sf
+Sample showing the loading of data from a csv file into upserting salesforce contacts
+Principles:
+- Base pipeline with csv path
+- filesystem as source
+- Transform with field mapping
+- Salesforce Key Resolver to resolve External_Id__c into a proper Salesforce ID ( for the parent account )
+- Salesforce Bulk2 as destination for an upsert operation
+
+# sample_delete_contact_csv_sf.py
+Sample showing the deletion of contacts from a csv file containing Contact emails
+Principles: 
+- Base pipeline with csv path
+- filesystem as source
+- Salesforce Bulk2 as destination for a delete operation with automatic key resolution ( with the Salesforce Key Resolver under the hood)
+
+# sample_replace_fixedrecord_csv_sf
+Sample showing the replace operation, meaning deleting all records and creating them
+Principles:
+- Base pipeline with csv path
+- fileystem as source
+- Salesforce Bulk2 as destination for a replace operation
+
+## Work with pipelines
+# Run pipeline
+Base commande to run the pipeline : uv run pipelines\<pipeline name>.py 
+Environment can be specified: uv run pipelines\<pipeline name>.py --env dev
+Filepath can be specified if your pipeline read or write data from a csv file : uv run pipelines\<pipeline name>.py "file_path"
+
+# Drop pipeline ( to reset the state for instance )
+dlt pipeline sample_sync_account_sf_to_postgres drop
+
+## Unit tests
 # Run pipeline tests
 uv run --with pytest pytest tests/pipelines/ -cov-report=term
 
-## Working on the framework
-# Run units tests
+# Run framework tests
 uv run --with pytest pytest tests/unit/ --cov=dlt_salesforce_advanced --cov-report=term
 
 # View coverage

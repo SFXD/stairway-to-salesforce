@@ -1,5 +1,4 @@
 ## Description
-
 Stairway to Salesforce is simple ETL Python Framework dedicated to Salesforce, built on top of the DLT library. DLT handles data (extract/normalize/transform/load) with predefined system connectors (source/destination) and tools (credential/performance tweaks/...).  Applied to Salesforce, a few components were missing, such as proper Bulk2 connectors or a Salesforce Key Resolver (converting an external id values into a Salesforce ID to be send through the Bulk2 API).
 
 Notes: Salesforce interactions is built with the python library simple-salesforce.

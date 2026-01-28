@@ -1,4 +1,4 @@
-Customer_Id,First_Name,Last_Name,Email
+External_ID,First_Name,Last_Name,Email
 ACC001,John,Doe,john.doe@acme.com
 ACC001,Jane,Doe,jane.doe@acme.com
 ACC002,Bob,Smith,bob.smith@global.com

@@ -46,6 +46,6 @@ class DeleteContactPipeline(BasePipeline):
 if __name__ == "__main__":
     DeleteContactPipeline.main(
         pipeline_base_name="sample_delete_contacts_csv_to_sf",
-        default_csv_path="data/deleted_contacts.csv",
+        default_csv_path="sample_data/deleted_contacts.csv",
         default_env="dev"
     )

@@ -81,6 +81,6 @@ class ReplaceFixedRecordPipeline(BasePipeline):
 if __name__ == "__main__":
     ReplaceFixedRecordPipeline.main(
         pipeline_base_name="sample_replace_fixedrecord_csv_to_sf",
-        default_csv_path="data/all_fixed_records.csv",
+        default_csv_path="sample_data/all_fixed_records.csv",
         default_env="dev"
     )

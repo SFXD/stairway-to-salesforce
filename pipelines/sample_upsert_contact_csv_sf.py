@@ -102,6 +102,6 @@ class UpsertContactPipeline(BasePipeline):
 if __name__ == "__main__":
     UpsertContactPipeline.main(
         pipeline_base_name="sample_upsert_contacts_csv_to_sf",
-        default_csv_path="data/updated_contacts.csv",
+        default_csv_path="sample_data/updated_contacts.csv",
         default_env="dev"
     )

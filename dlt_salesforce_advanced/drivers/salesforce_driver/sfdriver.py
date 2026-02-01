@@ -24,11 +24,20 @@ def get_salesforce_driver(
     
     # Credential path => use cache
     if isinstance(credentials, str):
+        # Check the cache first
         cache_key = get_cache_key(credentials) 
         driver = get_driver_from_cache(cache_key)
+
+        # If not retrieve from cache
         if driver is None:
-            sf_credential = dlt.secrets[f"{credentials}"]
-            driver = make_salesforce_driver(credentials,session,config)
+            # get credential from dlt secret
+            try:
+                sf_credential = dlt.secrets[f"{credentials}"]
+            except KeyError as e:  
+                raise ValueError(f"Failed to load credentials for {credentials}") 
+            
+            # build driver and cache it
+            driver = make_salesforce_driver(sf_credential,session,config)
             add_driver_to_cache(cache_key, driver)
         return driver
 

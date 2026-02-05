@@ -1,3 +1,10 @@
+# Stairway to Salesforce
+
+[![CI](https://github.com/SFXD/stairway-to-salesforce/actions/workflows/ci.yml/badge.svg)](https://github.com/SFXD/stairway-to-salesforce/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/SFXD/stairway-to-salesforce/branch/main/graph/badge.svg)](https://codecov.io/gh/SFXD/stairway-to-salesforce)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/github/license/SFXD/stairway-to-salesforce)](LICENSE)
+
 # Description
 Stairway to Salesforce is simple ETL Python Framework dedicated to Salesforce, built on top of the DLT library. DLT handles data (extract/normalize/transform/load) with predefined system connectors (source/destination) and tools (credential/performance tweaks/...).  Applied to Salesforce, a few components were missing, such as proper Bulk2 connectors or a Salesforce Key Resolver (converting an external id values into a Salesforce ID to be send through the Bulk2 API).
 

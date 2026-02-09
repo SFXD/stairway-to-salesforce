@@ -1,9 +1,10 @@
 [project]
 name = "stairway-to-salesforce"
 version = "0.1.0"
-description = "Python ETL for salesforce based on DLT"
+description = "Python ETL for Salesforce extending DLT framework"
 authors = [
-    {name = "Bertrand Leymarios", email = "bertrand.leymarios@gmail.com"}
+    {name = "Bertrand Leymarios", email = "bertrand.leymarios@gmail.com"},
+    {name = "Geoffrey Bessereau", email = "geoffrey@bessereau.eu"}
 ]
 readme = "readme.md"
 requires-python = ">=3.12"

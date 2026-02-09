@@ -98,8 +98,8 @@ Principles:
 - Postgres as destination
 
 Notes on the postgres destination:
+- For sample purpose, the postgres connector is included. It was addded through the command uv add dlt[postgres] and can be removed through uv remove dlt[postgres]
 - Official postgres destination documentation : https://dlthub.com/docs/dlt-ecosystem/destinations/postgres
-- You will need to install the postgres destination  ( either with uv add or uv pip)
 - The synchonisation state is directly handled by the destination postgres ( and stored within the postgres database).
 
 ## sample_upsert_contact_csv_sf

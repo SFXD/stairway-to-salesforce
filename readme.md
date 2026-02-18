@@ -5,32 +5,68 @@
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/github/license/SFXD/stairway-to-salesforce)](LICENSE)
 
-A simple ETL Python Framework for Salesforce, built on top of DLT, featuring Bulk API v2 connectors and a Salesforce Key Resolver for external ID conversion.
+A simple ETL Python Framework for Salesforce, built on DLT, featuring Bulk API v2 connectors and a Salesforce Key Resolver for external ID conversion.
 
 ## Features
+- **Simple pipeline definition** using DLT framework 
+- **Salesforce Bulk API v2** source and destination connectors
+- **Compatible with DLT connectors** both official and from community
+- **Full compatibility with DLT functionalities** for credentials, schema validation, performance, memory...
+- **Salesforce Key Resolver** - Convert external IDs to Salesforce IDs
+- **Simplified Salesforce environment management** to test first in sandbox (right?)
+- **Compatibility with Apache Airflow** for orchestration and scheduling
 
-- 🚀 **Salesforce Bulk API v2** source and destination connectors
-- 🔑 **Salesforce Key Resolver** - Convert external IDs to Salesforce IDs
-- 📊 **Multiple operations** - Insert, upsert, delete, and replace
-- 🔄 **Incremental loading** - Efficient data synchronization
-- 🛠️ **Built on DLT** - Leverage DLT's powerful data pipeline capabilities
-
-## Quick Install
+## Quick Install to run samples
 
 ```bash
 pip install uv
-uv sync
+uv sync --extra postgres
 ```
 
 ## Quick Example
+The following example show the simple structure of a pipeline with 5 steps.
+Fully working examples can be found in pipelines folder.
 
 ```python
+import dlt
 from stairway_to_salesforce.components import BasePipeline
 
-# Sync Salesforce accounts to Postgres
-pipeline = BasePipeline("sync_accounts", environment="dev")
-# ... configure source and destination
-pipeline.run()
+class HelloSalesforcePipeline(BasePipeline):
+
+    def execute(self) -> None:
+        # Step 1: Init pipeline with destination 
+        pipeline = dlt.pipeline(
+            pipeline_name=self.pipeline_name,
+            destination= ... using DLT connectors or Salesforce Bulk2 ...
+            dataset_name="..."
+        )   
+
+        # Step 2: Source
+        source_resource = ... using DLT connectors or Salesforce Bulk2 ...
+
+        # Step 3: Transform 
+        @dlt.transformer(name="...")
+        def transformer(records: Iterator[Dict[str, Any]]) -> Iterator[Dict[str, Any]]:
+            ...
+            yield ... record by record with data transformation ...
+
+        # Step 4: Destination (by configuring the transformer)
+        transformer_resource = transformer
+        transformer_resource.apply_hints(            
+            table_name="... table or sobjectname for Salesforce Bulk2 ...",
+            primary_key="... key column /field ...",               
+            ...
+        )
+
+        # Step 5: Execute pipeline
+        load_info = pipeline.run(source_resource | transformer_resource)
+        print(f"Load details for {self.pipeline_name}:\n{load_info}")
+
+if __name__ == "__main__":
+    HelloSalesforcePipeline.main(
+        pipeline_base_name="hello_salesforce",
+        default_env="dev"   # default environment if not specified on runtime
+    )
 ```
 
 ## 📚 Full Documentation
@@ -53,9 +89,7 @@ See [LICENSE](LICENSE) file for details.
 
 ### pyarrow timezone error (Windows)
 If you encounter timezone-related errors with pyarrow on Windows, run:
-
     uv add tzdata
 
 Then set the following environment variable in your `.env` or shell :
-
     TZDIR=<path_to_tzdata_zoneinfo>

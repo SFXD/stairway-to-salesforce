@@ -4,8 +4,8 @@ Pipeline to sync Salesforce Account data to PostgreSQL.
 Reworked to use BasePipeline for standardized CLI and environment management.
 """
 import dlt
-from dlt_salesforce_advanced.sources import salesforce_bulk2_source
-from dlt_salesforce_advanced.components import BasePipeline
+from stairway_to_salesforce.sources import salesforce_bulk2_source
+from stairway_to_salesforce.components import BasePipeline
 from typing import Iterator, Dict, Any
 
 class SampleSyncAccountSfToPostgresPipeline(BasePipeline):

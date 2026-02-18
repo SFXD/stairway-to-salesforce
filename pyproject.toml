@@ -8,23 +8,29 @@ authors = [
 ]
 readme = "readme.md"
 requires-python = ">=3.12"
+keywords = ["salesforce", "dlt", "etl", "bulk-api", "data-pipeline"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries",
+]
 dependencies = [
-    "dlt[postgres]>=0.4.0",
+    "dlt>=0.4.0",
     "simple-salesforce>=1.12.0",
     "pandas>=2.0.0",
     "pyarrow>=12.0.0",
     "pyyaml>=6.0",
-    "cachetools>=6.2.2",
+    "cachetools>=5.0.0",
 ]
 
-[build-system]
-requires = ["setuptools>=65.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project.optional-dependencies]
+postgres  = ["dlt[postgres]>=0.4.0"]
+duckdb    = ["dlt[duckdb]>=0.4.0"]
+bigquery  = ["dlt[bigquery]>=0.4.0"]
 dev = [
-    "pytest>=7.4.0",
-    "pytest-cov>=4.1.0",
+    "pytest>=9.0.0",
+    "pytest-cov>=7.0.0",
     "pytest-mock>=3.11.1",
     "mock>=5.1.0",
     "freezegun>=1.2.2",
@@ -34,19 +40,22 @@ dev = [
     "mypy>=1.5.0",
     "isort>=5.12.0",
 ]
+docs = [
+    "mkdocs-material>=9.7.1",
+    "mkdocstrings[python]>=1.0.3",
+]
 
-[tool.setuptools]
-packages = ["dlt_salesforce_advanced"]
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["stairway_to_salesforce*"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["stairway_to_salesforce/tests"]
 python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
-addopts = "--verbose --cov=dlt_salesforce_advanced"
-
-[dependency-groups]
-dev = [
-    "pytest>=9.0.2",
-    "pytest-cov>=7.0.0",
-]
+addopts = "--verbose --cov=stairway_to_salesforce"

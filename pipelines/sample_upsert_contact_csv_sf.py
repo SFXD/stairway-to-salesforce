@@ -17,9 +17,9 @@ from typing import Iterator, Dict, Any
 import dlt
 from dlt.sources.filesystem import filesystem, read_csv
 
-from dlt_salesforce_advanced.destinations import salesforce_bulk2
-from dlt_salesforce_advanced.components import SalesforceKeyResolver
-from dlt_salesforce_advanced.components import BasePipeline
+from stairway_to_salesforce.destinations import salesforce_bulk2
+from stairway_to_salesforce.components import SalesforceKeyResolver
+from stairway_to_salesforce.components import BasePipeline
 
 class UpsertContactPipeline(BasePipeline):
     """

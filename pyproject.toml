@@ -39,6 +39,7 @@ dev = [
     "flake8>=6.1.0",
     "mypy>=1.5.0",
     "isort>=5.12.0",
+    "flake8-pyproject>=1.2.0",
 ]
 docs = [
     "mkdocs-material>=9.7.1",
@@ -59,3 +60,18 @@ python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
 addopts = "--verbose --cov=stairway_to_salesforce"
+
+[tool.flake8]
+max-line-length = 100
+max-complexity = 10
+exclude = [
+    '.venv',
+    '.git',
+    '__pycache__',
+    'build',
+    'dist',
+    '*.egg-info',
+]
+per-file-ignores = [
+    '__init__.py:F401',
+]

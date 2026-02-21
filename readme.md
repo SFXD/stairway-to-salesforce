@@ -8,24 +8,32 @@
 A simple ETL Python Framework for Salesforce, built on DLT, featuring Bulk API v2 connectors and a Salesforce Key Resolver for external ID conversion.
 
 ## Features
+
 - **Simple pipeline definition** using DLT framework 
 - **Salesforce Bulk API v2** source and destination connectors
-- **Compatible with DLT connectors** both official and from community
+- **Compatible with DLT connectors** both official and from the community
 - **Full compatibility with DLT functionalities** for credentials, schema validation, performance, memory...
-- **Salesforce Key Resolver** - Convert external IDs to Salesforce IDs
-- **Simplified Salesforce environment management** to test first in sandbox (right?)
+- **Salesforce Key Resolver** - Convert external IDs to Salesforce IDs (useful for lookup or delete based on external id)
+- **Simplified Salesforce environment management** to differenciate test environment credentials from production credentials
 - **Compatibility with Apache Airflow** for orchestration and scheduling
 
-## Quick Install to run samples
+## Quick Install
 
+For normal usage, and basic CSV sample pipelines
 ```bash
 pip install uv
+uv sync 
+```
+
+If you want to test the sample pipeline Salesforce to Postgres, you have to add postgres dependency (dlt[postgres]) as follow 
+```bash
 uv sync --extra postgres
 ```
 
 ## Quick Example
+
 The following example show the simple structure of a pipeline with 5 steps.
-Fully working examples can be found in pipelines folder.
+Fully working samples can be found in pipelines folder.
 
 ```python
 import dlt

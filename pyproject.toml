@@ -25,20 +25,23 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-postgres  = ["dlt[postgres]>=0.4.0"]
-duckdb    = ["dlt[duckdb]>=0.4.0"]
-bigquery  = ["dlt[bigquery]>=0.4.0"]
+postgres = ["dlt[postgres]>=0.4.0"]
+duckdb   = ["dlt[duckdb]>=0.4.0"]
+bigquery = ["dlt[bigquery]>=0.4.0"]
+
+[dependency-groups]
 dev = [
-    "pytest>=9.0.0",
+    "bandit>=1.9.4",
+    "black>=25.12.0",
+    "flake8>=7.3.0",
+    "isort>=7.0.0",
+    "mypy>=1.19.1",
+    "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
     "pytest-mock>=3.11.1",
     "mock>=5.1.0",
     "freezegun>=1.2.2",
     "faker>=19.3.0",
-    "black>=23.7.0",
-    "flake8>=6.1.0",
-    "mypy>=1.5.0",
-    "isort>=5.12.0",
     "flake8-pyproject>=1.2.0",
 ]
 docs = [

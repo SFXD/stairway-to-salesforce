@@ -1,8 +1,9 @@
-from typing import Iterable, Any
+import io
+from typing import Any, Iterable
+
+import pandas as pd
 from dlt.common.typing import TDataItem
 
-import io
-import pandas as pd
 
 def process_csv_result(chunk: Any) -> Iterable[TDataItem]:
     """
@@ -15,12 +16,12 @@ def process_csv_result(chunk: Any) -> Iterable[TDataItem]:
         try:
             df = pd.read_csv(io.StringIO(chunk))
         except Exception as e:
-            raise ValueError(f"Failed to parse CSV chunk: {str(e)}") from e        
+            raise ValueError(f"Failed to parse CSV chunk: {str(e)}") from e
     elif isinstance(chunk, list):
         # List of dictionaries response
         if chunk:
             df = pd.DataFrame(chunk)
-    else:    
+    else:
         raise ValueError(
             f"Unexpected chunk type: {type(chunk).__name__}. "
             f"Expected str (CSV) or list (records)"

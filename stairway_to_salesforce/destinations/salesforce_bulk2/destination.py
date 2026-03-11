@@ -1,22 +1,25 @@
 """
 Salesforce Bulk API v2 destination for DLT.
 
-Refactored to use a Service/Action pattern with a centralized configuration 
+Refactored to use a Service/Action pattern with a centralized configuration
 layer for cleaner metadata validation.
 """
 
-import dlt
 import logging
 
-from dlt.common.typing import TDataItems
+import dlt
 from dlt.common.schema import TTableSchema
-from stairway_to_salesforce.drivers import get_salesforce_driver
+from dlt.common.typing import TDataItems
+
 from stairway_to_salesforce.components import get_salesforce_key_resolver
+from stairway_to_salesforce.drivers import get_salesforce_driver
+
+from .data_processor import cleanup_temp_file, prepare_data
 from .destination_config import SalesforceDestinationConfig
-from .data_processor import prepare_data, cleanup_temp_file
 from .job_executor import execute_job
 
 logger = logging.getLogger(__name__)
+
 
 @dlt.destination(
     name="salesforce_bulk2",
@@ -25,9 +28,7 @@ logger = logging.getLogger(__name__)
     naming_convention="direct",
 )
 def salesforce_bulk2(
-    items: TDataItems,
-    table: TTableSchema,
-    credentials: str = ""
+    items: TDataItems, table: TTableSchema, credentials: str = ""
 ) -> None:
     """
     DLT destination for Salesforce Bulk API v2 using Service/Action pattern.
@@ -35,17 +36,17 @@ def salesforce_bulk2(
     # 1. Configuration & Validation Layer
     # This replaces the messy inline validation blocks
     config = SalesforceDestinationConfig.from_table_schema(table)
-    
+
     # 2. Component Initialization
     driver = get_salesforce_driver(credentials)
     key_resolver = get_salesforce_key_resolver(credentials=credentials)
-    
+
     # 3. Preparation and Execution
     file_path = None
     try:
         # Convert items to Bulk 2.0 compatible CSV
         file_path = prepare_data(items)
-        
+
         # Dispatch to the Job Executor router
         execute_job(
             sf_driver=driver,
@@ -53,10 +54,12 @@ def salesforce_bulk2(
             salesforce_operation=config.salesforce_operation,
             primary_key=config.primary_key_field,
             file_path=file_path,
-            key_resolver=key_resolver
+            key_resolver=key_resolver,
         )
     except Exception as e:
-        logger.error(f"Critical failure during {config.salesforce_operation} on {config.target_object_name}: {str(e)}")
+        logger.error(
+            f"Critical failure during {config.salesforce_operation} on {config.target_object_name}: {str(e)}"
+        )
 
     finally:
         # Ensure cleanup of temporary CSV files

@@ -5,22 +5,22 @@ This module provides common fixtures used across all test modules,
 with special focus on supporting source module tests.
 """
 
-import pytest
-from unittest.mock import Mock
-from pathlib import Path
-import tempfile
 import os
+import tempfile
 from datetime import datetime
+from pathlib import Path
+from unittest.mock import Mock
 
+import pytest
 from simple_salesforce import Salesforce
+
 from stairway_to_salesforce.drivers.salesforce_driver.sfdriver_specs import (
-    SecurityTokenAuth,
-    ConsumerKeySecretDomainAuth,
-)
+    ConsumerKeySecretDomainAuth, SecurityTokenAuth)
 
 # ============================================================================
 # Credential Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 def mock_security_token_credentials():
@@ -28,7 +28,7 @@ def mock_security_token_credentials():
     return SecurityTokenAuth(
         user_name="test@example.com",
         password="test_password",
-        security_token="test_token"
+        security_token="test_token",
     )
 
 
@@ -38,7 +38,7 @@ def mock_consumer_key_credentials():
     return ConsumerKeySecretDomainAuth(
         consumer_key="test_consumer_key",
         consumer_secret="test_consumer_secret",
-        domain="test"
+        domain="test",
     )
 
 
@@ -48,13 +48,14 @@ def mock_credentials_dict():
     return {
         "user_name": "test@example.com",
         "password": "test_password",
-        "security_token": "test_token"
+        "security_token": "test_token",
     }
 
 
 # ============================================================================
 # Salesforce Client Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 def mock_salesforce_client():
@@ -84,21 +85,22 @@ def mock_salesforce_with_bulk2(mock_salesforce_client, mock_bulk2_client):
     mock_salesforce_client.bulk2.Account = mock_bulk2_client
     mock_salesforce_client.bulk2.Contact = mock_bulk2_client
     mock_salesforce_client.bulk2.Opportunity = mock_bulk2_client
-    
+
     # Support custom objects dynamically
     def get_bulk_handler(name):
-        if not name.startswith('_'):
+        if not name.startswith("_"):
             return mock_bulk2_client
         raise AttributeError(f"No such attribute: {name}")
-    
+
     mock_salesforce_client.bulk2.__getattr__ = get_bulk_handler
-    
+
     return mock_salesforce_client
 
 
 # ============================================================================
 # Data Fixtures for Source Tests
 # ============================================================================
+
 
 @pytest.fixture
 def sample_account_data():
@@ -109,15 +111,15 @@ def sample_account_data():
             "Name": "Acme Corp",
             "Type": "Customer",
             "LastModifiedDate": "2025-01-18T10:00:00.000Z",
-            "Website": "https://acme.com"
+            "Website": "https://acme.com",
         },
         {
             "Id": "001xx000000002",
             "Name": "Global Industries",
             "Type": "Customer",
             "LastModifiedDate": "2025-01-18T11:00:00.000Z",
-            "Website": "https://global.com"
-        }
+            "Website": "https://global.com",
+        },
     ]
 
 
@@ -130,15 +132,15 @@ def sample_contact_data():
             "FirstName": "John",
             "LastName": "Doe",
             "Email": "john.doe@example.com",
-            "AccountId": "001xx000000001"
+            "AccountId": "001xx000000001",
         },
         {
             "Id": "003xx000000002",
             "FirstName": "Jane",
             "LastName": "Smith",
             "Email": "jane.smith@example.com",
-            "AccountId": "001xx000000002"
-        }
+            "AccountId": "001xx000000002",
+        },
     ]
 
 
@@ -174,7 +176,7 @@ def sample_resource_config():
         "sobject": "Account",
         "fields": ["Id", "Name", "Type", "LastModifiedDate"],
         "write_disposition": "append",
-        "replication_key": "LastModifiedDate"
+        "replication_key": "LastModifiedDate",
     }
 
 
@@ -186,14 +188,14 @@ def sample_resource_configs():
             "name": "accounts",
             "primary_key": "id",
             "sobject": "Account",
-            "fields": ["Id", "Name", "Type"]
+            "fields": ["Id", "Name", "Type"],
         },
         {
             "name": "contacts",
             "primary_key": "id",
             "sobject": "Contact",
-            "fields": ["Id", "FirstName", "LastName", "Email"]
-        }
+            "fields": ["Id", "FirstName", "LastName", "Email"],
+        },
     ]
 
 
@@ -201,21 +203,18 @@ def sample_resource_configs():
 # File Fixtures
 # ============================================================================
 
+
 @pytest.fixture
 def temp_csv_file(sample_csv_data):
     """Create a temporary CSV file with sample data."""
     temp_file = tempfile.NamedTemporaryFile(
-        mode='w',
-        suffix='.csv',
-        delete=False,
-        newline='',
-        encoding='utf-8'
+        mode="w", suffix=".csv", delete=False, newline="", encoding="utf-8"
     )
     temp_file.write(sample_csv_data)
     temp_file.close()
-    
+
     yield temp_file.name
-    
+
     # Cleanup
     try:
         os.unlink(temp_file.name)
@@ -228,9 +227,10 @@ def temp_dir():
     """Create a temporary directory."""
     temp_path = tempfile.mkdtemp()
     yield Path(temp_path)
-    
+
     # Cleanup
     import shutil
+
     try:
         shutil.rmtree(temp_path)
     except Exception:
@@ -241,34 +241,41 @@ def temp_dir():
 # Job Result Fixtures (for destination tests)
 # ============================================================================
 
+
 @pytest.fixture
 def successful_job_result():
     """Mock successful Bulk API job result."""
-    return [{
-        'job_id': '750xx000000TEST',
-        'numberRecordsProcessed': 100,
-        'numberRecordsFailed': 0
-    }]
+    return [
+        {
+            "job_id": "750xx000000TEST",
+            "numberRecordsProcessed": 100,
+            "numberRecordsFailed": 0,
+        }
+    ]
 
 
 @pytest.fixture
 def failed_job_result():
     """Mock failed Bulk API job result."""
-    return [{
-        'job_id': '750xx000000FAIL',
-        'numberRecordsProcessed': 100,
-        'numberRecordsFailed': 5
-    }]
+    return [
+        {
+            "job_id": "750xx000000FAIL",
+            "numberRecordsProcessed": 100,
+            "numberRecordsFailed": 5,
+        }
+    ]
 
 
 @pytest.fixture
 def partial_success_job_result():
     """Mock partially successful Bulk API job result."""
-    return [{
-        'job_id': '750xx000000PART',
-        'numberRecordsProcessed': 100,
-        'numberRecordsFailed': 10
-    }]
+    return [
+        {
+            "job_id": "750xx000000PART",
+            "numberRecordsProcessed": 100,
+            "numberRecordsFailed": 10,
+        }
+    ]
 
 
 @pytest.fixture
@@ -284,6 +291,7 @@ def sample_failed_records_csv():
 # DateTime Fixtures
 # ============================================================================
 
+
 @pytest.fixture
 def fixed_datetime():
     """Fixed datetime for testing."""
@@ -293,19 +301,20 @@ def fixed_datetime():
 @pytest.fixture
 def mock_datetime(monkeypatch, fixed_datetime):
     """Mock datetime.now() to return fixed datetime."""
+
     class MockDatetime:
         @staticmethod
         def now():
             return fixed_datetime
-        
+
         @staticmethod
         def strftime(fmt):
             return fixed_datetime.strftime(fmt)
-        
+
         @classmethod
         def fromisoformat(cls, date_string):
             return datetime.fromisoformat(date_string)
-    
+
     monkeypatch.setattr("datetime.datetime", MockDatetime)
     return fixed_datetime
 
@@ -313,6 +322,7 @@ def mock_datetime(monkeypatch, fixed_datetime):
 # ============================================================================
 # Query Builder Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 def sample_soql_query():
@@ -339,13 +349,14 @@ def sample_bulk_query_multi_chunk():
 002,Global,contact@global.com""",
         """Id,Name,Email
 003,Test Inc,test@test.com
-004,Sample Co,info@sample.com"""
+004,Sample Co,info@sample.com""",
     ]
 
 
 # ============================================================================
 # Resource Builder Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 def sample_incremental_config():
@@ -356,7 +367,7 @@ def sample_incremental_config():
         "sobject": "Account",
         "fields": ["Id", "Name", "LastModifiedDate"],
         "write_disposition": "append",
-        "replication_key": "LastModifiedDate"
+        "replication_key": "LastModifiedDate",
     }
 
 
@@ -369,7 +380,7 @@ def sample_filtered_config():
         "sobject": "Account",
         "fields": ["Id", "Name", "Type"],
         "write_disposition": "append",
-        "query_filter": "Type = 'Customer'"
+        "query_filter": "Type = 'Customer'",
     }
 
 
@@ -380,7 +391,7 @@ def sample_custom_object_config():
         "name": "custom_records",
         "primary_key": "id",
         "sobject": "Custom_Object__c",
-        "fields": ["Id", "Name", "Custom_Field__c"]
+        "fields": ["Id", "Name", "Custom_Field__c"],
     }
 
 
@@ -388,34 +399,35 @@ def sample_custom_object_config():
 # Mock Functions for Source Tests
 # ============================================================================
 
+
 @pytest.fixture
 def mock_fetch_data_function():
     """Mock fetch_data function for resource builder tests."""
+
     def fetch_mock(sf, sobject, fields, **kwargs):
         # Yield sample data
-        yield [
-            {"Id": "001", "Name": "Test 1"},
-            {"Id": "002", "Name": "Test 2"}
-        ]
-    
+        yield [{"Id": "001", "Name": "Test 1"}, {"Id": "002", "Name": "Test 2"}]
+
     return Mock(side_effect=fetch_mock)
 
 
 @pytest.fixture
 def mock_fetch_data_empty():
     """Mock fetch_data function that returns no data."""
+
     def fetch_mock(sf, sobject, fields, **kwargs):
         return iter([])
-    
+
     return Mock(side_effect=fetch_mock)
 
 
 @pytest.fixture
 def mock_fetch_data_error():
     """Mock fetch_data function that raises an error."""
+
     def fetch_mock(sf, sobject, fields, **kwargs):
         raise RuntimeError("Fetch failed")
-    
+
     return Mock(side_effect=fetch_mock)
 
 
@@ -423,13 +435,14 @@ def mock_fetch_data_error():
 # Helper Functions
 # ============================================================================
 
+
 def create_mock_bulk_handler(query_response):
     """
     Helper to create a mock Bulk2 handler with query response.
-    
+
     Args:
         query_response: List of CSV strings or list of dicts
-    
+
     Returns:
         Mock Bulk2 handler
     """
@@ -441,21 +454,21 @@ def create_mock_bulk_handler(query_response):
 def create_mock_salesforce_with_data(sobject_name, query_response):
     """
     Helper to create a mock Salesforce client with data for a specific object.
-    
+
     Args:
         sobject_name: Name of the Salesforce object (e.g., "Account")
         query_response: Data to return from query
-    
+
     Returns:
         Mock Salesforce client
     """
     mock_sf = Mock(spec=Salesforce)
     mock_handler = create_mock_bulk_handler(query_response)
-    
+
     # Set up bulk2 attribute
     mock_sf.bulk2 = Mock()
     setattr(mock_sf.bulk2, sobject_name, mock_handler)
-    
+
     return mock_sf
 
 

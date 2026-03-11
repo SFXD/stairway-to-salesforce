@@ -1,14 +1,14 @@
 """Salesforce credential specification classes only."""
 
 from typing import Optional, Union
-from dlt.common.typing import TSecretStrValue
-from dlt.common.configuration.specs import (
-    CredentialsConfiguration,
-    configspec,
-    BaseConfiguration,
-)
+
 from dlt.common.configuration.exceptions import ConfigurationValueError
+from dlt.common.configuration.specs import (BaseConfiguration,
+                                            CredentialsConfiguration,
+                                            configspec)
+from dlt.common.typing import TSecretStrValue
 from simple_salesforce.api import DEFAULT_API_VERSION
+
 
 @configspec
 class SalesforceDriverConfiguration(BaseConfiguration):
@@ -21,13 +21,17 @@ class SalesforceDriverConfiguration(BaseConfiguration):
         if self.proxies is None:
             return None
         import json
-        from simple_salesforce.util import Proxies
         from typing import cast
+
+        from simple_salesforce.util import Proxies
+
         return cast(Proxies, json.loads(self.proxies))
+
 
 @configspec
 class SalesforceCredentialsBase(CredentialsConfiguration):
     """Base for all Salesforce credential classes."""
+
 
 # All your @configspec credential classes here...
 @configspec
@@ -108,7 +112,12 @@ class ConsumerKeySecretDomainAuth(SalesforceCredentialsBase):
     consumer_secret: TSecretStrValue = None
     domain: str = None
 
+
 SalesforceDriverAuth = Union[
-    SecurityTokenAuth, OrganizationIdAuth, ConsumerKeySecretAuth,
-    JWTAuth, ConsumerKeySecretDomainAuth, InstanceAuth
+    SecurityTokenAuth,
+    OrganizationIdAuth,
+    ConsumerKeySecretAuth,
+    JWTAuth,
+    ConsumerKeySecretDomainAuth,
+    InstanceAuth,
 ]

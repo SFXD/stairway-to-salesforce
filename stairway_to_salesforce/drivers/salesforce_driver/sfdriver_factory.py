@@ -1,28 +1,21 @@
 from typing import Optional, Union
 
 import dlt
-
 from dlt.sources.helpers.requests import Session
 from simple_salesforce import Salesforce
 
-from .sfdriver_specs import (
-    SalesforceDriverAuth,
-    SalesforceDriverConfiguration,
-    SecurityTokenAuth,
-    OrganizationIdAuth,
-    InstanceAuth,
-    ConsumerKeySecretAuth,
-    JWTAuth,
-    ConsumerKeySecretDomainAuth
-)
+from .sfdriver_specs import (ConsumerKeySecretAuth,
+                             ConsumerKeySecretDomainAuth, InstanceAuth,
+                             JWTAuth, OrganizationIdAuth, SalesforceDriverAuth,
+                             SalesforceDriverConfiguration, SecurityTokenAuth)
 
 
 def make_salesforce_driver(
     credentials: SalesforceDriverAuth,
     session: Optional[Session] = None,
     config: SalesforceDriverConfiguration = None,
-) -> Salesforce:    
-    
+) -> Salesforce:
+
     credentials = resolve_salesforce_credentials(credentials)
 
     if isinstance(credentials, SecurityTokenAuth):
@@ -84,7 +77,7 @@ def make_salesforce_driver(
             privatekey_file=credentials.privatekey_file,
             privatekey=credentials.privatekey,
         )
-    
+
     elif isinstance(credentials, ConsumerKeySecretDomainAuth):
         # NOTE: For this authentication type, domain must be provided as part of the credentials set,
         # we therefore get it from credentials, not config
@@ -99,25 +92,25 @@ def make_salesforce_driver(
 
 
 def resolve_salesforce_credentials(
-    credentials: Union[SalesforceDriverAuth, dict, str]
+    credentials: Union[SalesforceDriverAuth, dict, str],
 ) -> SalesforceDriverAuth:
     """
     Resolve and validate Salesforce credentials from various input formats.
-    
+
     This function handles:
     - Already instantiated credential objects (returns as-is)
     - Dictionary credentials (converts to appropriate class)
     - String paths to DLT secrets (loads and converts)
-    
+
     Args:
         credentials: Credentials in various formats:
             - SalesforceDriverAuth instance: returned as-is
             - dict: converted to appropriate credential class
             - str: loaded from DLT secrets path (e.g., "salesforce.dev")
-    
+
     Returns:
         Properly typed SalesforceDriverAuth instance
-    
+
     Raises:
         ValueError: If credentials cannot be resolved or are invalid
         TypeError: If credentials are in an unsupported format
@@ -130,52 +123,55 @@ def resolve_salesforce_credentials(
             raise ValueError(
                 f"Failed to load credentials from DLT secrets path '{credentials}': {str(e)}"
             ) from e
-    
+
     # If already a proper credential object, return it
-    if isinstance(credentials, (
-        SecurityTokenAuth,
-        OrganizationIdAuth,
-        InstanceAuth,
-        ConsumerKeySecretAuth,
-        JWTAuth,
-        ConsumerKeySecretDomainAuth
-    )):
+    if isinstance(
+        credentials,
+        (
+            SecurityTokenAuth,
+            OrganizationIdAuth,
+            InstanceAuth,
+            ConsumerKeySecretAuth,
+            JWTAuth,
+            ConsumerKeySecretDomainAuth,
+        ),
+    ):
         return credentials
-    
+
     # Convert dict to proper credential class
     if not isinstance(credentials, dict):
         raise TypeError(
             f"Credentials must be a SalesforceDriverAuth instance, dict, or string path. "
             f"Got {type(credentials).__name__}"
         )
-    
+
     # Determine credential type by checking which fields are present
     # Priority order matches Salesforce authentication specificity
-    
+
     if "security_token" in credentials:
         # OAuth 2.0 Username-Password Flow with Security Token
         return SecurityTokenAuth(
             user_name=credentials.get("user_name"),
             password=credentials.get("password"),
-            security_token=credentials.get("security_token")
+            security_token=credentials.get("security_token"),
         )
-    
+
     elif "organization_id" in credentials:
         # Trusted IP Ranges Authentication
         return OrganizationIdAuth(
             user_name=credentials.get("user_name"),
             password=credentials.get("password"),
-            organization_id=credentials.get("organization_id")
+            organization_id=credentials.get("organization_id"),
         )
-    
+
     elif "session_id" in credentials:
         # Direct Session Access
         return InstanceAuth(
             session_id=credentials.get("session_id"),
             instance=credentials.get("instance"),
-            instance_url=credentials.get("instance_url")
+            instance_url=credentials.get("instance_url"),
         )
-    
+
     elif "privatekey" in credentials or "privatekey_file" in credentials:
         # OAuth 2.0 JWT Bearer Flow
         return JWTAuth(
@@ -183,26 +179,28 @@ def resolve_salesforce_credentials(
             consumer_key=credentials.get("consumer_key"),
             privatekey_file=credentials.get("privatekey_file"),
             privatekey=credentials.get("privatekey"),
-            instance_url=credentials.get("instance_url")
+            instance_url=credentials.get("instance_url"),
         )
-    
+
     elif all(k in credentials for k in ["consumer_key", "consumer_secret", "domain"]):
         # OAuth 2.0 Client Credentials Flow
         return ConsumerKeySecretDomainAuth(
             consumer_key=credentials.get("consumer_key"),
             consumer_secret=credentials.get("consumer_secret"),
-            domain=credentials.get("domain")
+            domain=credentials.get("domain"),
         )
-    
-    elif all(k in credentials for k in ["consumer_key", "consumer_secret", "user_name"]):
+
+    elif all(
+        k in credentials for k in ["consumer_key", "consumer_secret", "user_name"]
+    ):
         # OAuth 2.0 Username-Password Flow with Connected App
         return ConsumerKeySecretAuth(
             user_name=credentials.get("user_name"),
             password=credentials.get("password"),
             consumer_key=credentials.get("consumer_key"),
-            consumer_secret=credentials.get("consumer_secret")
+            consumer_secret=credentials.get("consumer_secret"),
         )
-    
+
     else:
         raise ValueError(
             f"Could not determine Salesforce credential type. "

@@ -1,23 +1,21 @@
 """
 Salesforce Bulk API v2 job execution router.
 
-This module acts as a dispatcher, routing DLT load packages to specific 
+This module acts as a dispatcher, routing DLT load packages to specific
 operation services (insert, upsert, delete, replace).
 """
+
 import logging
-from typing import Optional, List, Union
+from typing import List, Optional, Union
+
 from simple_salesforce import Salesforce
 
 # Import the operation services from the operations package
-from .operations import (
-    exec_insert,
-    exec_upsert,
-    exec_delete,
-    exec_replace
-)
+from .operations import exec_delete, exec_insert, exec_replace, exec_upsert
 
 # Initialize logger
 logger = logging.getLogger(__name__)
+
 
 def execute_job(
     sf_driver: Salesforce,
@@ -25,11 +23,11 @@ def execute_job(
     salesforce_operation: str,
     primary_key: Optional[Union[str, List[str]]],
     file_path: str,
-    key_resolver: Optional[object] = None
+    key_resolver: Optional[object] = None,
 ) -> None:
     """
     Execute Salesforce Bulk API v2 job by dispatching to the appropriate service.
-    
+
     Args:
         sf_driver: Authenticated Salesforce client.
         target_name: The SObject name (e.g., 'Account').
@@ -45,7 +43,7 @@ def execute_job(
         "insert": exec_insert,
         "upsert": exec_upsert,
         "delete": exec_delete,
-        "replace": exec_replace
+        "replace": exec_replace,
     }
 
     # Verify that the requested operation is supported
@@ -57,12 +55,12 @@ def execute_job(
 
     # Execute the operation
     operation_func = dispatch_map[salesforce_operation]
-    
+
     operation_func(
         sf_driver=sf_driver,
         target_name=target_name,
         file_path=file_path,
         primary_key=primary_key,
-        key_resolver=key_resolver
+        key_resolver=key_resolver,
     )
     logger.debug("Successfully finished  %s on %s", salesforce_operation, target_name)

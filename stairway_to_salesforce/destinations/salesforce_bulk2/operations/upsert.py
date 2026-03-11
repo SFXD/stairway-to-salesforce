@@ -1,8 +1,7 @@
 import logging
 from typing import List, Union
 
-from stairway_to_salesforce.utils.salesforce_validators import \
-    sanitize_field_name
+from stairway_to_salesforce.utils.salesforce_validators import sanitize_field_name
 
 from .common import get_bulk_client, process_results
 

@@ -11,8 +11,13 @@ from unittest.mock import Mock, patch
 import pytest
 
 from stairway_to_salesforce.drivers.salesforce_driver.sfdriver_cache_manager import (
-    add_driver_to_cache, clear_cache, driver_cache, get_cache_key,
-    get_driver_from_cache, has_driver_in_cache)
+    add_driver_to_cache,
+    clear_cache,
+    driver_cache,
+    get_cache_key,
+    get_driver_from_cache,
+    has_driver_in_cache,
+)
 
 
 class TestGetCacheKey:

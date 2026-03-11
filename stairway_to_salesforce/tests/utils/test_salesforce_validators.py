@@ -7,8 +7,12 @@ from datetime import date, datetime
 import pytest
 
 from stairway_to_salesforce.utils.salesforce_validators import (
-    format_soql_value, sanitize_field_name, sanitize_sobject_name,
-    validate_field_names, validate_soql_filter)
+    format_soql_value,
+    sanitize_field_name,
+    sanitize_sobject_name,
+    validate_field_names,
+    validate_soql_filter,
+)
 
 
 class TestSanitizeSobjectName:
@@ -64,10 +68,7 @@ class TestSanitizeFieldName:
     def test_valid_custom_field(self):
         """Test validation of custom fields."""
         assert sanitize_field_name("Custom_Field__c") == "Custom_Field__c"
-        assert (
-            sanitize_field_name("truncated_description__c")
-            == "truncated_description__c"
-        )
+        assert sanitize_field_name("truncated_description__c") == "truncated_description__c"
 
     def test_valid_relationship_field(self):
         """Test validation of relationship fields with dot notation."""

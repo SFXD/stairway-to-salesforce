@@ -10,9 +10,15 @@ import pytest
 from dlt.common.configuration.exceptions import ConfigurationValueError
 
 from stairway_to_salesforce.drivers.salesforce_driver.sfdriver_specs import (
-    ConsumerKeySecretAuth, ConsumerKeySecretDomainAuth, InstanceAuth, JWTAuth,
-    OrganizationIdAuth, SalesforceDriverAuth, SalesforceDriverConfiguration,
-    SecurityTokenAuth)
+    ConsumerKeySecretAuth,
+    ConsumerKeySecretDomainAuth,
+    InstanceAuth,
+    JWTAuth,
+    OrganizationIdAuth,
+    SalesforceDriverAuth,
+    SalesforceDriverConfiguration,
+    SecurityTokenAuth,
+)
 
 
 class TestSalesforceDriverConfiguration:
@@ -131,9 +137,7 @@ class TestInstanceAuth:
 
     def test_create_instance_auth_with_instance(self):
         """Test creating InstanceAuth with instance field."""
-        creds = InstanceAuth(
-            session_id="test_session_id", instance="na1.salesforce.com"
-        )
+        creds = InstanceAuth(session_id="test_session_id", instance="na1.salesforce.com")
 
         assert creds.session_id == "test_session_id"
         assert creds.instance == "na1.salesforce.com"
@@ -222,9 +226,7 @@ class TestJWTAuth:
 
     def test_create_jwt_auth_with_privatekey(self):
         """Test creating JWTAuth with privatekey string."""
-        private_key_content = (
-            "-----BEGIN RSA PRIVATE KEY-----\ntest\n-----END RSA PRIVATE KEY-----"
-        )
+        private_key_content = "-----BEGIN RSA PRIVATE KEY-----\ntest\n-----END RSA PRIVATE KEY-----"
 
         creds = JWTAuth(
             user_name="test@example.com",

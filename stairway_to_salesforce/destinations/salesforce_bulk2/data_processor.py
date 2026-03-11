@@ -51,9 +51,7 @@ def prepare_data(items: TDataItems) -> str:
 
         # Validate it's a CSV (Bulk API requirement)
         if not file_path.lower().endswith(".csv"):
-            raise ValueError(
-                f"File must be CSV format for Salesforce Bulk API. Got: {file_path}"
-            )
+            raise ValueError(f"File must be CSV format for Salesforce Bulk API. Got: {file_path}")
 
         return file_path
 

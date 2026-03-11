@@ -15,8 +15,11 @@ from simple_salesforce import Salesforce
 from simple_salesforce.exceptions import SalesforceMalformedRequest
 
 from stairway_to_salesforce.utils.salesforce_validators import (
-    format_soql_value, sanitize_field_name, sanitize_sobject_name,
-    validate_soql_filter)
+    format_soql_value,
+    sanitize_field_name,
+    sanitize_sobject_name,
+    validate_soql_filter,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +72,9 @@ def _build_soql_query(
         order_by_clause = f" ORDER BY {sanitize_field_name(replication_key)} ASC"
 
     # Build final query
-    query = f"SELECT {', '.join(source_fields)} FROM {sobject}{where_clause}{order_by_clause} LIMIT 2"
+    query = (
+        f"SELECT {', '.join(source_fields)} FROM {sobject}{where_clause}{order_by_clause} LIMIT 2"
+    )
     logger.debug(f"Generated SOQL: {query}")
     return query
 
@@ -139,9 +144,7 @@ def fetch_data(
 
     # Build SOQL query
     try:
-        soql_query = _build_soql_query(
-            sobject, fields, query_filter, replication_key, last_state
-        )
+        soql_query = _build_soql_query(sobject, fields, query_filter, replication_key, last_state)
     except ValueError as e:
         logger.error(f"Failed to build SOQL query: {str(e)}")
         raise ValueError(f"Failed to build SOQL query: {str(e)}") from e
@@ -182,9 +185,7 @@ def fetch_data(
     except SalesforceMalformedRequest as e:
         logger.error(f"Malformed SOQL query for {sobject}: {str(e)}")
         raise SalesforceMalformedRequest(
-            f"Malformed SOQL query for {sobject}. "
-            f"Query: {soql_query}. "
-            f"Error: {str(e)}"
+            f"Malformed SOQL query for {sobject}. " f"Query: {soql_query}. " f"Error: {str(e)}"
         ) from e
 
     except AttributeError as e:

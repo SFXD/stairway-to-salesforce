@@ -94,9 +94,7 @@ class BasePipeline(ABC):
         try:
             self.logger.info(f"🚀 Initializing pipeline: {self.pipeline_name}")
             self.execute()
-            self.logger.info(
-                f"✅ Pipeline {self.pipeline_name} completed successfully."
-            )
+            self.logger.info(f"✅ Pipeline {self.pipeline_name} completed successfully.")
         except Exception as e:
             self.logger.error(f"❌ Pipeline failed: {e}")
             import traceback

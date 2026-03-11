@@ -54,9 +54,7 @@ def exec_delete(
             # 5. Salesforce Bulk Delete ONLY accepts 15/18 character Salesforce IDs.
             # We filter for rows where resolution actually returned a valid ID.
             # (Note: try_resolve returns the original value if not found, so we check for change)
-            df_to_delete = df_source[df_source["Id"].str.startswith("00", na=False)][
-                ["Id"]
-            ]
+            df_to_delete = df_source[df_source["Id"].str.startswith("00", na=False)][["Id"]]
 
             if not df_to_delete.empty:
                 temp_id_file = tempfile.NamedTemporaryFile(

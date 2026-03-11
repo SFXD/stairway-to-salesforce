@@ -28,9 +28,7 @@ def validate_resource_configs(configs: list[dict[str, Any]]) -> None:
         # Check for required fields
         missing = [f for f in required_fields if not config.get(f)]
         if missing:
-            raise ValueError(
-                f"Config {i} missing required fields: {', '.join(missing)}"
-            )
+            raise ValueError(f"Config {i} missing required fields: {', '.join(missing)}")
 
         # Validate structure
         if "fields" in config and not isinstance(config["fields"], list):
@@ -47,8 +45,7 @@ def validate_resource_configs(configs: list[dict[str, Any]]) -> None:
             replication_key = config["replication_key"]
             if replication_key not in config["fields"]:
                 raise ValueError(
-                    f"Config {i}: replication_key '{replication_key}' "
-                    f"must exist in fields list"
+                    f"Config {i}: replication_key '{replication_key}' " f"must exist in fields list"
                 )
 
 
@@ -95,9 +92,7 @@ def build_resource(
     # Setup incremental loading
     incremental_cursor = None
     if replication_key:
-        incremental_cursor = dlt.sources.incremental(
-            replication_key, initial_value=None
-        )
+        incremental_cursor = dlt.sources.incremental(replication_key, initial_value=None)
 
     @dlt.resource(
         name=name,
@@ -114,9 +109,7 @@ def build_resource(
         try:
             driver = get_salesforce_driver(credentials, session)
         except Exception as e:
-            raise RuntimeError(
-                f"Failed to create Salesforce driver for {sobject}: {str(e)}"
-            ) from e
+            raise RuntimeError(f"Failed to create Salesforce driver for {sobject}: {str(e)}") from e
 
         last_value = None
         if incremental_cursor and replication_key and incremental_load:

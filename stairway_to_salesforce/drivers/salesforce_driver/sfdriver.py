@@ -5,8 +5,7 @@ from dlt.common.configuration import with_config
 from dlt.sources.helpers.requests import Session
 from simple_salesforce import Salesforce
 
-from .sfdriver_cache_manager import (add_driver_to_cache, get_cache_key,
-                                     get_driver_from_cache)
+from .sfdriver_cache_manager import add_driver_to_cache, get_cache_key, get_driver_from_cache
 from .sfdriver_factory import make_salesforce_driver
 from .sfdriver_specs import SalesforceDriverAuth, SalesforceDriverConfiguration
 

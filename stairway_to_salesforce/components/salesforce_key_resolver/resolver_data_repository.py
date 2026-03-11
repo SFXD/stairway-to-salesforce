@@ -2,22 +2,24 @@ import logging
 from typing import Set
 
 import pandas as pd
-from simple_salesforce import (SalesforceError, SalesforceMalformedRequest,
-                               SalesforceResourceNotFound)
+from simple_salesforce import (
+    SalesforceError,
+    SalesforceMalformedRequest,
+    SalesforceResourceNotFound,
+)
 
-from stairway_to_salesforce.utils.salesforce_api_helper import \
-    process_csv_result
+from stairway_to_salesforce.utils.salesforce_api_helper import process_csv_result
 from stairway_to_salesforce.utils.salesforce_validators import (
-    sanitize_field_name, sanitize_sobject_name)
+    sanitize_field_name,
+    sanitize_sobject_name,
+)
 
 logger = logging.getLogger(__name__)
 
 
 class SalesforceRepository:
 
-    def _build_query(
-        self, sobject: str, key_field: str, key_values: Set[str] = None
-    ) -> str:
+    def _build_query(self, sobject: str, key_field: str, key_values: Set[str] = None) -> str:
         """
         Build base SOQL query, used both or a full load and a filtered load
 
@@ -30,9 +32,7 @@ class SalesforceRepository:
         """
         # Validate inputs (prevents injection attacks)
         validated_sobject = sanitize_sobject_name(sobject)
-        validated_key_field = sanitize_field_name(
-            key_field, allow_relationship_notation=False
-        )
+        validated_key_field = sanitize_field_name(key_field, allow_relationship_notation=False)
 
         base_query = (
             f"SELECT Id, {validated_key_field} "
@@ -49,9 +49,7 @@ class SalesforceRepository:
 
         return f"{base_query}{filter_query}"
 
-    def fetch_all(
-        self, salesforce_driver, sobject: str, key_field: str
-    ) -> pd.DataFrame:
+    def fetch_all(self, salesforce_driver, sobject: str, key_field: str) -> pd.DataFrame:
         """
         fetch mapping for the given sobject, using the Bulk API v2
 

@@ -64,16 +64,13 @@ def sanitize_sobject_name(sobject_name: str) -> str:
     # Additional validation: check length (Salesforce limit is 40 characters for API name)
     if len(sobject_name) > 255:  # Being generous with limit
         raise ValueError(
-            f"Object name too long: '{sobject_name}'. "
-            f"Maximum length is 255 characters."
+            f"Object name too long: '{sobject_name}'. " f"Maximum length is 255 characters."
         )
 
     return sobject_name
 
 
-def sanitize_field_name(
-    field_name: str, allow_relationship_notation: bool = True
-) -> str:
+def sanitize_field_name(field_name: str, allow_relationship_notation: bool = True) -> str:
     """
     Validate and sanitize SOQL field names to prevent injection.
 
@@ -132,11 +129,7 @@ def sanitize_field_name(
             f"Field names must start with a letter and contain only "
             f"letters, numbers, and underscores. "
             f"Custom fields should end with suffixes like '__c', '__r'. "
-            + (
-                "Relationship notation (dots) is allowed."
-                if allow_relationship_notation
-                else ""
-            )
+            + ("Relationship notation (dots) is allowed." if allow_relationship_notation else "")
         )
 
     # Additional security: block SQL/SOQL keywords that shouldn't be in field names
@@ -158,15 +151,12 @@ def sanitize_field_name(
         # Remove suffix for keyword check
         part_base = re.sub(r"__[a-zA-Z]+$", "", part).upper()
         if part_base in dangerous_keywords:
-            raise ValueError(
-                f"Field name contains disallowed keyword: '{part}' in '{field_name}'"
-            )
+            raise ValueError(f"Field name contains disallowed keyword: '{part}' in '{field_name}'")
 
     # Additional validation: check length
     if len(field_name) > 255:
         raise ValueError(
-            f"Field name too long: '{field_name}'. "
-            f"Maximum length is 255 characters."
+            f"Field name too long: '{field_name}'. " f"Maximum length is 255 characters."
         )
 
     return field_name
@@ -215,8 +205,7 @@ def validate_soql_filter(query_filter: str) -> None:
     for pattern in dangerous_patterns:
         if re.search(pattern, filter_upper, re.IGNORECASE):
             raise ValueError(
-                f"Query filter contains potentially dangerous pattern. "
-                f"Filter: {query_filter}"
+                f"Query filter contains potentially dangerous pattern. " f"Filter: {query_filter}"
             )
 
     # Check for dangerous standalone keywords at word boundaries
@@ -237,9 +226,7 @@ def validate_soql_filter(query_filter: str) -> None:
     for keyword in dangerous_keywords:
         # Check if keyword appears as a standalone word (not part of field name)
         # Allow it if it's part of a field name (followed/preceded by underscore or letter/number)
-        pattern = (
-            r"\b" + keyword + r"\b(?!_)"
-        )  # Word boundary but not followed by underscore
+        pattern = r"\b" + keyword + r"\b(?!_)"  # Word boundary but not followed by underscore
         if re.search(pattern, filter_upper):
             # Additional check: make sure it's not part of a custom field name like Update__c
             # Look for pattern: keyword followed by __ (custom field pattern)
@@ -315,9 +302,7 @@ def format_soql_value(value: Any, field_type: str = "auto") -> str:
         if isinstance(value, str):
             # Validate ISO format
             if not re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}", value):
-                raise ValueError(
-                    f"Invalid datetime format: {value}. Expected ISO 8601 format."
-                )
+                raise ValueError(f"Invalid datetime format: {value}. Expected ISO 8601 format.")
             # Ensure it ends with Z if no timezone specified
             if not (value.endswith("Z") or "+" in value or value.count("-") > 2):
                 value = value + "Z"
@@ -350,9 +335,7 @@ def format_soql_value(value: Any, field_type: str = "auto") -> str:
         return f"'{escaped}'"
 
 
-def validate_field_names(
-    fields: dict[str, str], allow_relationship_notation: bool = True
-) -> None:
+def validate_field_names(fields: dict[str, str], allow_relationship_notation: bool = True) -> None:
     """
     Validate all field names in a field mapping dictionary.
 

@@ -15,7 +15,9 @@ import pytest
 from simple_salesforce import Salesforce
 
 from stairway_to_salesforce.drivers.salesforce_driver.sfdriver_specs import (
-    ConsumerKeySecretDomainAuth, SecurityTokenAuth)
+    ConsumerKeySecretDomainAuth,
+    SecurityTokenAuth,
+)
 
 # ============================================================================
 # Credential Fixtures

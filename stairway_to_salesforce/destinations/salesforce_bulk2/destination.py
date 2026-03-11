@@ -27,9 +27,7 @@ logger = logging.getLogger(__name__)
     batch_size=10000,
     naming_convention="direct",
 )
-def salesforce_bulk2(
-    items: TDataItems, table: TTableSchema, credentials: str = ""
-) -> None:
+def salesforce_bulk2(items: TDataItems, table: TTableSchema, credentials: str = "") -> None:
     """
     DLT destination for Salesforce Bulk API v2 using Service/Action pattern.
     """

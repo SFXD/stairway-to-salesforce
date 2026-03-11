@@ -8,7 +8,10 @@ from unittest.mock import MagicMock, Mock, PropertyMock, call, patch
 import pytest
 
 from stairway_to_salesforce.destinations.salesforce_bulk2.operations.common import (
-    _save_rejected_records, get_bulk_client, process_results)
+    _save_rejected_records,
+    get_bulk_client,
+    process_results,
+)
 
 
 class TestGetBulkClient:
@@ -79,9 +82,7 @@ class TestProcessResults:
         # Should NOT call get_failed_records
         mock_client.get_failed_records.assert_not_called()
 
-    def test_process_results_with_failures(
-        self, failed_job_result, sample_failed_records_csv
-    ):
+    def test_process_results_with_failures(self, failed_job_result, sample_failed_records_csv):
         """Test processing job with failures."""
         mock_client = Mock()
         mock_client.get_failed_records.return_value = sample_failed_records_csv
@@ -89,9 +90,7 @@ class TestProcessResults:
         with patch(
             "stairway_to_salesforce.destinations.salesforce_bulk2.operations.common._save_rejected_records"
         ) as mock_save:
-            mock_save.return_value = (
-                ".dlt/rejected_records/Account_750xx000000FAIL_insert.csv"
-            )
+            mock_save.return_value = ".dlt/rejected_records/Account_750xx000000FAIL_insert.csv"
 
             process_results(
                 client=mock_client,
@@ -135,9 +134,7 @@ class TestProcessResults:
         """Test processing empty results."""
         mock_client = Mock()
 
-        process_results(
-            client=mock_client, results=[], target_name="Account", operation="insert"
-        )
+        process_results(client=mock_client, results=[], target_name="Account", operation="insert")
 
         # Should log warning about no results
         captured = capsys.readouterr()
@@ -147,9 +144,7 @@ class TestProcessResults:
         """Test processing None results."""
         mock_client = Mock()
 
-        process_results(
-            client=mock_client, results=None, target_name="Account", operation="insert"
-        )
+        process_results(client=mock_client, results=None, target_name="Account", operation="insert")
 
         # Should handle gracefully
         captured = capsys.readouterr()
@@ -213,9 +208,7 @@ class TestSaveRejectedRecords:
             assert "DUPLICATE_VALUE" in content
             assert "REQUIRED_FIELD_MISSING" in content
 
-    def test_save_rejected_records_creates_directories(
-        self, sample_failed_records_csv, temp_dir
-    ):
+    def test_save_rejected_records_creates_directories(self, sample_failed_records_csv, temp_dir):
         """Test that parent directories are created if needed."""
         with patch(
             "stairway_to_salesforce.destinations.salesforce_bulk2.operations.common.get_rejected_records_path"

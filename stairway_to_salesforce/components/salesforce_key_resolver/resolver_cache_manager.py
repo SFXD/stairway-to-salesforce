@@ -110,9 +110,7 @@ class CacheManager:
 
         return len(df_merged)
 
-    def find_missing_keys(
-        self, sobject: str, key_field: str, requested_keys: Set[str]
-    ) -> Set[str]:
+    def find_missing_keys(self, sobject: str, key_field: str, requested_keys: Set[str]) -> Set[str]:
         """
         Find keys not in cache.
 
@@ -139,9 +137,7 @@ class CacheManager:
 
         return missing_keys
 
-    def resolve_single(
-        self, sobject: str, key_field: str, external_value: str
-    ) -> Optional[str]:
+    def resolve_single(self, sobject: str, key_field: str, external_value: str) -> Optional[str]:
         """
         Resolve single external ID to Salesforce ID.
 
@@ -171,9 +167,7 @@ class CacheManager:
 
         return result.iloc[0]
 
-    def clear(
-        self, sobject: Optional[str] = None, key_field: Optional[str] = None
-    ) -> None:
+    def clear(self, sobject: Optional[str] = None, key_field: Optional[str] = None) -> None:
         """
         Clear cache entries.
 
@@ -186,9 +180,7 @@ class CacheManager:
             if cache_key in self._cache:
                 del self._cache[cache_key]
         elif sobject:
-            keys_to_delete = [
-                k for k in self._cache.keys() if k.startswith(f"{sobject}:")
-            ]
+            keys_to_delete = [k for k in self._cache.keys() if k.startswith(f"{sobject}:")]
             for key in keys_to_delete:
                 del self._cache[key]
         else:

@@ -4,10 +4,16 @@ import dlt
 from dlt.sources.helpers.requests import Session
 from simple_salesforce import Salesforce
 
-from .sfdriver_specs import (ConsumerKeySecretAuth,
-                             ConsumerKeySecretDomainAuth, InstanceAuth,
-                             JWTAuth, OrganizationIdAuth, SalesforceDriverAuth,
-                             SalesforceDriverConfiguration, SecurityTokenAuth)
+from .sfdriver_specs import (
+    ConsumerKeySecretAuth,
+    ConsumerKeySecretDomainAuth,
+    InstanceAuth,
+    JWTAuth,
+    OrganizationIdAuth,
+    SalesforceDriverAuth,
+    SalesforceDriverConfiguration,
+    SecurityTokenAuth,
+)
 
 
 def make_salesforce_driver(
@@ -190,9 +196,7 @@ def resolve_salesforce_credentials(
             domain=credentials.get("domain"),
         )
 
-    elif all(
-        k in credentials for k in ["consumer_key", "consumer_secret", "user_name"]
-    ):
+    elif all(k in credentials for k in ["consumer_key", "consumer_secret", "user_name"]):
         # OAuth 2.0 Username-Password Flow with Connected App
         return ConsumerKeySecretAuth(
             user_name=credentials.get("user_name"),

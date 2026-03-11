@@ -6,8 +6,9 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from stairway_to_salesforce.destinations.salesforce_bulk2.destination_config import \
-    SalesforceDestinationConfig
+from stairway_to_salesforce.destinations.salesforce_bulk2.destination_config import (
+    SalesforceDestinationConfig,
+)
 
 
 class TestSalesforceDestinationConfig:
@@ -118,9 +119,10 @@ class TestSalesforceDestinationConfig:
         config = SalesforceDestinationConfig.from_table_schema(table_schema)
 
         # Should return list when multiple PKs found
-        assert isinstance(
-            config.primary_key_field, list
-        ) or config.primary_key_field in ["Id", "External_ID__c"]
+        assert isinstance(config.primary_key_field, list) or config.primary_key_field in [
+            "Id",
+            "External_ID__c",
+        ]
 
     def test_from_table_schema_primary_key_precedence(self):
         """Test that top-level primary_key takes precedence over columns."""

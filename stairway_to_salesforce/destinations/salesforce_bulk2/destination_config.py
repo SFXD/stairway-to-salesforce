@@ -21,9 +21,7 @@ class SalesforceDestinationConfig:
     primary_key_field: Optional[Union[str, List[str]]]
 
     @classmethod
-    def from_table_schema(
-        cls, table_schema: TTableSchema
-    ) -> "SalesforceDestinationConfig":
+    def from_table_schema(cls, table_schema: TTableSchema) -> "SalesforceDestinationConfig":
         """
         Factories a config object from DLT metadata with strict validation.
         """
@@ -33,9 +31,7 @@ class SalesforceDestinationConfig:
         operation_hint = table_schema.get("x-salesforce-operation")
 
         if not target_name:
-            raise ValueError(
-                "Salesforce SObject name must be defined in the table schema."
-            )
+            raise ValueError("Salesforce SObject name must be defined in the table schema.")
 
         # 2. Resolve Primary Key (check top-level then column-level)
         primary_key = table_schema.get("primary_key")

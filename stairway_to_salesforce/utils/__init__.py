@@ -6,9 +6,12 @@ This package contains common utilities used across Salesforce sources and destin
 
 from .logger_config import get_rejected_records_path
 from .salesforce_api_helper import process_csv_result
-from .salesforce_validators import (format_soql_value, sanitize_field_name,
-                                    sanitize_sobject_name,
-                                    validate_soql_filter)
+from .salesforce_validators import (
+    format_soql_value,
+    sanitize_field_name,
+    sanitize_sobject_name,
+    validate_soql_filter,
+)
 
 __all__ = [
     "sanitize_sobject_name",

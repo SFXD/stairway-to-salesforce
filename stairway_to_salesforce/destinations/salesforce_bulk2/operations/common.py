@@ -1,9 +1,7 @@
 import logging
 
-from stairway_to_salesforce.utils.logger_config import \
-    get_rejected_records_path
-from stairway_to_salesforce.utils.salesforce_validators import \
-    sanitize_sobject_name
+from stairway_to_salesforce.utils.logger_config import get_rejected_records_path
+from stairway_to_salesforce.utils.salesforce_validators import sanitize_sobject_name
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +28,7 @@ def process_results(client, results, target_name: str, operation: str) -> None:
 
         if num_failed > 0:
             failed_records = client.get_failed_records(job_id)
-            rejected_file = _save_rejected_records(
-                failed_records, target_name, job_id, operation
-            )
+            rejected_file = _save_rejected_records(failed_records, target_name, job_id, operation)
             logger.error(
                 f"Failed records saved to: {rejected_file}, for {operation} on {target_name}"
             )

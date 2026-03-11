@@ -10,8 +10,9 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from stairway_to_salesforce.destinations.salesforce_bulk2.destination_config import \
-    SalesforceDestinationConfig
+from stairway_to_salesforce.destinations.salesforce_bulk2.destination_config import (
+    SalesforceDestinationConfig,
+)
 
 
 class TestDestinationConfig:
@@ -147,21 +148,13 @@ class TestDestinationConfig:
 class TestDestinationWorkflow:
     """Tests for destination workflow and integration."""
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.cleanup_temp_file"
-    )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.execute_job"
-    )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.prepare_data"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.destination.cleanup_temp_file")
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.destination.execute_job")
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.destination.prepare_data")
     @patch(
         "stairway_to_salesforce.destinations.salesforce_bulk2.destination.get_salesforce_key_resolver"
     )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.get_salesforce_driver"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.destination.get_salesforce_driver")
     @patch(
         "stairway_to_salesforce.destinations.salesforce_bulk2.destination.SalesforceDestinationConfig"
     )
@@ -177,8 +170,9 @@ class TestDestinationWorkflow:
         temp_csv_file,
     ):
         """Test that destination workflow calls expected components."""
-        from stairway_to_salesforce.destinations.salesforce_bulk2.destination import \
-            salesforce_bulk2
+        from stairway_to_salesforce.destinations.salesforce_bulk2.destination import (
+            salesforce_bulk2,
+        )
 
         # Setup mocks
         mock_config = Mock()
@@ -213,21 +207,13 @@ class TestDestinationWorkflow:
 class TestDataProcessorIntegration:
     """Tests for data processor integration."""
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.cleanup_temp_file"
-    )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.execute_job"
-    )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.prepare_data"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.destination.cleanup_temp_file")
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.destination.execute_job")
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.destination.prepare_data")
     @patch(
         "stairway_to_salesforce.destinations.salesforce_bulk2.destination.get_salesforce_key_resolver"
     )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.get_salesforce_driver"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.destination.get_salesforce_driver")
     def test_prepare_data_called_with_items(
         self,
         mock_get_driver,
@@ -243,8 +229,7 @@ class TestDataProcessorIntegration:
         # Even though we can't directly test the decorated function,
         # we can test that the components work correctly
 
-        from stairway_to_salesforce.destinations.salesforce_bulk2.data_processor import \
-            prepare_data
+        from stairway_to_salesforce.destinations.salesforce_bulk2.data_processor import prepare_data
 
         # Test prepare_data directly
         result = prepare_data(sample_account_data)
@@ -253,8 +238,9 @@ class TestDataProcessorIntegration:
         assert result.endswith(".csv")
 
         # Cleanup
-        from stairway_to_salesforce.destinations.salesforce_bulk2.data_processor import \
-            cleanup_temp_file
+        from stairway_to_salesforce.destinations.salesforce_bulk2.data_processor import (
+            cleanup_temp_file,
+        )
 
         cleanup_temp_file(result)
 
@@ -262,17 +248,14 @@ class TestDataProcessorIntegration:
 class TestJobExecutorIntegration:
     """Tests for job executor integration."""
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_insert"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_insert")
     def test_execute_job_insert_operation(
         self, mock_insert, mock_security_token_credentials, temp_csv_file
     ):
         """Test execute_job calls correct operation handler."""
         from simple_salesforce import Salesforce
 
-        from stairway_to_salesforce.destinations.salesforce_bulk2.job_executor import \
-            execute_job
+        from stairway_to_salesforce.destinations.salesforce_bulk2.job_executor import execute_job
 
         mock_driver = Mock(spec=Salesforce)
 
@@ -288,15 +271,12 @@ class TestJobExecutorIntegration:
         # Should call insert handler
         mock_insert.assert_called_once()
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_upsert"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_upsert")
     def test_execute_job_upsert_operation(self, mock_upsert, temp_csv_file):
         """Test execute_job calls upsert handler."""
         from simple_salesforce import Salesforce
 
-        from stairway_to_salesforce.destinations.salesforce_bulk2.job_executor import \
-            execute_job
+        from stairway_to_salesforce.destinations.salesforce_bulk2.job_executor import execute_job
 
         mock_driver = Mock(spec=Salesforce)
 
@@ -311,15 +291,12 @@ class TestJobExecutorIntegration:
 
         mock_upsert.assert_called_once()
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_delete"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_delete")
     def test_execute_job_delete_operation(self, mock_delete, temp_csv_file):
         """Test execute_job calls delete handler."""
         from simple_salesforce import Salesforce
 
-        from stairway_to_salesforce.destinations.salesforce_bulk2.job_executor import \
-            execute_job
+        from stairway_to_salesforce.destinations.salesforce_bulk2.job_executor import execute_job
 
         mock_driver = Mock(spec=Salesforce)
         mock_resolver = Mock()
@@ -335,15 +312,12 @@ class TestJobExecutorIntegration:
 
         mock_delete.assert_called_once()
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_replace"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_replace")
     def test_execute_job_replace_operation(self, mock_replace, temp_csv_file):
         """Test execute_job calls replace handler."""
         from simple_salesforce import Salesforce
 
-        from stairway_to_salesforce.destinations.salesforce_bulk2.job_executor import \
-            execute_job
+        from stairway_to_salesforce.destinations.salesforce_bulk2.job_executor import execute_job
 
         mock_driver = Mock(spec=Salesforce)
 
@@ -362,8 +336,7 @@ class TestJobExecutorIntegration:
         """Test execute_job raises error for invalid operation."""
         from simple_salesforce import Salesforce
 
-        from stairway_to_salesforce.destinations.salesforce_bulk2.job_executor import \
-            execute_job
+        from stairway_to_salesforce.destinations.salesforce_bulk2.job_executor import execute_job
 
         mock_driver = Mock(spec=Salesforce)
 
@@ -427,9 +400,7 @@ class TestDestinationEdgeCases:
 class TestComponentFactories:
     """Tests for component factory functions."""
 
-    @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver.make_salesforce_driver"
-    )
+    @patch("stairway_to_salesforce.drivers.salesforce_driver.sfdriver.make_salesforce_driver")
     @patch("dlt.secrets")
     def test_get_salesforce_driver(self, mock_secrets, mock_make_driver):
         """Test get_salesforce_driver factory."""
@@ -452,8 +423,7 @@ class TestComponentFactories:
     )
     def test_get_salesforce_key_resolver(self, mock_resolver_class):
         """Test get_salesforce_key_resolver factory."""
-        from stairway_to_salesforce.components import \
-            get_salesforce_key_resolver
+        from stairway_to_salesforce.components import get_salesforce_key_resolver
 
         mock_resolver = Mock()
         mock_resolver_class.return_value = mock_resolver

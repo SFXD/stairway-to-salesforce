@@ -4,8 +4,7 @@ Unit tests for logger configuration.
 
 from pathlib import Path
 
-from stairway_to_salesforce.utils.logger_config import \
-    get_rejected_records_path
+from stairway_to_salesforce.utils.logger_config import get_rejected_records_path
 
 
 class TestGetRejectedRecordsPath:

@@ -7,8 +7,7 @@ from typing import List, Optional, Set
 
 from tomlkit import key
 
-from stairway_to_salesforce.drivers.salesforce_driver.sfdriver import \
-    get_salesforce_driver
+from stairway_to_salesforce.drivers.salesforce_driver.sfdriver import get_salesforce_driver
 
 from .resolver_cache_manager import CacheManager
 from .resolver_data_repository import SalesforceRepository
@@ -82,9 +81,7 @@ class SalesforceKeyResolver:
         try:
             df_new = None
             if full_load:
-                df_new = self.sf_repository.fetch_all(
-                    self.sf_driver, sobject, key_field
-                )
+                df_new = self.sf_repository.fetch_all(self.sf_driver, sobject, key_field)
             else:
                 # Find missing keys (values not already in cache)
                 missing_key_values = self.cache_manager.find_missing_keys(
@@ -167,14 +164,10 @@ class SalesforceKeyResolver:
         Returns:
             Salesforce ID if resolved, None otherwise
         """
-        resolved_id = self.cache_manager.resolve_single(
-            sobject, key_field, external_value
-        )
+        resolved_id = self.cache_manager.resolve_single(sobject, key_field, external_value)
         return resolved_id if resolved_id else external_value
 
-    def clear_cache(
-        self, sobject: Optional[str] = None, key_field: Optional[str] = None
-    ) -> None:
+    def clear_cache(self, sobject: Optional[str] = None, key_field: Optional[str] = None) -> None:
         """
         Clear cache entries.
 

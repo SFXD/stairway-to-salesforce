@@ -17,8 +17,7 @@ from typing import Any, Dict, Iterator
 import dlt
 from dlt.sources.filesystem import filesystem, read_csv
 
-from stairway_to_salesforce.components import (BasePipeline,
-                                               SalesforceKeyResolver)
+from stairway_to_salesforce.components import BasePipeline, SalesforceKeyResolver
 from stairway_to_salesforce.destinations import salesforce_bulk2
 
 
@@ -67,9 +66,7 @@ class UpsertContactPipeline(BasePipeline):
 
             # Extract source external keys we need to convert into Salesforce Ids
             account_key_values = {
-                str(record["External_ID"])
-                for record in records
-                if record.get("External_ID")
+                str(record["External_ID"]) for record in records if record.get("External_ID")
             }
 
             # Init resolver ( with base pipeline credentials)

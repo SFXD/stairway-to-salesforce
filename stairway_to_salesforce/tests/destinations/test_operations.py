@@ -9,25 +9,17 @@ from unittest.mock import MagicMock, Mock, call, patch
 import pandas as pd
 import pytest
 
-from stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete import \
-    exec_delete
-from stairway_to_salesforce.destinations.salesforce_bulk2.operations.insert import \
-    exec_insert
-from stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace import \
-    exec_replace
-from stairway_to_salesforce.destinations.salesforce_bulk2.operations.upsert import \
-    exec_upsert
+from stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete import exec_delete
+from stairway_to_salesforce.destinations.salesforce_bulk2.operations.insert import exec_insert
+from stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace import exec_replace
+from stairway_to_salesforce.destinations.salesforce_bulk2.operations.upsert import exec_upsert
 
 
 class TestExecInsert:
     """Tests for exec_insert() operation."""
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.insert.process_results"
-    )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.insert.get_bulk_client"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.insert.process_results")
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.insert.get_bulk_client")
     def test_insert_success(
         self, mock_get_client, mock_process, temp_csv_file, successful_job_result
     ):
@@ -38,9 +30,7 @@ class TestExecInsert:
 
         mock_driver = Mock()
 
-        exec_insert(
-            sf_driver=mock_driver, target_name="Account", file_path=temp_csv_file
-        )
+        exec_insert(sf_driver=mock_driver, target_name="Account", file_path=temp_csv_file)
 
         # Verify insert was called with correct file
         mock_client.insert.assert_called_once_with(temp_csv_file)
@@ -50,24 +40,16 @@ class TestExecInsert:
             mock_client, successful_job_result, "Account", "insert"
         )
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.insert.process_results"
-    )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.insert.get_bulk_client"
-    )
-    def test_insert_sanitizes_object_name(
-        self, mock_get_client, mock_process, temp_csv_file
-    ):
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.insert.process_results")
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.insert.get_bulk_client")
+    def test_insert_sanitizes_object_name(self, mock_get_client, mock_process, temp_csv_file):
         """Test that object name is sanitized."""
         mock_client = Mock()
         # FIX: Mock insert to return a valid result
         mock_client.insert.return_value = []
         mock_get_client.return_value = (mock_client, "Custom_Object__c")
 
-        exec_insert(
-            sf_driver=Mock(), target_name="Custom_Object__c", file_path=temp_csv_file
-        )
+        exec_insert(sf_driver=Mock(), target_name="Custom_Object__c", file_path=temp_csv_file)
 
         # Verify sanitized name was used
         mock_get_client.assert_called_once()
@@ -76,12 +58,8 @@ class TestExecInsert:
 class TestExecUpsert:
     """Tests for exec_upsert() operation."""
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.upsert.process_results"
-    )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.upsert.get_bulk_client"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.upsert.process_results")
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.upsert.get_bulk_client")
     def test_upsert_with_string_external_id(
         self, mock_get_client, mock_process, temp_csv_file, successful_job_result
     ):
@@ -102,12 +80,8 @@ class TestExecUpsert:
             temp_csv_file, external_id_field="External_ID__c"
         )
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.upsert.process_results"
-    )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.upsert.get_bulk_client"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.upsert.process_results")
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.upsert.get_bulk_client")
     def test_upsert_with_list_external_id(
         self, mock_get_client, mock_process, temp_csv_file, successful_job_result
     ):
@@ -128,15 +102,9 @@ class TestExecUpsert:
             temp_csv_file, external_id_field="External_ID__c"
         )
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.upsert.process_results"
-    )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.upsert.get_bulk_client"
-    )
-    def test_upsert_sanitizes_field_name(
-        self, mock_get_client, mock_process, temp_csv_file
-    ):
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.upsert.process_results")
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.upsert.get_bulk_client")
+    def test_upsert_sanitizes_field_name(self, mock_get_client, mock_process, temp_csv_file):
         """Test that field name is sanitized."""
         mock_client = Mock()
         # FIX: Mock upsert to return a valid result
@@ -153,9 +121,7 @@ class TestExecUpsert:
 
         mock_client.upsert.assert_called_once()
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.upsert.get_bulk_client"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.upsert.get_bulk_client")
     def test_upsert_rejects_relationship_notation(self, mock_get_client, temp_csv_file):
         """Test that relationship notation is rejected."""
         mock_client = Mock()
@@ -174,12 +140,8 @@ class TestExecUpsert:
 class TestExecDelete:
     """Tests for exec_delete() operation."""
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete.process_results"
-    )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete.get_bulk_client"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete.process_results")
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete.get_bulk_client")
     def test_delete_with_salesforce_id(
         self, mock_get_client, mock_process, temp_csv_file, successful_job_result
     ):
@@ -198,12 +160,8 @@ class TestExecDelete:
         # Should call delete with the file directly
         mock_client.delete.assert_called_once_with(temp_csv_file)
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete.process_results"
-    )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete.get_bulk_client"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete.process_results")
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete.get_bulk_client")
     def test_delete_with_external_id_resolution(
         self, mock_get_client, mock_process, temp_dir, successful_job_result
     ):
@@ -243,9 +201,7 @@ class TestExecDelete:
         assert call_args[1]["full_load"] == False
         assert len(call_args[1]["key_values"]) == 3
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete.get_bulk_client"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete.get_bulk_client")
     def test_delete_without_resolver(self, mock_get_client, temp_csv_file, capsys):
         """Test delete without key resolver (direct ID delete)."""
         mock_client = Mock()
@@ -266,9 +222,7 @@ class TestExecDelete:
 
         captured = capsys.readouterr()
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete.get_bulk_client"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete.get_bulk_client")
     def test_delete_with_failed_resolution(self, mock_get_client, temp_dir, capsys):
         """Test delete when external ID resolution fails."""
         # Create CSV
@@ -281,9 +235,7 @@ class TestExecDelete:
         # FIX: The function expects set_definition to succeed but return no resolutions
         # We should mock try_resolve to return the original values
         mock_resolver.set_definition.return_value = True
-        mock_resolver.try_resolve.side_effect = (
-            lambda obj, field, val: val
-        )  # Return unchanged
+        mock_resolver.try_resolve.side_effect = lambda obj, field, val: val  # Return unchanged
 
         mock_client = Mock()
         mock_client.delete.return_value = []
@@ -304,27 +256,17 @@ class TestExecDelete:
 class TestExecReplace:
     """Tests for exec_replace() operation."""
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace.exec_insert"
-    )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace.exec_delete"
-    )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace._query_all_ids"
-    )
-    def test_replace_with_existing_data(
-        self, mock_query, mock_delete, mock_insert, temp_csv_file
-    ):
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace.exec_insert")
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace.exec_delete")
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace._query_all_ids")
+    def test_replace_with_existing_data(self, mock_query, mock_delete, mock_insert, temp_csv_file):
         """Test replace operation with existing data."""
         # Mock query to return existing IDs
         mock_query.return_value = ["001xx000000001", "001xx000000002"]
 
         mock_driver = Mock()
 
-        exec_replace(
-            sf_driver=mock_driver, target_name="Account", file_path=temp_csv_file
-        )
+        exec_replace(sf_driver=mock_driver, target_name="Account", file_path=temp_csv_file)
 
         # Should query for existing IDs
         mock_query.assert_called_once_with(mock_driver, "Account")
@@ -339,15 +281,9 @@ class TestExecReplace:
         # Should insert new data
         mock_insert.assert_called_once_with(mock_driver, "Account", temp_csv_file)
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace.exec_insert"
-    )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace.exec_delete"
-    )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace._query_all_ids"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace.exec_insert")
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace.exec_delete")
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace._query_all_ids")
     def test_replace_with_no_existing_data(
         self, mock_query, mock_delete, mock_insert, temp_csv_file
     ):
@@ -357,9 +293,7 @@ class TestExecReplace:
 
         mock_driver = Mock()
 
-        exec_replace(
-            sf_driver=mock_driver, target_name="Account", file_path=temp_csv_file
-        )
+        exec_replace(sf_driver=mock_driver, target_name="Account", file_path=temp_csv_file)
 
         # Should query
         mock_query.assert_called_once()
@@ -375,8 +309,9 @@ class TestExecReplace:
     )
     def test_replace_query_all_ids(self, mock_get_client):
         """Test _query_all_ids helper function."""
-        from stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace import \
-            _query_all_ids
+        from stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace import (
+            _query_all_ids,
+        )
 
         # Mock bulk client query result (CSV format)
         csv_data = "Id\n001xx000000001\n001xx000000002\n001xx000000003"
@@ -405,8 +340,9 @@ class TestExecReplace:
     )
     def test_replace_query_handles_multiple_chunks(self, mock_get_client):
         """Test _query_all_ids with multiple CSV chunks."""
-        from stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace import \
-            _query_all_ids
+        from stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace import (
+            _query_all_ids,
+        )
 
         # Mock multiple chunks
         chunk1 = "Id\n001xx000000001\n001xx000000002"
@@ -421,12 +357,8 @@ class TestExecReplace:
         # Should combine all IDs
         assert len(ids) == 4
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace.exec_insert"
-    )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace._query_all_ids"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace.exec_insert")
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace._query_all_ids")
     def test_replace_logs_warning(self, mock_query, mock_insert, temp_csv_file, capsys):
         """Test that replace logs appropriate warning."""
         mock_query.return_value = ["001", "002"]
@@ -434,9 +366,7 @@ class TestExecReplace:
         with patch(
             "stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace.exec_delete"
         ):
-            exec_replace(
-                sf_driver=Mock(), target_name="Account", file_path=temp_csv_file
-            )
+            exec_replace(sf_driver=Mock(), target_name="Account", file_path=temp_csv_file)
 
         # Should log warning about data removal
         captured = capsys.readouterr()
@@ -446,33 +376,21 @@ class TestExecReplace:
 class TestOperationsEdgeCases:
     """Tests for edge cases across operations."""
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.insert.process_results"
-    )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.insert.get_bulk_client"
-    )
-    def test_operations_handle_custom_objects(
-        self, mock_get_client, mock_process, temp_csv_file
-    ):
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.insert.process_results")
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.insert.get_bulk_client")
+    def test_operations_handle_custom_objects(self, mock_get_client, mock_process, temp_csv_file):
         """Test that all operations handle custom objects correctly."""
         mock_client = Mock()
         mock_client.insert.return_value = []
         mock_get_client.return_value = (mock_client, "Custom_Object__c")
 
-        exec_insert(
-            sf_driver=Mock(), target_name="Custom_Object__c", file_path=temp_csv_file
-        )
+        exec_insert(sf_driver=Mock(), target_name="Custom_Object__c", file_path=temp_csv_file)
 
         # Should work with custom object names
         mock_client.insert.assert_called_once()
 
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete.process_results"
-    )
-    @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete.get_bulk_client"
-    )
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete.process_results")
+    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete.get_bulk_client")
     def test_delete_cleans_up_temp_files(self, mock_get_client, mock_process, temp_dir):
         """Test that delete operation cleans up temporary files."""
         csv_file = temp_dir / "delete_data.csv"

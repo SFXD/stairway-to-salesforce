@@ -13,7 +13,10 @@ import pytest
 from simple_salesforce.exceptions import SalesforceMalformedRequest
 
 from stairway_to_salesforce.sources.salesforce_bulk2.query_builder import (
-    _build_soql_query, _normalize_result, fetch_data)
+    _build_soql_query,
+    _normalize_result,
+    fetch_data,
+)
 
 
 class TestBuildSoqlQuery:
@@ -350,9 +353,7 @@ class TestFetchData:
         setattr(mock_sf.bulk2, "Custom_Object__c", mock_bulk_handler)
 
         results = list(
-            fetch_data(
-                sf=mock_sf, sobject="Custom_Object__c", fields=["Id", "Custom_Field__c"]
-            )
+            fetch_data(sf=mock_sf, sobject="Custom_Object__c", fields=["Id", "Custom_Field__c"])
         )
 
         assert len(results) == 1
@@ -394,9 +395,7 @@ class TestQueryBuilderSecurity:
         ]
 
         for filter_expr in valid_filters:
-            query = _build_soql_query(
-                sobject="Account", fields=["Id"], query_filter=filter_expr
-            )
+            query = _build_soql_query(sobject="Account", fields=["Id"], query_filter=filter_expr)
             assert filter_expr in query
 
 

@@ -14,9 +14,7 @@ logger = logging.getLogger(__name__)
 
 def exec_replace(sf_driver, target_name: str, file_path: str, **kwargs) -> None:
     """Execute replace: query all IDs, delete them, then insert new file."""
-    logger.warning(
-        "Starting REPLACE on %s. Existing data will be removed.", target_name
-    )
+    logger.warning("Starting REPLACE on %s. Existing data will be removed.", target_name)
 
     # 1. Query Phase: Get all existing IDs to wipe the table
     existing_ids = _query_all_ids(sf_driver, target_name)

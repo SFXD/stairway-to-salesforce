@@ -29,19 +29,20 @@ class DeleteContactPipeline(BasePipeline):
                 bucket_url=self.csv_file_path.rsplit("/", 1)[0],  # folder path
                 file_glob=self.csv_file_path.rsplit("/", 1)[1],  # filename
             )
-            | read_csv()
+            | read_csv()  # noqa: W503
         )
 
         # Step 3: Transform
         # No transform needed
 
-        # Step 4 Destination ( directly applied to the source_resource as we don't have a transformer here)
+        # Step 4 Destination
+        # Directly applied to the source_resource as we don't have a transformer here
         source_resource.apply_hints(
             table_name="Contact",  # Target SObject Name
-            primary_key="Email",  # Email will be converted in Id by Salesforce Key Resolver  ( additional API consumption, use directly with ID to avoid it)
-            write_disposition="append",  # Default write disposition handled, specialized with the operation below
+            primary_key="Email",  # Email will be converted in Id by Salesforce Key Resolver
+            write_disposition="append",  # Default write disposition
             additional_table_hints={
-                "x-salesforce-operation": "delete",  # Will execute a delete job through the Bulk2 API
+                "x-salesforce-operation": "delete",  # Delete job on Bulk API2
             },
         )
 

@@ -4,13 +4,10 @@ Unit tests for Salesforce source query builder.
 Tests SOQL query construction, validation, security, and data fetching.
 """
 
-import io
 from datetime import datetime
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock
 
-import pandas as pd
 import pytest
-from simple_salesforce.exceptions import SalesforceMalformedRequest
 
 from stairway_to_salesforce.sources.salesforce_bulk2.query_builder import (
     _build_soql_query,

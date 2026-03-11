@@ -76,7 +76,7 @@ class TestSanitizeFieldName:
         assert sanitize_field_name("Owner__r.Email") == "Owner__r.Email"
         assert (
             sanitize_field_name("Custom_Lookup__r.Custom_Field__c")
-            == "Custom_Lookup__r.Custom_Field__c"
+            == "Custom_Lookup__r.Custom_Field__c"  # noqa: W503
         )
 
     def test_relationship_notation_disabled(self):

@@ -2,9 +2,7 @@
 Unit tests for individual Salesforce Bulk API operations.
 """
 
-import os
-import tempfile
-from unittest.mock import MagicMock, Mock, call, patch
+from unittest.mock import Mock, patch
 
 import pandas as pd
 import pytest
@@ -198,7 +196,7 @@ class TestExecDelete:
         call_args = mock_resolver.set_definition.call_args
         assert call_args[1]["sobject"] == "Account"
         assert call_args[1]["key_field"] == "External_ID__c"
-        assert call_args[1]["full_load"] == False
+        assert call_args[1]["full_load"] is False
         assert len(call_args[1]["key_values"]) == 3
 
     @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete.get_bulk_client")
@@ -219,8 +217,6 @@ class TestExecDelete:
 
         # Should call delete directly
         mock_client.delete.assert_called_once()
-
-        captured = capsys.readouterr()
 
     @patch("stairway_to_salesforce.destinations.salesforce_bulk2.operations.delete.get_bulk_client")
     def test_delete_with_failed_resolution(self, mock_get_client, temp_dir, capsys):
@@ -248,9 +244,6 @@ class TestExecDelete:
             primary_key="External_ID__c",
             key_resolver=mock_resolver,
         )
-
-        # Should log warning but not crash
-        captured = capsys.readouterr()
 
 
 class TestExecReplace:
@@ -367,10 +360,6 @@ class TestExecReplace:
             "stairway_to_salesforce.destinations.salesforce_bulk2.operations.replace.exec_delete"
         ):
             exec_replace(sf_driver=Mock(), target_name="Account", file_path=temp_csv_file)
-
-        # Should log warning about data removal
-        captured = capsys.readouterr()
-        # Warning may be logged
 
 
 class TestOperationsEdgeCases:

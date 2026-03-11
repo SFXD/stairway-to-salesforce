@@ -5,8 +5,7 @@ Tests driver caching with TTL support.
 """
 
 import hashlib
-import time
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import pytest
 

@@ -116,6 +116,37 @@ def _normalize_result(chunk: Any) -> Iterable[TDataItem]:
     return records
 
 
+def _execute_bulk_query(sf, sobject, soql_query):
+    bulk_handler = getattr(sf.bulk2, sobject)
+    chunk_count = 0
+    total_records = 0
+
+    # For each Bulk2 API file result (=chunk)
+    for chunk in bulk_handler.query(soql_query):
+        chunk_count += 1
+        logger.debug(f"Processing chunk {chunk_count}")
+
+        # Normalize the result (to make sure the format is a dictionnary)
+        try:
+            records = _normalize_result(chunk)
+        except Exception as e:
+            logger.error(f"Failed to process chunk {chunk_count}: {str(e)}")
+            raise RuntimeError(
+                f"Failed to process chunk {chunk_count} for {sobject}: {str(e)}"
+            ) from e
+
+        # Return the group of records
+        yield records
+
+    if chunk_count == 0:
+        logger.warning(f"No data returned for {sobject}")
+    else:
+        logger.info(
+            f"Successfully fetched {total_records} record(s) from {sobject} "
+            f"in {chunk_count} chunk(s)"
+        )
+
+
 def fetch_data(
     sf: Salesforce,
     sobject: str,
@@ -153,34 +184,7 @@ def fetch_data(
 
     # Execute bulk query
     try:
-        bulk_handler = getattr(sf.bulk2, sobject)
-        chunk_count = 0
-        total_records = 0
-
-        # For each Bulk2 API file result (=chunk)
-        for chunk in bulk_handler.query(soql_query):
-            chunk_count += 1
-            logger.debug(f"Processing chunk {chunk_count}")
-
-            # Normalize the result (to make sure the format is a dictionnary)
-            try:
-                records = _normalize_result(chunk)
-            except Exception as e:
-                logger.error(f"Failed to process chunk {chunk_count}: {str(e)}")
-                raise RuntimeError(
-                    f"Failed to process chunk {chunk_count} for {sobject}: {str(e)}"
-                ) from e
-
-            # Return the group of records
-            yield records
-
-        if chunk_count == 0:
-            logger.warning(f"No data returned for {sobject}")
-        else:
-            logger.info(
-                f"Successfully fetched {total_records} record(s) from {sobject} "
-                f"in {chunk_count} chunk(s)"
-            )
+        yield from _execute_bulk_query(sf, sobject, soql_query)
 
     except SalesforceMalformedRequest as e:
         logger.error(f"Malformed SOQL query for {sobject}: {str(e)}")

@@ -3,7 +3,6 @@ from typing import Set
 
 import pandas as pd
 from simple_salesforce import (
-    SalesforceError,
     SalesforceMalformedRequest,
     SalesforceResourceNotFound,
 )
@@ -105,7 +104,8 @@ class SalesforceRepository:
         key_list = list(key_values)
         if len(key_list) > 400:
             raise ValueError(
-                f"Error: fetch_with_keys can handle up to 400 filter values ( current = {len(key_list)})"
+                "Error: fetch_with_keys can handle up to 400 filter values"
+                f"( current = {len(key_list)})"
             )
 
         df_result = pd.DataFrame(columns=["Id", key_field])

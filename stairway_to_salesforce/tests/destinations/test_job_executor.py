@@ -2,7 +2,7 @@
 Unit tests for Salesforce destination job executor (dispatch router).
 """
 
-from unittest.mock import MagicMock, Mock, call, patch
+from unittest.mock import Mock, patch
 
 import pytest
 

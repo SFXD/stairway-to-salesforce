@@ -11,7 +11,6 @@ import pytest
 from stairway_to_salesforce.drivers.salesforce_driver.sfdriver import get_salesforce_driver
 from stairway_to_salesforce.drivers.salesforce_driver.sfdriver_specs import (
     ConsumerKeySecretDomainAuth,
-    SalesforceDriverAuth,
     SalesforceDriverConfiguration,
     SecurityTokenAuth,
 )

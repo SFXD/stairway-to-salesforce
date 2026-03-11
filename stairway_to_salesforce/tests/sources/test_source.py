@@ -4,7 +4,7 @@ Unit tests for Salesforce Bulk API v2 source.
 Tests the main source function and source creation.
 """
 
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 

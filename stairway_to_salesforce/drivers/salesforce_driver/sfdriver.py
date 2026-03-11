@@ -1,4 +1,4 @@
-from typing import Optional, Union, cast
+from typing import Optional
 
 import dlt
 from dlt.common.configuration import with_config
@@ -30,7 +30,9 @@ def get_salesforce_driver(
             try:
                 sf_credential = dlt.secrets[f"{credentials}"]
             except KeyError as e:
-                raise ValueError(f"Failed to load credentials for {credentials}")
+                raise ValueError(
+                    f"Failed to load credentials for {credentials}, " f"exception: {e}"
+                )
 
             # build driver and cache it
             driver = make_salesforce_driver(sf_credential, session, config)
@@ -41,4 +43,4 @@ def get_salesforce_driver(
     elif isinstance(credentials, SalesforceDriverAuth):
         return make_salesforce_driver(credentials, session, config)
     else:
-        raise ValueError(f"Error: incorrect credentials passed")
+        raise ValueError("Error: incorrect credentials passed")

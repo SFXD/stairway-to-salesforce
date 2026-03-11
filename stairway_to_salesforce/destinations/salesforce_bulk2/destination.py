@@ -56,7 +56,9 @@ def salesforce_bulk2(items: TDataItems, table: TTableSchema, credentials: str = 
         )
     except Exception as e:
         logger.error(
-            f"Critical failure during {config.salesforce_operation} on {config.target_object_name}: {str(e)}"
+            "Critical failure"
+            f" during {config.salesforce_operation}"
+            f" on {config.target_object_name}: {str(e)}"
         )
 
     finally:

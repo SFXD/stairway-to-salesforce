@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 """
 Sample pipeline upserting contacts from a CSV file to Salesforce
-- Using BasePipeline component, SalesforceKeyResolver Component and SalesforceBulk2 Destination with an upsert operation
+Using
+- BasePipeline component,
+- SalesforceKeyResolver Component
+- SalesforceBulk2 Destination with an upsert operation
 
 Process:
 - CSV File is loaded ( sample is data/upsert_contacts.csv )
 - Contacts are transformed in the pipeline
     - keeping only specific columns (if additional columns are present in the csv)
-    - resolving the Account Customer Id (=Custom External Id field for this sample)  as a Salesforce Id, using Salesforce Key Resolver
+    - resolving the Account Customer Id (a custom External Id field)  as a Salesforce Id
 - Contacts are upserted to Salesforce based on the Email as External Id
 
 
@@ -43,7 +46,7 @@ class UpsertContactPipeline(BasePipeline):
                 bucket_url=self.csv_file_path.rsplit("/", 1)[0],
                 file_glob=self.csv_file_path.rsplit("/", 1)[1],
             )
-            | read_csv()
+            | read_csv()  # noqa: W503
         )
 
         # Step 3: Transform
@@ -72,7 +75,8 @@ class UpsertContactPipeline(BasePipeline):
             # Init resolver ( with base pipeline credentials)
             resolver = SalesforceKeyResolver(credentials=self.sf_credential_path)
             account_sobject = "Account"
-            account_key_field = "External_ID__c"  # For the sample, External_ID__c is an external key custom field on Account
+            # For the sample, External_ID__c is an external key custom field on Account
+            account_key_field = "External_ID__c"
             resolver.set_definition(
                 sobject=account_sobject,
                 key_field=account_key_field,
@@ -97,9 +101,12 @@ class UpsertContactPipeline(BasePipeline):
         transformer_resource.apply_hints(
             table_name="Contact",  # Target sObject Name
             primary_key="Email",  # required for an append / upsert
-            write_disposition="append",  # Merge write_disposition is not handled, append behavior is defined by the operation parameter below
+            write_disposition="append",
+            # Merge write_disposition is not handled,
+            # append behavior is defined by the operation parameter below
             additional_table_hints={
-                "x-salesforce-operation": "upsert",  # Bulk2 operation : insert, update, upsert, delete
+                "x-salesforce-operation": "upsert",
+                # Bulk2 operation : insert, update, upsert, delete
             },
         )
 

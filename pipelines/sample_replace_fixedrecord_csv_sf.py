@@ -5,19 +5,19 @@ Sample pipeline replacing all fixed records from a CSV file to Salesforce
 - Showcasing Transform
 
 Note on Salesforce destination:
-Fixed record is a sample custom sobject (for security purpose to avoid unvolontary sample pipeline launch).
-To test the pipeline, you will either need to change the configuration to an existing sobject (watch out, as existing records will be deleted)
-or to create the Fixed Record Sobject as the following:
-- Sobject Name: FixedRecord__c
-- Fields: Name, FixedCode__c, FixedDescription__c
+Fixed record is a sample custom sobject (for security purpose).
 
+To test the pipeline, you will either
+- need to change the configuration to an existing sobject(existing records will be deleted)
+- or to create the Fixed Record Sobject as the following:
+    - Sobject Name: FixedRecord__c
+    - Fields: Name, FixedCode__c, FixedDescription__c
 
 Process:
-- CSV File is loadded ( sample is data/all_fixed_records.csv )
+- CSV File is loaded ( sample is data/all_fixed_records.csv )
 - Fixed records are transformed in the pipeline
     - renaming columns
-- Fixed records are loaded to Salesforce with a replace operation ( deleting all records and loading the new ones)
-
+- Fixed records are loaded to Salesforce with a replace operation
 """
 from typing import Any, Dict, Iterator
 
@@ -46,7 +46,7 @@ class ReplaceFixedRecordPipeline(BasePipeline):
                 bucket_url=self.csv_file_path.rsplit("/", 1)[0],
                 file_glob=self.csv_file_path.rsplit("/", 1)[1],
             )
-            | read_csv()
+            | read_csv()  # noqa: W503
         )
 
         # Step 3: Transform
@@ -75,7 +75,8 @@ class ReplaceFixedRecordPipeline(BasePipeline):
         transformer_resource.apply_hints(
             # SObject name
             table_name="FixedRecord__c",
-            write_disposition="replace",  # Replace will execute a first delete bulk2 operation on the Sobject and then reload the data
+            # Replace will execute a first delete operation and an insert
+            write_disposition="replace",
         )
 
         # Step 5: Run pipeline

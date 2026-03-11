@@ -184,5 +184,4 @@ class CacheManager:
             for key in keys_to_delete:
                 del self._cache[key]
         else:
-            count = len(self._cache)
             self._cache.clear()

@@ -71,7 +71,8 @@ class InstanceAuth(SalesforceCredentialsBase):
 @configspec
 class ConsumerKeySecretAuth(SalesforceCredentialsBase):
     """
-    This class is used to store 'OAuth 2.0 Username Password Flow Credentials' based on a connected app.
+    This class is used to store 'OAuth 2.0 Username Password Flow Credentials'
+    based on a connected app.
     """
 
     user_name: str = None

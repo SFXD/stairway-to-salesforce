@@ -4,7 +4,7 @@ Unit tests for Salesforce driver factory.
 Tests credential resolution and driver creation logic.
 """
 
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -282,7 +282,7 @@ class TestCredentialResolutionPriority:
         assert isinstance(result, JWTAuth)
 
     def test_domain_with_consumer_triggers_domain_auth(self):
-        """Test that domain + consumer_key + consumer_secret triggers ConsumerKeySecretDomainAuth."""
+        """Test that domain + consumer_key + consumer_secret triggers ConsumerKeySecretDomainAuth."""  # noqa: E501
         cred_dict = {
             "consumer_key": "key",
             "consumer_secret": "secret",

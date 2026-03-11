@@ -5,8 +5,6 @@ Main Salesforce lookup resolver class.
 import logging
 from typing import List, Optional, Set
 
-from tomlkit import key
-
 from stairway_to_salesforce.drivers.salesforce_driver.sfdriver import get_salesforce_driver
 
 from .resolver_cache_manager import CacheManager
@@ -70,11 +68,11 @@ class SalesforceKeyResolver:
         if not full_load:
             if not key_values:
                 raise ValueError(
-                    f"Error: key_values are not defined for a filter load by Salesforce Key Resolver."
+                    "SF Key Resolver Error:: key_values are not defined for a filtered load."
                 )
             elif len(key_values) == 0:
                 raise ValueError(
-                    f"Error: key_values cannot be empty for a filter load by Salesforce Key Resolver."
+                    "SF Key Resolver Error: key_values must be defined for a filtered load."
                 )
 
         cache_size = 0
@@ -133,7 +131,8 @@ class SalesforceKeyResolver:
             key_values_to_load = key_values
         else:
             logger.warning(
-                f"No data loaded for the key resolution for {sobject}.{key_field}. full load was not activated and no key value passed."
+                f"No data loaded for the key resolution for {sobject}.{key_field}."
+                "full load was not activated and no key value passed."
             )
             return False
 

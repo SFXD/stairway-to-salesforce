@@ -4,8 +4,6 @@ Unit tests for Salesforce driver credential specification classes.
 Tests all credential types and validation logic defined in sfdriver_specs.py
 """
 
-from unittest.mock import Mock, patch
-
 import pytest
 from dlt.common.configuration.exceptions import ConfigurationValueError
 
@@ -15,7 +13,6 @@ from stairway_to_salesforce.drivers.salesforce_driver.sfdriver_specs import (
     InstanceAuth,
     JWTAuth,
     OrganizationIdAuth,
-    SalesforceDriverAuth,
     SalesforceDriverConfiguration,
     SecurityTokenAuth,
 )

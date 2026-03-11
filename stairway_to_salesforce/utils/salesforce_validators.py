@@ -126,10 +126,14 @@ def sanitize_field_name(field_name: str, allow_relationship_notation: bool = Tru
     if not re.match(pattern, field_name):
         raise ValueError(
             f"Invalid field name: '{field_name}'. "
-            f"Field names must start with a letter and contain only "
-            f"letters, numbers, and underscores. "
+            "Field names must start with a letter and contain only "
+            "letters, numbers, and underscores. "
             f"Custom fields should end with suffixes like '__c', '__r'. "
-            + ("Relationship notation (dots) is allowed." if allow_relationship_notation else "")
+            + (  # noqa: W503
+                "Relationship notation (dots) is allowed."
+                if allow_relationship_notation
+                else ""
+            )
         )
 
     # Additional security: block SQL/SOQL keywords that shouldn't be in field names
@@ -143,7 +147,6 @@ def sanitize_field_name(field_name: str, allow_relationship_notation: bool = Tru
         "EXEC",
         "EXECUTE",
     ]
-    field_upper = field_name.upper()
 
     # Check each part of the field name (split by dots for relationships)
     parts = field_name.split(".")
@@ -237,6 +240,55 @@ def validate_soql_filter(query_filter: str) -> None:
                 )
 
 
+def _detect_type(value) -> str:
+    if isinstance(value, datetime):
+        field_type = "datetime"
+    elif isinstance(value, date):
+        field_type = "date"
+    elif isinstance(value, bool):
+        field_type = "boolean"
+    elif isinstance(value, (int, float)):
+        field_type = "number"
+    elif isinstance(value, str):
+        # Try to detect datetime/date strings
+        if "T" in value and ("Z" in value or "+" in value or value.count(":") >= 2):
+            field_type = "datetime"
+        elif re.match(r"^\d{4}-\d{2}-\d{2}$", value):
+            field_type = "date"
+        else:
+            field_type = "string"
+    else:
+        field_type = "string"
+
+    return field_type
+
+
+def _format_datetime(value) -> str:
+    if isinstance(value, str):
+        # Validate ISO format
+        if not re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}", value):
+            raise ValueError(f"Invalid datetime format: {value}. Expected ISO 8601 format.")
+        # Ensure it ends with Z if no timezone specified
+        if not (value.endswith("Z") or "+" in value or value.count("-") > 2):
+            value = value + "Z"
+        return value  # NO QUOTES for datetime literals
+    elif isinstance(value, datetime):
+        return value.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+    else:
+        raise ValueError(f"Cannot format {type(value).__name__} as datetime")
+
+
+def _format_date(value) -> str:
+    if isinstance(value, str):
+        if not re.match(r"^\d{4}-\d{2}-\d{2}$", value):
+            raise ValueError(f"Invalid date format: {value}. Expected YYYY-MM-DD.")
+        return value  # NO QUOTES for date literals
+    elif isinstance(value, (datetime, date)):
+        return value.strftime("%Y-%m-%d")
+    else:
+        raise ValueError(f"Cannot format {type(value).__name__} as date")
+
+
 def format_soql_value(value: Any, field_type: str = "auto") -> str:
     """
     Safely format a value for use in SOQL queries with proper escaping.
@@ -278,49 +330,14 @@ def format_soql_value(value: Any, field_type: str = "auto") -> str:
 
     # Auto-detect type if not specified
     if field_type == "auto":
-        if isinstance(value, datetime):
-            field_type = "datetime"
-        elif isinstance(value, date):
-            field_type = "date"
-        elif isinstance(value, bool):
-            field_type = "boolean"
-        elif isinstance(value, (int, float)):
-            field_type = "number"
-        elif isinstance(value, str):
-            # Try to detect datetime/date strings
-            if "T" in value and ("Z" in value or "+" in value or value.count(":") >= 2):
-                field_type = "datetime"
-            elif re.match(r"^\d{4}-\d{2}-\d{2}$", value):
-                field_type = "date"
-            else:
-                field_type = "string"
-        else:
-            field_type = "string"
+        field_type = _detect_type(value)
 
     # Format based on type
     if field_type == "datetime":
-        if isinstance(value, str):
-            # Validate ISO format
-            if not re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}", value):
-                raise ValueError(f"Invalid datetime format: {value}. Expected ISO 8601 format.")
-            # Ensure it ends with Z if no timezone specified
-            if not (value.endswith("Z") or "+" in value or value.count("-") > 2):
-                value = value + "Z"
-            return value  # NO QUOTES for datetime literals
-        elif isinstance(value, datetime):
-            return value.strftime("%Y-%m-%dT%H:%M:%S.000Z")
-        else:
-            raise ValueError(f"Cannot format {type(value).__name__} as datetime")
+        return _format_datetime(value)
 
     elif field_type == "date":
-        if isinstance(value, str):
-            if not re.match(r"^\d{4}-\d{2}-\d{2}$", value):
-                raise ValueError(f"Invalid date format: {value}. Expected YYYY-MM-DD.")
-            return value  # NO QUOTES for date literals
-        elif isinstance(value, (datetime, date)):
-            return value.strftime("%Y-%m-%d")
-        else:
-            raise ValueError(f"Cannot format {type(value).__name__} as date")
+        return _format_date(value)
 
     elif field_type == "number":
         return str(value)

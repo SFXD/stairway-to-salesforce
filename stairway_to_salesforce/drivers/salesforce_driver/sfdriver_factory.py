@@ -85,7 +85,8 @@ def make_salesforce_driver(
         )
 
     elif isinstance(credentials, ConsumerKeySecretDomainAuth):
-        # NOTE: For this authentication type, domain must be provided as part of the credentials set,
+        # NOTE: For this authentication type,
+        # domain must be provided as part of the credentials set,
         # we therefore get it from credentials, not config
         return Salesforce(
             version=config.version,
@@ -97,7 +98,7 @@ def make_salesforce_driver(
         )
 
 
-def resolve_salesforce_credentials(
+def resolve_salesforce_credentials(  # noqa: C901
     credentials: Union[SalesforceDriverAuth, dict, str],
 ) -> SalesforceDriverAuth:
     """

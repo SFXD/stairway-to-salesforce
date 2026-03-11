@@ -4,9 +4,8 @@ Unit tests for DLT resource builder.
 Tests resource configuration validation and resource building.
 """
 
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
-import dlt
 import pytest
 
 from stairway_to_salesforce.sources.salesforce_bulk2.resource_builder import (
@@ -207,7 +206,7 @@ class TestBuildResource:
         mock_fetch_fn = Mock()
         mock_fetch_fn.return_value = iter([[{"Id": "001", "Name": "Test"}]])
 
-        resource = build_resource(
+        build_resource(
             config=config,
             fetch_data_fn=mock_fetch_fn,
             credentials="salesforce.dev",

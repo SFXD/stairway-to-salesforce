@@ -2,8 +2,6 @@
 Unit tests for Salesforce destination configuration validation.
 """
 
-from unittest.mock import Mock, patch
-
 import pytest
 
 from stairway_to_salesforce.destinations.salesforce_bulk2.destination_config import (

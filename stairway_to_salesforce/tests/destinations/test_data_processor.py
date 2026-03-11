@@ -6,7 +6,7 @@ import csv
 import os
 import tempfile
 from pathlib import Path
-from unittest.mock import Mock, mock_open, patch
+from unittest.mock import patch
 
 import pandas as pd
 import pyarrow as pa
@@ -379,7 +379,7 @@ class TestCleanupTempFile:
         # Cleanup for real
         try:
             os.unlink(temp_file.name)
-        except:
+        except:  # noqa: E722
             pass
 
 

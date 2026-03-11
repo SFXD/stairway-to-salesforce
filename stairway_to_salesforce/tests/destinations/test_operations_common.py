@@ -2,8 +2,7 @@
 Unit tests for common operation utilities (get_bulk_client, process_results).
 """
 
-from pathlib import Path
-from unittest.mock import MagicMock, Mock, PropertyMock, call, patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -88,7 +87,7 @@ class TestProcessResults:
         mock_client.get_failed_records.return_value = sample_failed_records_csv
 
         with patch(
-            "stairway_to_salesforce.destinations.salesforce_bulk2.operations.common._save_rejected_records"
+            "stairway_to_salesforce.destinations.salesforce_bulk2.operations.common._save_rejected_records"  # noqa: E501
         ) as mock_save:
             mock_save.return_value = ".dlt/rejected_records/Account_750xx000000FAIL_insert.csv"
 
@@ -115,7 +114,7 @@ class TestProcessResults:
         mock_client.get_failed_records.return_value = sample_failed_records_csv
 
         with patch(
-            "stairway_to_salesforce.destinations.salesforce_bulk2.operations.common._save_rejected_records"
+            "stairway_to_salesforce.destinations.salesforce_bulk2.operations.common._save_rejected_records"  # noqa: E501
         ) as mock_save:
             mock_save.return_value = ".dlt/rejected_records/test.csv"
 
@@ -136,18 +135,11 @@ class TestProcessResults:
 
         process_results(client=mock_client, results=[], target_name="Account", operation="insert")
 
-        # Should log warning about no results
-        captured = capsys.readouterr()
-        # May log warning or return silently
-
     def test_process_results_none_results(self, capsys):
         """Test processing None results."""
         mock_client = Mock()
 
         process_results(client=mock_client, results=None, target_name="Account", operation="insert")
-
-        # Should handle gracefully
-        captured = capsys.readouterr()
 
     def test_process_results_multiple_jobs(self, sample_failed_records_csv):
         """Test processing multiple job results."""
@@ -168,7 +160,7 @@ class TestProcessResults:
         ]
 
         with patch(
-            "stairway_to_salesforce.destinations.salesforce_bulk2.operations.common._save_rejected_records"
+            "stairway_to_salesforce.destinations.salesforce_bulk2.operations.common._save_rejected_records"  # noqa: E501
         ) as mock_save:
             process_results(
                 client=mock_client,
@@ -188,7 +180,7 @@ class TestSaveRejectedRecords:
     def test_save_rejected_records_success(self, sample_failed_records_csv, temp_dir):
         """Test successful save of rejected records."""
         with patch(
-            "stairway_to_salesforce.destinations.salesforce_bulk2.operations.common.get_rejected_records_path"
+            "stairway_to_salesforce.destinations.salesforce_bulk2.operations.common.get_rejected_records_path"  # noqa: E501
         ) as mock_path:
             test_file = temp_dir / "rejected_Account_750TEST_insert.csv"
             mock_path.return_value = test_file
@@ -211,7 +203,7 @@ class TestSaveRejectedRecords:
     def test_save_rejected_records_creates_directories(self, sample_failed_records_csv, temp_dir):
         """Test that parent directories are created if needed."""
         with patch(
-            "stairway_to_salesforce.destinations.salesforce_bulk2.operations.common.get_rejected_records_path"
+            "stairway_to_salesforce.destinations.salesforce_bulk2.operations.common.get_rejected_records_path"  # noqa: E501
         ) as mock_path:
             # Path with nested directories
             test_file = temp_dir / "nested" / "dirs" / "rejected.csv"
@@ -221,7 +213,7 @@ class TestSaveRejectedRecords:
             # The implementation should handle this, but we ensure it for the test
             test_file.parent.mkdir(parents=True, exist_ok=True)
 
-            result = _save_rejected_records(
+            _save_rejected_records(
                 failed_records=sample_failed_records_csv,
                 target_name="Account",
                 job_id="750TEST",
@@ -240,7 +232,7 @@ class TestSaveRejectedRecords:
 """
 
         with patch(
-            "stairway_to_salesforce.destinations.salesforce_bulk2.operations.common.get_rejected_records_path"
+            "stairway_to_salesforce.destinations.salesforce_bulk2.operations.common.get_rejected_records_path"  # noqa: E501
         ) as mock_path:
             test_file = temp_dir / "rejected_unicode.csv"
             mock_path.return_value = test_file
@@ -260,7 +252,7 @@ class TestSaveRejectedRecords:
     def test_save_rejected_records_empty_data(self, temp_dir):
         """Test saving empty rejected records."""
         with patch(
-            "stairway_to_salesforce.destinations.salesforce_bulk2.operations.common.get_rejected_records_path"
+            "stairway_to_salesforce.destinations.salesforce_bulk2.operations.common.get_rejected_records_path"  # noqa: E501
         ) as mock_path:
             test_file = temp_dir / "rejected_empty.csv"
             mock_path.return_value = test_file

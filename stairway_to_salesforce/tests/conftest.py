@@ -284,7 +284,7 @@ def partial_success_job_result():
 def sample_failed_records_csv():
     """Sample failed records CSV from Salesforce."""
     return """Id,Name,sf__Error
-001xx000000003,Bad Record,"DUPLICATE_VALUE:duplicate value found: Email__c duplicates value on record with id: 001xx000000001"
+001xx000000003,Bad Record,"DUPLICATE_VALUE:duplicate value found: Email__c duplicates value on record with id: 001xx000000001" # noqa: E501
 001xx000000004,Invalid Record,"REQUIRED_FIELD_MISSING:Required fields are missing: [Name]"
 """
 
@@ -329,7 +329,12 @@ def mock_datetime(monkeypatch, fixed_datetime):
 @pytest.fixture
 def sample_soql_query():
     """Sample SOQL query string."""
-    return "SELECT Id, Name, Email FROM Account WHERE Type = 'Customer' ORDER BY LastModifiedDate ASC LIMIT 2"
+    return (
+        "SELECT Id, Name, Email "
+        "FROM Account "
+        "WHERE Type = 'Customer' "
+        "ORDER BY LastModifiedDate ASC LIMIT 2"
+    )
 
 
 @pytest.fixture

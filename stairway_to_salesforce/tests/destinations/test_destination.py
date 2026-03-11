@@ -6,7 +6,7 @@ The @dlt.destination decorator makes direct testing challenging, so we test
 the underlying logic and configuration validation.
 """
 
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -152,11 +152,11 @@ class TestDestinationWorkflow:
     @patch("stairway_to_salesforce.destinations.salesforce_bulk2.destination.execute_job")
     @patch("stairway_to_salesforce.destinations.salesforce_bulk2.destination.prepare_data")
     @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.get_salesforce_key_resolver"
+        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.get_salesforce_key_resolver"  # noqa: E501
     )
     @patch("stairway_to_salesforce.destinations.salesforce_bulk2.destination.get_salesforce_driver")
     @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.SalesforceDestinationConfig"
+        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.SalesforceDestinationConfig"  # noqa: E501
     )
     def test_destination_workflow_components(
         self,
@@ -170,10 +170,6 @@ class TestDestinationWorkflow:
         temp_csv_file,
     ):
         """Test that destination workflow calls expected components."""
-        from stairway_to_salesforce.destinations.salesforce_bulk2.destination import (
-            salesforce_bulk2,
-        )
-
         # Setup mocks
         mock_config = Mock()
         mock_config.target_object_name = "Account"
@@ -211,7 +207,7 @@ class TestDataProcessorIntegration:
     @patch("stairway_to_salesforce.destinations.salesforce_bulk2.destination.execute_job")
     @patch("stairway_to_salesforce.destinations.salesforce_bulk2.destination.prepare_data")
     @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.get_salesforce_key_resolver"
+        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.get_salesforce_key_resolver"  # noqa: E501
     )
     @patch("stairway_to_salesforce.destinations.salesforce_bulk2.destination.get_salesforce_driver")
     def test_prepare_data_called_with_items(

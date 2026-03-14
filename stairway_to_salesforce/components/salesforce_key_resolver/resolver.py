@@ -3,7 +3,6 @@ Main Salesforce lookup resolver class.
 """
 
 import logging
-from typing import List, Optional, Set
 
 from stairway_to_salesforce.drivers.salesforce_driver.sfdriver import get_salesforce_driver
 
@@ -46,7 +45,7 @@ class SalesforceKeyResolver:
         sobject: str,
         key_field: str,
         full_load: bool,
-        key_values: Optional[Set[str]] = None,
+        key_values: set[str] | None = None,
     ) -> int:
         """
         Load an ID mapping for the specified definition (sobject / key field).
@@ -81,6 +80,9 @@ class SalesforceKeyResolver:
             if full_load:
                 df_new = self.sf_repository.fetch_all(self.sf_driver, sobject, key_field)
             else:
+                # check done for load mode determination
+                assert key_values is not None
+
                 # Find missing keys (values not already in cache)
                 missing_key_values = self.cache_manager.find_missing_keys(
                     sobject, key_field, key_values
@@ -104,7 +106,7 @@ class SalesforceKeyResolver:
         sobject: str,
         key_field: str,
         full_load: bool = False,
-        key_values: List[str] = None,
+        key_values: list[str] | None = None,
     ) -> bool:
         """
         Check if a matching definition (sobject / key_field) exists.
@@ -124,17 +126,7 @@ class SalesforceKeyResolver:
         if not self.cache_manager.has_cache(sobject, key_field):
             self.cache_manager.initialize_cache(sobject, key_field)
 
-        key_values_to_load = None
-        if full_load:
-            pass
-        elif key_values and len(key_values):
-            key_values_to_load = key_values
-        else:
-            logger.warning(
-                f"No data loaded for the key resolution for {sobject}.{key_field}."
-                "full load was not activated and no key value passed."
-            )
-            return False
+        key_values_to_load: set[str] | None = set(key_values) if key_values else None
 
         try:
             self._load_data(sobject, key_field, full_load, key_values_to_load)
@@ -166,7 +158,7 @@ class SalesforceKeyResolver:
         resolved_id = self.cache_manager.resolve_single(sobject, key_field, external_value)
         return resolved_id if resolved_id else external_value
 
-    def clear_cache(self, sobject: Optional[str] = None, key_field: Optional[str] = None) -> None:
+    def clear_cache(self, sobject: str | None = None, key_field: str | None = None) -> None:
         """
         Clear cache entries.
 

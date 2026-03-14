@@ -1,11 +1,9 @@
-from typing import Optional
-
 import dlt
 
 from .resolver import SalesforceKeyResolver
 
 # Module-level singleton resolver to maintain state across datasets
-_resolver: Optional[SalesforceKeyResolver] = None
+_resolver: SalesforceKeyResolver | None = None
 
 
 def get_salesforce_key_resolver(credentials=dlt.secrets.value) -> SalesforceKeyResolver:

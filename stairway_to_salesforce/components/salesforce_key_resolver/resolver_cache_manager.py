@@ -2,8 +2,6 @@
 Cache management for Salesforce lookup mappings.
 """
 
-from typing import Dict, Optional, Set
-
 import pandas as pd
 
 
@@ -17,7 +15,7 @@ class CacheManager:
 
     def __init__(self):
         """Initialize empty cache."""
-        self._cache: Dict[str, pd.DataFrame] = {}
+        self._cache: dict[str, pd.DataFrame] = {}
 
     def get_cache_key(self, sobject: str, key_field: str) -> str:
         """
@@ -110,7 +108,7 @@ class CacheManager:
 
         return len(df_merged)
 
-    def find_missing_keys(self, sobject: str, key_field: str, requested_keys: Set[str]) -> Set[str]:
+    def find_missing_keys(self, sobject: str, key_field: str, requested_keys: set[str]) -> set[str]:
         """
         Find keys not in cache.
 
@@ -137,7 +135,7 @@ class CacheManager:
 
         return missing_keys
 
-    def resolve_single(self, sobject: str, key_field: str, external_value: str) -> Optional[str]:
+    def resolve_single(self, sobject: str, key_field: str, external_value: str) -> str | None:
         """
         Resolve single external ID to Salesforce ID.
 
@@ -167,7 +165,7 @@ class CacheManager:
 
         return result.iloc[0]
 
-    def clear(self, sobject: Optional[str] = None, key_field: Optional[str] = None) -> None:
+    def clear(self, sobject: str | None = None, key_field: str | None = None) -> None:
         """
         Clear cache entries.
 

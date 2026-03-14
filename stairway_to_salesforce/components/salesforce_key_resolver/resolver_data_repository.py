@@ -1,5 +1,4 @@
 import logging
-from typing import Set
 
 import pandas as pd
 from simple_salesforce import (
@@ -18,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 class SalesforceRepository:
 
-    def _build_query(self, sobject: str, key_field: str, key_values: Set[str] = None) -> str:
+    def _build_query(self, sobject: str, key_field: str, key_values: set[str] | None = None) -> str:
         """
         Build base SOQL query, used both or a full load and a filtered load
 
@@ -85,7 +84,7 @@ class SalesforceRepository:
         return df[[id_field, key_field]]
 
     def fetch_with_keys(
-        self, salesforce_driver, sobject: str, key_field: str, key_values: Set[str]
+        self, salesforce_driver, sobject: str, key_field: str, key_values: set[str]
     ) -> pd.DataFrame:
         """
         fetch mapping for specific keys for the specific sobject using the REST API

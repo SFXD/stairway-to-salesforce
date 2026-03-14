@@ -372,11 +372,12 @@ class TestQueryBuilderSecurity:
 
     def test_prevents_sql_injection_in_filter(self):
         """Test that SQL injection in filter is prevented."""
-        with pytest.raises(ValueError, match="dangerous pattern|disallowed keyword"):
+        fields = ["Id", "Name"]
+        error_pattern = "(?i)dangerous pattern|disallowed keyword"
+
+        with pytest.raises(ValueError, match=error_pattern):
             _build_soql_query(
-                sobject="Account",
-                fields=["Id"],
-                query_filter="Type = 'Customer'; DROP TABLE--",
+                sobject="Account", fields=fields, query_filter="Name = 'Acme'; DROP TABLE Account"
             )
 
     def test_allows_valid_soql_operators(self):

@@ -28,7 +28,7 @@ class TestPrepareData:
         result = prepare_data(temp_csv_file)
 
         assert result == temp_csv_file
-        assert os.path.exists(result) 
+        assert os.path.exists(result)
         assert result.endswith(".csv")
 
     def test_prepare_data_from_path_object(self, temp_csv_file):

@@ -1,5 +1,4 @@
 import logging
-from typing import List, Union
 
 from stairway_to_salesforce.utils.salesforce_validators import sanitize_field_name
 
@@ -12,7 +11,7 @@ def exec_upsert(
     sf_driver,
     target_name: str,
     file_path: str,
-    primary_key: Union[str, List[str]],
+    primary_key: str | list[str],
     **kwargs,
 ) -> None:
     """Execute upsert operation using an External ID."""

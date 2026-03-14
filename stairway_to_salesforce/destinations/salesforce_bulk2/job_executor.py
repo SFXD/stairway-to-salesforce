@@ -6,7 +6,8 @@ operation services (insert, upsert, delete, replace).
 """
 
 import logging
-from typing import List, Optional, Union
+from collections.abc import Callable
+from typing import Any, Dict
 
 from simple_salesforce import Salesforce
 
@@ -21,9 +22,9 @@ def execute_job(
     sf_driver: Salesforce,
     target_name: str,
     salesforce_operation: str,
-    primary_key: Optional[Union[str, List[str]]],
+    primary_key: str | list[str] | None,
     file_path: str,
-    key_resolver: Optional[object] = None,
+    key_resolver: Any | None = None,
 ) -> None:
     """
     Execute Salesforce Bulk API v2 job by dispatching to the appropriate service.
@@ -39,7 +40,7 @@ def execute_job(
     logger.debug("Dispatching %s operation for %s", salesforce_operation, target_name)
 
     # Mapping of operation strings to their service functions
-    dispatch_map = {
+    dispatch_map: Dict[str, Callable[..., Any]] = {
         "insert": exec_insert,
         "upsert": exec_upsert,
         "delete": exec_delete,

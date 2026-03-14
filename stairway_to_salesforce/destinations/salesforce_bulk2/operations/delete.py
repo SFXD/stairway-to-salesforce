@@ -1,7 +1,6 @@
 import logging
 import os
 import tempfile
-from typing import List, Optional, Union
 
 import pandas as pd
 
@@ -13,8 +12,8 @@ logger = logging.getLogger(__name__)
 def exec_delete(
     sf_driver,
     target_name: str,
-    file_path: Optional[str],
-    primary_key: Optional[Union[str, List[str]]] = None,
+    file_path: str | None,
+    primary_key: str | list[str] | None = None,
     key_resolver=None,
     **kwargs,
 ) -> None:
@@ -88,7 +87,7 @@ def exec_delete(
                 logger.error(f"Could not delete temp file {temp_id_file.name}: {e}")
 
 
-def _is_salesforce_id(primary_key: Optional[Union[str, List[str]]]) -> bool:
+def _is_salesforce_id(primary_key: str | list[str] | None) -> bool:
     """Check if the primary key is already the Salesforce 'Id' field."""
     if not primary_key:
         return False

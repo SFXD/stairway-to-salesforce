@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from typing import List, Optional, Union
+from typing import Any, cast
 
 from dlt.common.schema import TTableSchema
 from tomlkit import key
@@ -18,7 +18,7 @@ class SalesforceDestinationConfig:
     target_object_name: str
     write_disposition: str
     salesforce_operation: str
-    primary_key_field: Optional[Union[str, List[str]]]
+    primary_key_field: str | list[str] | None
 
     @classmethod
     def from_table_schema(cls, table_schema: TTableSchema) -> "SalesforceDestinationConfig":
@@ -26,15 +26,16 @@ class SalesforceDestinationConfig:
         Factories a config object from DLT metadata with strict validation.
         """
         # 1. Extract basic metadata
-        target_name = table_schema.get("name")
-        disposition = table_schema.get("write_disposition")
-        operation_hint = table_schema.get("x-salesforce-operation")
+        target_name = cast(str, table_schema.get("name"))
+        disposition = cast(str, table_schema.get("write_disposition"))
+        operation_hint = cast(str | None, table_schema.get("x-salesforce-operation"))
 
         if not target_name:
             raise ValueError("Salesforce SObject name must be defined in the table schema.")
 
         # 2. Resolve Primary Key (check top-level then column-level)
-        primary_key = table_schema.get("primary_key")
+        primary_key: str | list[str] | None = cast(Any, table_schema.get("primary_key"))
+
         if not primary_key and "columns" in table_schema:
             primary_key = [
                 column_name

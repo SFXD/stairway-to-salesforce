@@ -11,7 +11,8 @@ driver_cache: TTLCache[str, Salesforce] = TTLCache(maxsize=8, ttl=3600)
 
 def get_cache_key(secrets_path: str) -> str:
     """Deterministic cache key from dlt secrets path."""
-    return hashlib.md5(secrets_path.encode()).hexdigest()
+    # SHA-256 is modern and avoids all security warnings
+    return hashlib.sha256(secrets_path.encode()).hexdigest()
 
 
 def has_driver_in_cache(cache_key: str) -> bool:

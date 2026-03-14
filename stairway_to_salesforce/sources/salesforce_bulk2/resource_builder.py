@@ -1,6 +1,7 @@
 """DLT resource building and configuration validation for Salesforce sources."""
 
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
 import dlt
 from dlt.sources.helpers.requests import Session
@@ -53,7 +54,7 @@ def build_resource(
     config: dict[str, Any],
     fetch_data_fn: Callable,
     credentials: str,
-    session: Optional[Session],
+    session: Session | None,
 ):
     """
     Build a DLT resource from configuration.

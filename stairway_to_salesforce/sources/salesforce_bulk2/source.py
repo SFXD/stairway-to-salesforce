@@ -1,6 +1,6 @@
 """Main Salesforce Bulk API v2 source implementation."""
 
-from typing import Any, Optional
+from typing import Any
 
 import dlt
 from dlt.sources.helpers.requests import Session
@@ -12,7 +12,7 @@ from .resource_builder import build_resource, validate_resource_configs
 def salesforce_bulk2_source(
     resource_configs: list[dict[str, Any]],
     credentials: str = "",
-    session: Optional[Session] = None,
+    session: Session | None = None,
 ):
     """
     Dynamic Salesforce Bulk API v2 source.

@@ -81,7 +81,8 @@ class SalesforceKeyResolver:
                 df_new = self.sf_repository.fetch_all(self.sf_driver, sobject, key_field)
             else:
                 # check done for load mode determination
-                assert key_values is not None
+                if key_values is None:
+                    raise ValueError("key_values cannot be None in this context")
 
                 # Find missing keys (values not already in cache)
                 missing_key_values = self.cache_manager.find_missing_keys(

@@ -2,7 +2,6 @@ import argparse
 import logging
 import sys
 from abc import ABC, abstractmethod
-from typing import Optional
 
 import dlt
 
@@ -17,8 +16,8 @@ class BasePipeline(ABC):
     def __init__(
         self,
         pipeline_base_name: str,
-        default_csv_path: Optional[str] = None,
-        default_env: Optional[str] = None,
+        default_csv_path: str | None = None,
+        default_env: str | None = None,
     ):
         self.pipeline_base_name = pipeline_base_name
         self.default_csv_path = default_csv_path
@@ -106,8 +105,8 @@ class BasePipeline(ABC):
     def main(
         cls,
         pipeline_base_name: str,
-        default_csv_path: Optional[str] = None,
-        default_env: Optional[str] = None,
+        default_csv_path: str | None = None,
+        default_env: str | None = None,
     ):
         """
         Standardized entry point for all pipeline scripts.

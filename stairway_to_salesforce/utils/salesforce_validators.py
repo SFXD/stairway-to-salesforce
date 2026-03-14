@@ -130,9 +130,7 @@ def sanitize_field_name(field_name: str, allow_relationship_notation: bool = Tru
             "letters, numbers, and underscores. "
             f"Custom fields should end with suffixes like '__c', '__r'. "
             + (  # noqa: W503
-                "Relationship notation (dots) is allowed."
-                if allow_relationship_notation
-                else ""
+                "Relationship notation (dots) is allowed." if allow_relationship_notation else ""
             )
         )
 

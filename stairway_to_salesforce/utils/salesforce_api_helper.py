@@ -1,7 +1,8 @@
 import io
-from typing import Any, Iterable
+from typing import Any
 
 import pandas as pd
+from _collections_abc import Iterable
 from dlt.common.typing import TDataItem
 
 

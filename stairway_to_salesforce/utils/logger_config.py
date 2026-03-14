@@ -7,11 +7,10 @@ Salesforce-related operations.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 
 def get_rejected_records_path(
-    target_name: str, job_id: str, operation: str, output_dir: Optional[str] = None
+    target_name: str, job_id: str, operation: str, output_dir: str | None = None
 ) -> Path:
     """
     Generate path for rejected records CSV file.

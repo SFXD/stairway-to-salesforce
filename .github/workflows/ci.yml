@@ -38,7 +38,7 @@ jobs:
         uv run isort --check .
 
     - name: Security check (Bandit)
-      run: uv run bandit -r stairway_to_salesforce/
+      run: uv run bandit -c pyproject.toml -r stairway_to_salesforce/
       continue-on-error: true
 
     - name: Type check with mypy

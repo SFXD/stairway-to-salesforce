@@ -5,6 +5,8 @@ import tempfile
 
 import pandas as pd
 
+from stairway_to_salesforce.utils.salesforce_validators import sanitize_sobject_name
+
 from .common import get_bulk_client
 from .delete import exec_delete
 from .insert import exec_insert
@@ -38,10 +40,13 @@ def exec_replace(sf_driver, target_name: str, file_path: str, **kwargs) -> None:
 
 def _query_all_ids(sf_driver, target_name: str) -> list[str]:
     """Internal helper to fetch all IDs for the replace operation."""
+    target_name = sanitize_sobject_name(target_name)
     client, _ = get_bulk_client(sf_driver, target_name)
     ids = []
+
     # Bulk 2.0 query returns an iterator of CSV chunks
-    for chunk in client.query(f"SELECT Id FROM {target_name}"):
+    # target_name was sanitized against soql injection
+    for chunk in client.query(f"SELECT Id FROM {target_name}"):  # nosec B608
         df = pd.read_csv(io.StringIO(chunk))
         if not df.empty:
             ids.extend(df["Id"].tolist())

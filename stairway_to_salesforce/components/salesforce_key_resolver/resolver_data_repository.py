@@ -32,10 +32,11 @@ class SalesforceRepository:
         validated_sobject = sanitize_sobject_name(sobject)
         validated_key_field = sanitize_field_name(key_field, allow_relationship_notation=False)
 
+        # sobject and keyfield name are sanitized against soql injection
         base_query = (
-            f"SELECT Id, {validated_key_field} "
-            f"FROM {validated_sobject} "
-            f"WHERE {validated_key_field} != null"
+            f"SELECT Id, {validated_key_field} "  # nosec B608
+            f"FROM {validated_sobject} "  # nosec B608
+            f"WHERE {validated_key_field} != null"  # nosec B608
         )
 
         filter_query = ""

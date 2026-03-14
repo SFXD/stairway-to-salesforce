@@ -112,9 +112,9 @@ class ConsumerKeySecretDomainAuth(SalesforceCredentialsBase):
 
 SalesforceDriverAuth = (
     SecurityTokenAuth
-    | OrganizationIdAuth
-    | ConsumerKeySecretAuth
-    | JWTAuth
-    | ConsumerKeySecretDomainAuth
-    | InstanceAuth
+    | OrganizationIdAuth  # noqa: W503
+    | ConsumerKeySecretAuth  # noqa: W503
+    | JWTAuth  # noqa: W503
+    | ConsumerKeySecretDomainAuth  # noqa: W503
+    | InstanceAuth  # noqa: W503
 )

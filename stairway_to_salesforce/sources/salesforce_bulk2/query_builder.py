@@ -74,7 +74,10 @@ def _build_soql_query(
 
     # Build final query
     # Variables are sanitized to prevent SOQL injection.
-    query = f"SELECT {', '.join(source_fields)} FROM {sobject}{where_clause}{order_by_clause} LIMIT 2"  # nosec B608
+    query = (
+        f"SELECT {', '.join(source_fields)} "  # nosec B608
+        f"FROM {sobject}{where_clause}{order_by_clause} LIMIT 2"  # nosec B608
+    )
     logger.debug(f"Generated SOQL: {query}")
     return query
 

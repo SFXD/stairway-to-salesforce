@@ -43,6 +43,7 @@ dev = [
     "freezegun>=1.2.2",
     "faker>=19.3.0",
     "flake8-pyproject>=1.2.0",
+    "types-cachetools>=6.2.0.20251022",
 ]
 docs = [
     "mkdocs-material>=9.7.1",
@@ -64,9 +65,21 @@ python_classes = "Test*"
 python_functions = "test_*"
 addopts = "--verbose --cov=stairway_to_salesforce"
 
+[tool.black]
+line-length = 100
+target-version = ['py312']
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
 [tool.flake8]
 max-line-length = 100
 max-complexity = 10
+select = ["E9", "F63", "F7", "F82", "E", "W", "F", "C90"] 
+statistics = true
+show-source = true
+extend-ignore = ["E203"]
 exclude = [
     '.venv',
     '.git',

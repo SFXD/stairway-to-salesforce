@@ -1,5 +1,3 @@
-from typing import Optional, Union
-
 import dlt
 from dlt.sources.helpers.requests import Session
 from simple_salesforce import Salesforce
@@ -18,88 +16,92 @@ from .sfdriver_specs import (
 
 def make_salesforce_driver(
     credentials: SalesforceDriverAuth,
-    session: Optional[Session] = None,
-    config: SalesforceDriverConfiguration = None,
+    session: Session | None = None,
+    config: SalesforceDriverConfiguration | None = None,
 ) -> Salesforce:
 
-    credentials = resolve_salesforce_credentials(credentials)
+    # Consistency on config ( default if none )
+    resolved_config = config if config is not None else SalesforceDriverConfiguration()
 
-    if isinstance(credentials, SecurityTokenAuth):
+    # Consistency on credentials
+    resolved_credentials = resolve_salesforce_credentials(credentials)
+
+    if isinstance(resolved_credentials, SecurityTokenAuth):
         return Salesforce(
-            version=config.version,
-            domain=config.domain,
+            version=resolved_config.version,
+            domain=resolved_config.domain,
             session=session,
-            proxies=config.get_proxies(),
-            username=credentials.user_name,
-            password=credentials.password,
-            security_token=credentials.security_token,
-            client_id=config.client_id,
+            proxies=resolved_config.get_proxies(),
+            username=resolved_credentials.user_name,
+            password=resolved_credentials.password,
+            security_token=resolved_credentials.security_token,
+            client_id=resolved_config.client_id,
         )
 
-    elif isinstance(credentials, InstanceAuth):
+    elif isinstance(resolved_credentials, InstanceAuth):
         return Salesforce(
-            version=config.version,
-            domain=config.domain,
+            version=resolved_config.version,
+            domain=resolved_config.domain,
             session=session,
-            proxies=config.get_proxies(),
-            session_id=credentials.session_id,
-            instance=credentials.instance,
-            instance_url=credentials.instance_url,
+            proxies=resolved_config.get_proxies(),
+            session_id=resolved_credentials.session_id,
+            instance=resolved_credentials.instance,
+            instance_url=resolved_credentials.instance_url,
         )
 
-    elif isinstance(credentials, OrganizationIdAuth):
+    elif isinstance(resolved_credentials, OrganizationIdAuth):
         return Salesforce(
-            version=config.version,
-            domain=config.domain,
+            version=resolved_config.version,
+            domain=resolved_config.domain,
             session=session,
-            proxies=config.get_proxies(),
-            username=credentials.user_name,
-            password=credentials.password,
-            organizationId=credentials.organization_id,
-            client_id=config.client_id,
+            proxies=resolved_config.get_proxies(),
+            username=resolved_credentials.user_name,
+            password=resolved_credentials.password,
+            organizationId=resolved_credentials.organization_id,
+            client_id=resolved_config.client_id,
         )
 
-    elif isinstance(credentials, ConsumerKeySecretAuth):
+    elif isinstance(resolved_credentials, ConsumerKeySecretAuth):
         return Salesforce(
-            version=config.version,
-            domain=config.domain,
+            version=resolved_config.version,
+            domain=resolved_config.domain,
             session=session,
-            proxies=config.get_proxies(),
-            username=credentials.user_name,
-            password=credentials.password,
-            consumer_key=credentials.consumer_key,
-            consumer_secret=credentials.consumer_secret,
+            proxies=resolved_config.get_proxies(),
+            username=resolved_credentials.user_name,
+            password=resolved_credentials.password,
+            consumer_key=resolved_credentials.consumer_key,
+            consumer_secret=resolved_credentials.consumer_secret,
         )
 
-    elif isinstance(credentials, JWTAuth):
+    elif isinstance(resolved_credentials, JWTAuth):
         return Salesforce(
-            version=config.version,
-            domain=config.domain,
+            version=resolved_config.version,
+            domain=resolved_config.domain,
             session=session,
-            proxies=config.get_proxies(),
-            username=credentials.user_name,
-            instance_url=credentials.instance_url,
-            consumer_key=credentials.consumer_key,
-            privatekey_file=credentials.privatekey_file,
-            privatekey=credentials.privatekey,
+            proxies=resolved_config.get_proxies(),
+            username=resolved_credentials.user_name,
+            instance_url=resolved_credentials.instance_url,
+            consumer_key=resolved_credentials.consumer_key,
+            privatekey_file=resolved_credentials.privatekey_file,
+            privatekey=resolved_credentials.privatekey,
         )
 
-    elif isinstance(credentials, ConsumerKeySecretDomainAuth):
+    elif isinstance(resolved_credentials, ConsumerKeySecretDomainAuth):
         # NOTE: For this authentication type,
         # domain must be provided as part of the credentials set,
         # we therefore get it from credentials, not config
         return Salesforce(
-            version=config.version,
+            version=resolved_config.version,
             session=session,
-            proxies=config.get_proxies(),
-            consumer_key=credentials.consumer_key,
-            consumer_secret=credentials.consumer_secret,
-            domain=credentials.domain,
+            proxies=resolved_config.get_proxies(),
+            consumer_key=resolved_credentials.consumer_key,
+            consumer_secret=resolved_credentials.consumer_secret,
+            domain=resolved_credentials.domain,
         )
 
 
 def resolve_salesforce_credentials(  # noqa: C901
-    credentials: Union[SalesforceDriverAuth, dict, str],
+    credentials: SalesforceDriverAuth | dict | str,
 ) -> SalesforceDriverAuth:
     """
     Resolve and validate Salesforce credentials from various input formats.
@@ -208,13 +210,13 @@ def resolve_salesforce_credentials(  # noqa: C901
 
     else:
         raise ValueError(
-            f"Could not determine Salesforce credential type. "
+            "Could not determine Salesforce credential type. "
             f"Available fields: {list(credentials.keys())}. "
-            f"Supported credential types require one of:\n"
-            f"  - SecurityTokenAuth: user_name, password, security_token\n"
-            f"  - OrganizationIdAuth: user_name, password, organization_id\n"
-            f"  - InstanceAuth: session_id, (instance OR instance_url)\n"
-            f"  - JWTAuth: user_name, consumer_key, (privatekey OR privatekey_file)\n"
-            f"  - ConsumerKeySecretDomainAuth: consumer_key, consumer_secret, domain\n"
-            f"  - ConsumerKeySecretAuth: user_name, password, consumer_key, consumer_secret"
+            "Supported credential types require one of:\n"
+            "  - SecurityTokenAuth: user_name, password, security_token\n"
+            "  - OrganizationIdAuth: user_name, password, organization_id\n"
+            "  - InstanceAuth: session_id, (instance OR instance_url)\n"
+            "  - JWTAuth: user_name, consumer_key, (privatekey OR privatekey_file)\n"
+            "  - ConsumerKeySecretDomainAuth: consumer_key, consumer_secret, domain\n"
+            "  - ConsumerKeySecretAuth: user_name, password, consumer_key, consumer_secret"
         )

@@ -6,6 +6,7 @@ to CSV format required by Salesforce Bulk API.
 """
 
 import csv
+import logging
 import os
 import tempfile
 from pathlib import Path
@@ -14,6 +15,8 @@ from typing import Any
 import pyarrow as pa
 from _collections_abc import Iterator
 from dlt.common.typing import TDataItems
+
+logger = logging.getLogger(__name__)
 
 
 def prepare_data(items: TDataItems) -> str:
@@ -189,6 +192,5 @@ def cleanup_temp_file(file_path: str) -> None:
     try:
         if os.path.exists(file_path):
             os.unlink(file_path)
-    except Exception:
-        # Best effort cleanup - don't fail the pipeline if cleanup fails
-        pass
+    except Exception as e:
+        logger.debug(f"Failed to delete temporary file {file_path}: {str(e)}")

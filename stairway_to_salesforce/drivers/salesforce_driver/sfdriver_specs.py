@@ -111,10 +111,10 @@ class ConsumerKeySecretDomainAuth(SalesforceCredentialsBase):
 
 
 SalesforceDriverAuth = (
-    SecurityTokenAuth |
-    OrganizationIdAuth |
-    ConsumerKeySecretAuth |
-    JWTAuth |
-    ConsumerKeySecretDomainAuth |
-    InstanceAuth
+    SecurityTokenAuth
+    | OrganizationIdAuth
+    | ConsumerKeySecretAuth
+    | JWTAuth
+    | ConsumerKeySecretDomainAuth
+    | InstanceAuth
 )

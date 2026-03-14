@@ -94,3 +94,7 @@ per-file-ignores = [
 
 [tool.bandit]
 exclude_dirs = ["tests"]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true

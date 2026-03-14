@@ -7,7 +7,8 @@ and data fetching from Salesforce using the Bulk API v2.
 
 import io
 import logging
-from typing import Any, Iterable, Optional
+from collections.abc import Iterable
+from typing import Any
 
 import pandas as pd
 from dlt.common.typing import TDataItem
@@ -27,9 +28,9 @@ logger = logging.getLogger(__name__)
 def _build_soql_query(
     sobject: str,
     fields: list[str],
-    query_filter: Optional[str] = None,
-    replication_key: Optional[str] = None,
-    last_state: Optional[Any] = None,
+    query_filter: str | None = None,
+    replication_key: str | None = None,
+    last_state: Any | None = None,
 ) -> str:
     """
     Build a secure SOQL query with proper validation and escaping.
@@ -151,9 +152,9 @@ def fetch_data(
     sf: Salesforce,
     sobject: str,
     fields: list[str],
-    replication_key: Optional[str] = None,
-    last_state: Optional[Any] = None,
-    query_filter: Optional[str] = None,
+    replication_key: str | None = None,
+    last_state: Any | None = None,
+    query_filter: str | None = None,
 ) -> Iterable[TDataItem]:
     """
     Fetch data from Salesforce using Bulk API v2.
@@ -187,9 +188,10 @@ def fetch_data(
         yield from _execute_bulk_query(sf, sobject, soql_query)
 
     except SalesforceMalformedRequest as e:
-        logger.error(f"Malformed SOQL query for {sobject}: {str(e)}")
+        custom_msg = f"Malformed SOQL query for {sobject}. Query: {soql_query}. Error: {str(e)}"
+        logger.error(custom_msg)
         raise SalesforceMalformedRequest(
-            f"Malformed SOQL query for {sobject}. " f"Query: {soql_query}. " f"Error: {str(e)}"
+            custom_msg, status=e.status, resource_name=e.resource_name, content=e.content
         ) from e
 
     except AttributeError as e:

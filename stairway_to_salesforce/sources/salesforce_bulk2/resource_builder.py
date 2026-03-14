@@ -90,7 +90,7 @@ def build_resource(
     column_types = config.get("column_types")
 
     # Setup incremental loading
-    incremental_cursor = None
+    incremental_cursor: Any | None = None
     if replication_key:
         incremental_cursor = dlt.sources.incremental(replication_key, initial_value=None)
 

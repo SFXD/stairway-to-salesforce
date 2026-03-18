@@ -43,27 +43,29 @@ class ReplaceFixedRecordPipeline(BasePipeline):
         # Step 2: Source
         source_resource = (
             filesystem(
-                bucket_url=self.csv_file_path.rsplit("/", 1)[0],
-                file_glob=self.csv_file_path.rsplit("/", 1)[1],
+                bucket_url=self.csv_path.rsplit("/", 1)[0],
+                file_glob=self.csv_path.rsplit("/", 1)[1],
             )
             | read_csv()  # noqa: W503
         )
 
         # Step 3: Transform
         @dlt.transformer(name="transform_fixedrecords_csv_to_sf")
-        def transformer(records: Iterator[Dict[str, Any]]) -> Iterator[Dict[str, Any]]:
-            # Safety if the records are processed one by one
+        def transformer(records: Any) -> Iterator[Dict[str, Any]]:
+            # Ensure we are working with an iterable of records
             if isinstance(records, dict):
-                records = [records]
+                resolved_records = [records]
+            else:
+                resolved_records = records
 
             # Validate Schema
             required_columns = ["name", "code", "description"]
-            missing = [col for col in required_columns if col not in records[0]]
+            missing = [col for col in required_columns if col not in resolved_records[0]]
             if missing:
                 raise ValueError(f"Missing required columns: {missing}")
 
             # Map fields
-            for record in records:
+            for record in resolved_records:
                 yield {
                     "Name": record["name"],
                     "FixedCode__c": record["code"],

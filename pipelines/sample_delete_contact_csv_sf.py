@@ -13,7 +13,6 @@ from stairway_to_salesforce.destinations import salesforce_bulk2
 
 class DeleteContactPipeline(BasePipeline):
     def execute(self) -> None:
-
         # Step 1: Init pipeline
         pipeline = dlt.pipeline(
             pipeline_name=f"{self.pipeline_name}",
@@ -26,8 +25,8 @@ class DeleteContactPipeline(BasePipeline):
         # Step 2: Source
         source_resource = (
             filesystem(
-                bucket_url=self.csv_file_path.rsplit("/", 1)[0],  # folder path
-                file_glob=self.csv_file_path.rsplit("/", 1)[1],  # filename
+                bucket_url=self.csv_path.rsplit("/", 1)[0],  # folder path
+                file_glob=self.csv_path.rsplit("/", 1)[1],  # filename
             )
             | read_csv()  # noqa: W503
         )

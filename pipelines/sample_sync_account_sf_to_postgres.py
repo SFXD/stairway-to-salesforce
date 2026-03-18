@@ -57,12 +57,14 @@ class SampleSyncAccountSfToPostgresPipeline(BasePipeline):
 
         # Step 3: Transform
         @dlt.transformer(name="tb_accounts")
-        def transformer(records: Iterator[Dict[str, Any]]) -> Iterator[Dict[str, Any]]:
-            # Safety if the records are processed one by one
+        def transformer(records: Any) -> Iterator[Dict[str, Any]]:
+            # Ensure we are working with an iterable of records
             if isinstance(records, dict):
-                records = [records]
+                resolved_records = [records]
+            else:
+                resolved_records = records
 
-            for record in records:
+            for record in resolved_records:
                 yield {
                     "account_id": record["Id"],
                     "account_name": record["Name"],

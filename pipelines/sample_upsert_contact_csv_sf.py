@@ -43,18 +43,20 @@ class UpsertContactPipeline(BasePipeline):
         # Step 2: Source
         source_resource = (
             filesystem(
-                bucket_url=self.csv_file_path.rsplit("/", 1)[0],
-                file_glob=self.csv_file_path.rsplit("/", 1)[1],
+                bucket_url=self.csv_path.rsplit("/", 1)[0],
+                file_glob=self.csv_path.rsplit("/", 1)[1],
             )
             | read_csv()  # noqa: W503
         )
 
         # Step 3: Transform
         @dlt.transformer(name="transform_contacts_csv_to_sf")
-        def transformer(records: Iterator[Dict[str, Any]]) -> Iterator[Dict[str, Any]]:
-            # Safety if the records are processed one by one
+        def transformer(records: Any) -> Iterator[Dict[str, Any]]:
+            # Ensure we are working with an iterable of records
             if isinstance(records, dict):
-                records = [records]
+                resolved_records = [records]
+            else:
+                resolved_records = records
 
             # Validate source schema
             required_columns = [
@@ -63,13 +65,15 @@ class UpsertContactPipeline(BasePipeline):
                 "Last_Name",
                 "Email",
             ]  # required columns to be updated with your csv structure
-            missing = [col for col in required_columns if col not in records[0]]
+            missing = [col for col in required_columns if col not in resolved_records[0]]
             if missing:
                 raise ValueError(f"Missing required columns: {missing}")
 
             # Extract source external keys we need to convert into Salesforce Ids
             account_key_values = {
-                str(record["External_ID"]) for record in records if record.get("External_ID")
+                str(record["External_ID"])
+                for record in resolved_records
+                if record.get("External_ID")
             }
 
             # Init resolver ( with base pipeline credentials)
@@ -84,7 +88,7 @@ class UpsertContactPipeline(BasePipeline):
             )
 
             # Map fields
-            for record in records:
+            for record in resolved_records:
                 yield {
                     # Direct field mapping
                     "FirstName": record["First_Name"],

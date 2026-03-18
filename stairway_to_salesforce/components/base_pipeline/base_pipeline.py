@@ -80,6 +80,7 @@ class BasePipeline(ABC):
         except Exception as e:
             self.logger.error(f"❌ Pipeline failed: {e}")
             import traceback
+
             traceback.print_exc()
             sys.exit(1)
 

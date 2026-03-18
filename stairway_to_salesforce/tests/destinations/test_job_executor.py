@@ -6,13 +6,17 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from stairway_to_salesforce.destinations.salesforce_bulk2.job_executor import execute_job
+from stairway_to_salesforce.destinations.salesforce_bulk2.job_executor import (
+    execute_job,
+)
 
 
 class TestExecuteJob:
     """Tests for execute_job() dispatch function."""
 
-    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_insert")
+    @patch(
+        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_insert"
+    )
     def test_execute_job_insert(self, mock_insert, temp_csv_file):
         """Test job execution dispatches to insert."""
         mock_driver = Mock()
@@ -36,7 +40,9 @@ class TestExecuteJob:
             key_resolver=mock_resolver,
         )
 
-    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_upsert")
+    @patch(
+        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_upsert"
+    )
     def test_execute_job_upsert(self, mock_upsert, temp_csv_file):
         """Test job execution dispatches to upsert."""
         mock_driver = Mock()
@@ -60,7 +66,9 @@ class TestExecuteJob:
             key_resolver=mock_resolver,
         )
 
-    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_delete")
+    @patch(
+        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_delete"
+    )
     def test_execute_job_delete(self, mock_delete, temp_csv_file):
         """Test job execution dispatches to delete."""
         mock_driver = Mock()
@@ -84,7 +92,9 @@ class TestExecuteJob:
             key_resolver=mock_resolver,
         )
 
-    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_replace")
+    @patch(
+        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_replace"
+    )
     def test_execute_job_replace(self, mock_replace, temp_csv_file):
         """Test job execution dispatches to replace."""
         mock_driver = Mock()
@@ -138,7 +148,9 @@ class TestExecuteJob:
         assert "delete" in error_msg
         assert "replace" in error_msg
 
-    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_insert")
+    @patch(
+        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_insert"
+    )
     def test_execute_job_passes_all_kwargs(self, mock_insert, temp_csv_file):
         """Test that execute_job passes all parameters correctly."""
         mock_driver = Mock()
@@ -161,7 +173,9 @@ class TestExecuteJob:
         assert call_kwargs["primary_key"] == ["Field1__c", "Field2__c"]
         assert call_kwargs["key_resolver"] == mock_resolver
 
-    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_upsert")
+    @patch(
+        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_upsert"
+    )
     def test_execute_job_without_resolver(self, mock_upsert, temp_csv_file):
         """Test execution without key_resolver (optional parameter)."""
         execute_job(
@@ -181,7 +195,9 @@ class TestExecuteJob:
 class TestExecuteJobEdgeCases:
     """Tests for edge cases in job execution."""
 
-    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_insert")
+    @patch(
+        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_insert"
+    )
     def test_execute_job_custom_object(self, mock_insert, temp_csv_file):
         """Test execution with custom Salesforce object."""
         execute_job(
@@ -195,7 +211,9 @@ class TestExecuteJobEdgeCases:
 
         assert mock_insert.call_args[1]["target_name"] == "My_Custom_Object__c"
 
-    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_delete")
+    @patch(
+        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_delete"
+    )
     def test_execute_job_list_primary_key(self, mock_delete, temp_csv_file):
         """Test execution with list primary key."""
         execute_job(
@@ -242,10 +260,18 @@ class TestDispatchMapIntegrity:
         assert callable(exec_delete)
         assert callable(exec_replace)
 
-    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_insert")
-    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_upsert")
-    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_delete")
-    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_replace")
+    @patch(
+        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_insert"
+    )
+    @patch(
+        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_upsert"
+    )
+    @patch(
+        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_delete"
+    )
+    @patch(
+        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_replace"
+    )
     def test_all_operations_dispatched(
         self, mock_replace, mock_delete, mock_upsert, mock_insert, temp_csv_file
     ):
@@ -272,7 +298,9 @@ class TestDispatchMapIntegrity:
 class TestJobExecutorErrorHandling:
     """Tests for error handling in job executor."""
 
-    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_insert")
+    @patch(
+        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_insert"
+    )
     def test_execute_job_propagates_operation_errors(self, mock_insert, temp_csv_file):
         """Test that errors from operations are propagated."""
         mock_insert.side_effect = RuntimeError("Salesforce API Error")
@@ -287,7 +315,9 @@ class TestJobExecutorErrorHandling:
                 key_resolver=None,
             )
 
-    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_insert")
+    @patch(
+        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_insert"
+    )
     def test_execute_job_with_none_file_path(self, mock_insert):
         """Test handling of None file path."""
         # FIX: Mock the insert operation to avoid the actual execution
@@ -307,7 +337,9 @@ class TestJobExecutorErrorHandling:
         # Verify it was called with None file_path
         assert mock_insert.call_args[1]["file_path"] is None
 
-    @patch("stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_insert")
+    @patch(
+        "stairway_to_salesforce.destinations.salesforce_bulk2.job_executor.exec_insert"
+    )
     def test_execute_job_with_empty_target_name(self, mock_insert, temp_csv_file):
         """Test handling of empty target name."""
         # May be caught by validation in operations

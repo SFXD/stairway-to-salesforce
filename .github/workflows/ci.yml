@@ -29,17 +29,10 @@ jobs:
     - name: Install dependencies
       run: uv sync --group dev
 
-    - name: Lint with flake8
-      run: uv run flake8 .
-
-    - name: Check code formatting (Black & Isort)
-      run: |
-        uv run black --check .
-        uv run isort --check .
-
-    - name: Security check (Bandit)
-      run: uv run bandit -c pyproject.toml -r stairway_to_salesforce/
-      continue-on-error: true
+    - name: Lint and Format check with Ruff
+          run: |
+            uv run ruff format --check .
+            uv run ruff check .
 
     - name: Type check with mypy
       run: uv run mypy .

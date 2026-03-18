@@ -6,6 +6,7 @@ import re
 from datetime import date, datetime
 from typing import Any
 
+
 # 1. BASE PATTERNS
 _SF_NAME = r"[a-zA-Z][a-zA-Z0-9_]*"
 _SF_SUFFIX = r"(__[cr|e|p|v|share|history|changeevent])?"

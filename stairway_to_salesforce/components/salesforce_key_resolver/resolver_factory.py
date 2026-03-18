@@ -2,6 +2,7 @@ import dlt
 
 from .resolver import SalesforceKeyResolver
 
+
 # Module-level singleton resolver to maintain state across datasets
 _resolver: SalesforceKeyResolver | None = None
 

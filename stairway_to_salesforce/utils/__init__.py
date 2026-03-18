@@ -13,6 +13,7 @@ from .salesforce_validators import (
     validate_soql_filter,
 )
 
+
 __all__ = [
     "sanitize_sobject_name",
     "sanitize_field_name",

@@ -3,6 +3,7 @@ import logging
 from stairway_to_salesforce.utils.logger_config import get_rejected_records_path
 from stairway_to_salesforce.utils.salesforce_validators import sanitize_sobject_name
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -11,9 +12,9 @@ def get_bulk_client(sf_driver, target_name: str):
     target_name = sanitize_sobject_name(target_name)
     try:
         return getattr(sf_driver.bulk2, target_name), target_name
-    except AttributeError:
+    except AttributeError as e:
         logger.error(f"Invalid Salesforce object name: {target_name}")
-        raise ValueError(f"Invalid Salesforce object name: '{target_name}'.")
+        raise ValueError(f"Invalid Salesforce object name: '{target_name}'.") from e
 
 
 def process_results(client, results, target_name: str, operation: str) -> None:

@@ -103,7 +103,9 @@ class TestPrepareData:
 
     def test_prepare_data_iterator(self):
         """Test prepare_data with iterator of dictionaries."""
-        data_iter = iter([{"Id": "001", "Name": "Test1"}, {"Id": "002", "Name": "Test2"}])
+        data_iter = iter(
+            [{"Id": "001", "Name": "Test1"}, {"Id": "002", "Name": "Test2"}]
+        )
 
         result = prepare_data(data_iter)
 
@@ -292,7 +294,9 @@ class TestConvertDictsToCsv:
 
     def test_convert_iterator_of_dicts(self):
         """Test conversion of iterator (should convert to list first)."""
-        data_iter = iter([{"Id": "001", "Name": "Test1"}, {"Id": "002", "Name": "Test2"}])
+        data_iter = iter(
+            [{"Id": "001", "Name": "Test1"}, {"Id": "002", "Name": "Test2"}]
+        )
 
         result = _convert_dicts_to_csv(data_iter)
 

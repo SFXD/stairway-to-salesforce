@@ -12,11 +12,11 @@ from stairway_to_salesforce.utils.salesforce_validators import (
     sanitize_sobject_name,
 )
 
+
 logger = logging.getLogger(__name__)
 
 
 class SalesforceRepository:
-
     def _build_query(self, sobject: str, key_field: str, key_values: set[str] | None = None) -> str:
         """
         Build base SOQL query, used both or a full load and a filtered load
@@ -34,9 +34,9 @@ class SalesforceRepository:
 
         # sobject and keyfield name are sanitized against soql injection
         base_query = (
-            f"SELECT Id, {validated_key_field} "  # nosec B608
-            f"FROM {validated_sobject} "  # nosec B608
-            f"WHERE {validated_key_field} != null"  # nosec B608
+            f"SELECT Id, {validated_key_field} "  # noqa: S608
+            f"FROM {validated_sobject} "  # noqa: S608
+            f"WHERE {validated_key_field} != null"  # noqa: S608
         )
 
         filter_query = ""

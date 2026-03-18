@@ -9,6 +9,7 @@ from .base_pipeline.base_pipeline import BasePipeline
 from .salesforce_key_resolver.resolver import SalesforceKeyResolver
 from .salesforce_key_resolver.resolver_factory import get_salesforce_key_resolver
 
+
 __version__ = "1.0.0"
 
 __all__ = [

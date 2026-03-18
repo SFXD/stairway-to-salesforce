@@ -189,18 +189,24 @@ class TestResolveSalesforceCredentials:
         result = resolve_salesforce_credentials("salesforce.sandbox.credentials")
 
         assert isinstance(result, ConsumerKeySecretDomainAuth)
-        mock_secrets.__getitem__.assert_called_once_with("salesforce.sandbox.credentials")
+        mock_secrets.__getitem__.assert_called_once_with(
+            "salesforce.sandbox.credentials"
+        )
 
     def test_resolve_invalid_dict_raises_error(self):
         """Test that invalid dict raises ValueError."""
         cred_dict = {"invalid_field": "value", "another_invalid": "value"}
 
-        with pytest.raises(ValueError, match="Could not determine Salesforce credential type"):
+        with pytest.raises(
+            ValueError, match="Could not determine Salesforce credential type"
+        ):
             resolve_salesforce_credentials(cred_dict)
 
     def test_resolve_empty_dict_raises_error(self):
         """Test that empty dict raises ValueError."""
-        with pytest.raises(ValueError, match="Could not determine Salesforce credential type"):
+        with pytest.raises(
+            ValueError, match="Could not determine Salesforce credential type"
+        ):
             resolve_salesforce_credentials({})
 
     def test_resolve_invalid_type_raises_error(self):
@@ -219,7 +225,9 @@ class TestResolveSalesforceCredentials:
         """Test error handling when loading from DLT secrets fails."""
         mock_secrets.__getitem__.side_effect = KeyError("Secret not found")
 
-        with pytest.raises(ValueError, match="Failed to load credentials from DLT secrets path"):
+        with pytest.raises(
+            ValueError, match="Failed to load credentials from DLT secrets path"
+        ):
             resolve_salesforce_credentials("salesforce.nonexistent")
 
 
@@ -311,7 +319,9 @@ class TestCredentialResolutionPriority:
 class TestMakeSalesforceDriver:
     """Tests for make_salesforce_driver() function."""
 
-    @patch("stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce")
+    @patch(
+        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+    )
     def test_make_driver_security_token_auth(self, mock_sf_class):
         """Test driver creation with SecurityTokenAuth."""
         mock_sf_instance = Mock()
@@ -336,7 +346,9 @@ class TestMakeSalesforceDriver:
         assert "version" in call_kwargs
         assert "domain" in call_kwargs
 
-    @patch("stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce")
+    @patch(
+        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+    )
     def test_make_driver_organization_id_auth(self, mock_sf_class):
         """Test driver creation with OrganizationIdAuth."""
         mock_sf_instance = Mock()
@@ -357,7 +369,9 @@ class TestMakeSalesforceDriver:
         assert call_kwargs["username"] == "test@example.com"
         assert call_kwargs["organizationId"] == "00Dxx0000000001"
 
-    @patch("stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce")
+    @patch(
+        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+    )
     def test_make_driver_instance_auth(self, mock_sf_class):
         """Test driver creation with InstanceAuth."""
         mock_sf_instance = Mock()
@@ -374,7 +388,9 @@ class TestMakeSalesforceDriver:
         assert call_kwargs["session_id"] == "test_session"
         assert call_kwargs["instance"] == "na1.salesforce.com"
 
-    @patch("stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce")
+    @patch(
+        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+    )
     def test_make_driver_consumer_key_secret_auth(self, mock_sf_class):
         """Test driver creation with ConsumerKeySecretAuth."""
         mock_sf_instance = Mock()
@@ -397,7 +413,9 @@ class TestMakeSalesforceDriver:
         assert call_kwargs["consumer_key"] == "test_key"
         assert call_kwargs["consumer_secret"] == "test_secret"
 
-    @patch("stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce")
+    @patch(
+        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+    )
     def test_make_driver_jwt_auth(self, mock_sf_class):
         """Test driver creation with JWTAuth."""
         mock_sf_instance = Mock()
@@ -419,7 +437,9 @@ class TestMakeSalesforceDriver:
         assert call_kwargs["consumer_key"] == "test_key"
         assert call_kwargs["privatekey_file"] == "/path/to/key.pem"
 
-    @patch("stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce")
+    @patch(
+        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+    )
     def test_make_driver_consumer_key_secret_domain_auth(self, mock_sf_class):
         """Test driver creation with ConsumerKeySecretDomainAuth."""
         mock_sf_instance = Mock()
@@ -439,7 +459,9 @@ class TestMakeSalesforceDriver:
         assert call_kwargs["consumer_secret"] == "test_secret"
         assert call_kwargs["domain"] == "test"
 
-    @patch("stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce")
+    @patch(
+        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+    )
     def test_make_driver_resolves_dict_credentials(self, mock_sf_class):
         """Test that make_salesforce_driver resolves dict credentials."""
         mock_sf_instance = Mock()
@@ -458,7 +480,9 @@ class TestMakeSalesforceDriver:
         # Should have resolved to SecurityTokenAuth and called Salesforce()
         mock_sf_class.assert_called_once()
 
-    @patch("stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce")
+    @patch(
+        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+    )
     def test_make_driver_with_custom_session(self, mock_sf_class):
         """Test driver creation with custom session."""
         mock_sf_instance = Mock()
@@ -479,7 +503,9 @@ class TestMakeSalesforceDriver:
         call_kwargs = mock_sf_class.call_args[1]
         assert call_kwargs["session"] == mock_session
 
-    @patch("stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce")
+    @patch(
+        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+    )
     def test_make_driver_with_custom_config(self, mock_sf_class):
         """Test driver creation with custom configuration."""
         mock_sf_instance = Mock()
@@ -503,7 +529,9 @@ class TestMakeSalesforceDriver:
         assert call_kwargs["domain"] == "test"
         assert call_kwargs["client_id"] == "custom_client"
 
-    @patch("stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce")
+    @patch(
+        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+    )
     def test_make_driver_with_proxies(self, mock_sf_class):
         """Test driver creation with proxy configuration."""
         mock_sf_instance = Mock()
@@ -530,7 +558,9 @@ class TestMakeSalesforceDriver:
 class TestDriverFactoryEdgeCases:
     """Tests for edge cases in driver factory."""
 
-    @patch("stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce")
+    @patch(
+        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+    )
     def test_make_driver_preserves_credential_fields(self, mock_sf_class):
         """Test that all credential fields are passed to Salesforce()."""
         mock_sf_instance = Mock()

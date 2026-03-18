@@ -9,12 +9,13 @@ import csv
 import logging
 import os
 import tempfile
+from _collections_abc import Iterator
 from pathlib import Path
 from typing import Any
 
 import pyarrow as pa
-from _collections_abc import Iterator
 from dlt.common.typing import TDataItems
+
 
 logger = logging.getLogger(__name__)
 

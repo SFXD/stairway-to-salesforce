@@ -5,6 +5,7 @@ import hashlib
 from cachetools import TTLCache
 from simple_salesforce import Salesforce
 
+
 # Global cache: 8 drivers, 1hr TTL (Salesforce default session lifetime)
 driver_cache: TTLCache[str, Salesforce] = TTLCache(maxsize=8, ttl=3600)
 

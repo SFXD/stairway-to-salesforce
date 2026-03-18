@@ -6,6 +6,7 @@ import pandas as pd
 
 from .common import get_bulk_client, process_results
 
+
 logger = logging.getLogger(__name__)
 
 

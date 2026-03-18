@@ -4,10 +4,13 @@ Main Salesforce lookup resolver class.
 
 import logging
 
-from stairway_to_salesforce.drivers.salesforce_driver.sfdriver import get_salesforce_driver
+from stairway_to_salesforce.drivers.salesforce_driver.sfdriver import (
+    get_salesforce_driver,
+)
 
 from .resolver_cache_manager import CacheManager
 from .resolver_data_repository import SalesforceRepository
+
 
 logger = logging.getLogger(__name__)
 

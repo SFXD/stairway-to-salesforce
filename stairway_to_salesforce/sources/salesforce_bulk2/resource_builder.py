@@ -46,7 +46,7 @@ def validate_resource_configs(configs: list[dict[str, Any]]) -> None:
             replication_key = config["replication_key"]
             if replication_key not in config["fields"]:
                 raise ValueError(
-                    f"Config {i}: replication_key '{replication_key}' " f"must exist in fields list"
+                    f"Config {i}: replication_key '{replication_key}' must exist in fields list"
                 )
 
 

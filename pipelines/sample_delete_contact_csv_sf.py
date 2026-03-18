@@ -4,6 +4,7 @@ Delete contacts from a csv file, based on an external key "Email"
 
 The delete operation is resolving the email into Salesforce Id (necessary for the salesforce delete)
 """
+
 import dlt
 from dlt.sources.filesystem import filesystem, read_csv
 

@@ -31,10 +31,7 @@ bigquery = ["dlt[bigquery]>=0.4.0"]
 
 [dependency-groups]
 dev = [
-    "bandit>=1.9.4",
-    "black>=25.12.0",
-    "flake8>=7.3.0",
-    "isort>=7.0.0",
+    "ruff>=0.15.6",
     "mypy>=1.19.1",
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
@@ -42,12 +39,12 @@ dev = [
     "mock>=5.1.0",
     "freezegun>=1.2.2",
     "faker>=19.3.0",
-    "flake8-pyproject>=1.2.0",
     "types-cachetools>=6.2.0.20251022",
 ]
 docs = [
     "mkdocs-material>=9.7.1",
     "mkdocstrings[python]>=1.0.3",
+    "mkdocs-include-markdown-plugin>=7.2.1",    
 ]
 
 [build-system]
@@ -65,36 +62,31 @@ python_classes = "Test*"
 python_functions = "test_*"
 addopts = "--verbose --cov=stairway_to_salesforce"
 
-[tool.black]
+[tool.ruff]
 line-length = 100
-target-version = ['py312']
-
-[tool.isort]
-profile = "black"
-line_length = 100
-
-[tool.flake8]
-max-line-length = 100
-max-complexity = 10
-select = ["E9", "F63", "F7", "F82", "E", "W", "F", "C90"] 
-statistics = true
-show-source = true
-extend-ignore = ["E203"]
+target-version = "py312"
 exclude = [
-    '.venv',
-    '.git',
-    '__pycache__',
-    'build',
-    'dist',
-    '*.egg-info',
-]
-per-file-ignores = [
-    '__init__.py:F401',
+    ".venv",
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    "stairway_to_salesforce/tests", 
 ]
 
-[tool.bandit]
-exclude_dirs = ["tests"]
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "S", "C90", "B", "E9", "F63", "F7", "F82"]
+ignore = ["E203"] 
 
-[tool.mypy]
-python_version = "3.12"
-ignore_missing_imports = true
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"**/tests/*" = ["S101"]
+
+[tool.ruff.lint.isort]
+# Pour correspondre au profil Black que tu avais
+force-single-line = false
+lines-after-imports = 2
+known-first-party = ["stairway_to_salesforce"]

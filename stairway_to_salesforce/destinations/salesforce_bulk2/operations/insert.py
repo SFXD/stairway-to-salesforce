@@ -2,6 +2,7 @@ import logging
 
 from .common import get_bulk_client, process_results
 
+
 logger = logging.getLogger(__name__)
 
 

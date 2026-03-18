@@ -1,8 +1,8 @@
 import io
+from _collections_abc import Iterable
 from typing import Any
 
 import pandas as pd
-from _collections_abc import Iterable
 from dlt.common.typing import TDataItem
 
 
@@ -24,7 +24,6 @@ def process_csv_result(chunk: Any) -> Iterable[TDataItem]:
             df = pd.DataFrame(chunk)
     else:
         raise ValueError(
-            f"Unexpected chunk type: {type(chunk).__name__}. "
-            f"Expected str (CSV) or list (records)"
+            f"Unexpected chunk type: {type(chunk).__name__}. Expected str (CSV) or list (records)"
         )
     return df

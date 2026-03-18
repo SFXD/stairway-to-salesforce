@@ -4,6 +4,7 @@ from stairway_to_salesforce.utils.salesforce_validators import sanitize_field_na
 
 from .common import get_bulk_client, process_results
 
+
 logger = logging.getLogger(__name__)
 
 

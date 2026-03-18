@@ -22,6 +22,7 @@ from stairway_to_salesforce.utils.salesforce_validators import (
     validate_soql_filter,
 )
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -75,8 +76,8 @@ def _build_soql_query(
     # Build final query
     # Variables are sanitized to prevent SOQL injection.
     query = (
-        f"SELECT {', '.join(source_fields)} "  # nosec B608
-        f"FROM {sobject}{where_clause}{order_by_clause} LIMIT 2"  # nosec B608
+        f"SELECT {', '.join(source_fields)} "  # noqa: S608
+        f"FROM {sobject}{where_clause}{order_by_clause} LIMIT 2"  # noqa: S608
     )
     logger.debug(f"Generated SOQL: {query}")
     return query
@@ -104,8 +105,7 @@ def _normalize_result(chunk: Any) -> Iterable[TDataItem]:
     else:
         logger.error(f"Unexpected chunk type: {type(chunk).__name__}")
         raise ValueError(
-            f"Unexpected chunk type: {type(chunk).__name__}. "
-            f"Expected str (CSV) or list (records)"
+            f"Unexpected chunk type: {type(chunk).__name__}. Expected str (CSV) or list (records)"
         )
 
     # Handle empty results
@@ -193,7 +193,10 @@ def fetch_data(
         custom_msg = f"Malformed SOQL query for {sobject}. Query: {soql_query}. Error: {str(e)}"
         logger.error(custom_msg)
         raise SalesforceMalformedRequest(
-            custom_msg, status=e.status, resource_name=e.resource_name, content=e.content
+            custom_msg,
+            status=e.status,
+            resource_name=e.resource_name,
+            content=e.content,
         ) from e
 
     except AttributeError as e:

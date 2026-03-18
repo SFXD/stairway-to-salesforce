@@ -52,7 +52,9 @@ class TestValidateResourceConfigs:
 
     def test_validate_empty_configs(self):
         """Test that empty configs raises error."""
-        with pytest.raises(ValueError, match="At least one resource configuration is required"):
+        with pytest.raises(
+            ValueError, match="At least one resource configuration is required"
+        ):
             validate_resource_configs([])
 
     def test_validate_missing_name(self):
@@ -157,7 +159,9 @@ class TestValidateResourceConfigs:
 class TestBuildResource:
     """Tests for build_resource() function."""
 
-    @patch("stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver")
+    @patch(
+        "stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver"
+    )
     def test_build_resource_basic(self, mock_get_driver):
         """Test basic resource building."""
         config = {
@@ -186,7 +190,9 @@ class TestBuildResource:
     @patch(
         "stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.dlt.sources.incremental"
     )
-    @patch("stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver")
+    @patch(
+        "stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver"
+    )
     def test_build_resource_with_incremental(self, mock_get_driver, mock_incremental):
         """Test resource building with incremental loading."""
         config = {
@@ -216,7 +222,9 @@ class TestBuildResource:
         # Verify incremental was configured
         mock_incremental.assert_called_once_with("LastModifiedDate", initial_value=None)
 
-    @patch("stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver")
+    @patch(
+        "stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver"
+    )
     def test_build_resource_with_write_disposition(self, mock_get_driver):
         """Test resource with custom write_disposition."""
         config = {
@@ -242,7 +250,9 @@ class TestBuildResource:
 
         assert callable(resource)
 
-    @patch("stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver")
+    @patch(
+        "stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver"
+    )
     def test_build_resource_with_query_filter(self, mock_get_driver):
         """Test resource with query filter."""
         config = {
@@ -268,7 +278,9 @@ class TestBuildResource:
 
         assert callable(resource)
 
-    @patch("stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver")
+    @patch(
+        "stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver"
+    )
     def test_build_resource_with_column_types(self, mock_get_driver):
         """Test resource with column type definitions."""
         config = {
@@ -298,7 +310,9 @@ class TestBuildResource:
 
         assert callable(resource)
 
-    @patch("stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver")
+    @patch(
+        "stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver"
+    )
     def test_build_resource_driver_creation_error(self, mock_get_driver):
         """Test error handling when driver creation fails."""
         config = {
@@ -325,7 +339,9 @@ class TestBuildResource:
         # Error should occur when resource is actually executed by DLT
         # We can't easily test this without running the full DLT pipeline
 
-    @patch("stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver")
+    @patch(
+        "stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver"
+    )
     def test_build_resource_fetch_error(self, mock_get_driver):
         """Test error handling when fetch fails."""
         config = {
@@ -380,7 +396,9 @@ class TestBuildResource:
 class TestResourceBuilderIntegration:
     """Integration tests for resource builder."""
 
-    @patch("stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver")
+    @patch(
+        "stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver"
+    )
     def test_full_resource_workflow(self, mock_get_driver):
         """Test complete resource building and execution workflow."""
         config = {
@@ -474,7 +492,9 @@ class TestResourceBuilderEdgeCases:
 
         validate_resource_configs(configs)
 
-    @patch("stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver")
+    @patch(
+        "stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver"
+    )
     def test_build_resource_with_dict_credentials(self, mock_get_driver):
         """Test resource building with dict credentials."""
         config = {
@@ -505,7 +525,9 @@ class TestResourceBuilderEdgeCases:
 
         assert callable(resource)
 
-    @patch("stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver")
+    @patch(
+        "stairway_to_salesforce.sources.salesforce_bulk2.resource_builder.get_salesforce_driver"
+    )
     def test_build_resource_with_list_primary_key(self, mock_get_driver):
         """Test resource with composite primary key."""
         config = {

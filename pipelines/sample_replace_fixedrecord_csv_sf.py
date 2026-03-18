@@ -19,6 +19,7 @@ Process:
     - renaming columns
 - Fixed records are loaded to Salesforce with a replace operation
 """
+
 from typing import Any, Dict, Iterator
 
 import dlt

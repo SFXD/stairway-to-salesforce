@@ -14,6 +14,7 @@ from simple_salesforce import Salesforce
 # Import the operation services from the operations package
 from .operations import exec_delete, exec_insert, exec_replace, exec_upsert
 
+
 # Initialize logger
 logger = logging.getLogger(__name__)
 

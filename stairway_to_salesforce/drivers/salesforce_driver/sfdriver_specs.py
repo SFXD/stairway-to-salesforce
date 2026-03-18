@@ -1,7 +1,11 @@
 """Salesforce credential specification classes only."""
 
 from dlt.common.configuration.exceptions import ConfigurationValueError
-from dlt.common.configuration.specs import BaseConfiguration, CredentialsConfiguration, configspec
+from dlt.common.configuration.specs import (
+    BaseConfiguration,
+    CredentialsConfiguration,
+    configspec,
+)
 from dlt.common.typing import TSecretStrValue
 from simple_salesforce.api import DEFAULT_API_VERSION
 

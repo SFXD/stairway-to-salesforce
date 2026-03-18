@@ -5,6 +5,7 @@ from typing import Any, cast
 from dlt.common.schema import TTableSchema
 from tomlkit import key
 
+
 logger = logging.getLogger(__name__)
 
 

@@ -3,6 +3,7 @@
 Pipeline to sync Salesforce Account data to PostgreSQL.
 Reworked to use BasePipeline for standardized CLI and environment management.
 """
+
 from typing import Any, Dict, Iterator
 
 import dlt

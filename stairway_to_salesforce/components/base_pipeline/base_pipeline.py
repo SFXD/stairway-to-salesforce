@@ -65,11 +65,10 @@ class BasePipeline(ABC):
         credential_path = f"{basepath}.{self.env}"
         try:
             return dlt.secrets[credential_path]
-        except KeyError:
+        except KeyError as e:
             raise KeyError(
-                f"Credentials not found at '{credential_path}'. "
-                "Check your .dlt/secrets.toml file."
-            )
+                f"Credentials not found at '{credential_path}'. Check your .dlt/secrets.toml file."
+            ) from e
 
     def run(self) -> None:
         """Standard execution wrapper with logging and consistent exit codes."""
@@ -105,7 +104,7 @@ class BasePipeline(ABC):
         """The core pipeline logic. Must be implemented by the subclass."""
         pass
 
-    def add_custom_arguments(self, parser: argparse.ArgumentParser) -> None:
+    def add_custom_arguments(self, parser: argparse.ArgumentParser) -> None:  # noqa B027
         """Override in subclasses to add specific CLI arguments."""
         pass
 

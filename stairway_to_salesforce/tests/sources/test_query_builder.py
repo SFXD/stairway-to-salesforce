@@ -350,7 +350,9 @@ class TestFetchData:
         setattr(mock_sf.bulk2, "Custom_Object__c", mock_bulk_handler)
 
         results = list(
-            fetch_data(sf=mock_sf, sobject="Custom_Object__c", fields=["Id", "Custom_Field__c"])
+            fetch_data(
+                sf=mock_sf, sobject="Custom_Object__c", fields=["Id", "Custom_Field__c"]
+            )
         )
 
         assert len(results) == 1
@@ -377,7 +379,9 @@ class TestQueryBuilderSecurity:
 
         with pytest.raises(ValueError, match=error_pattern):
             _build_soql_query(
-                sobject="Account", fields=fields, query_filter="Name = 'Acme'; DROP TABLE Account"
+                sobject="Account",
+                fields=fields,
+                query_filter="Name = 'Acme'; DROP TABLE Account",
             )
 
     def test_allows_valid_soql_operators(self):
@@ -393,7 +397,9 @@ class TestQueryBuilderSecurity:
         ]
 
         for filter_expr in valid_filters:
-            query = _build_soql_query(sobject="Account", fields=["Id"], query_filter=filter_expr)
+            query = _build_soql_query(
+                sobject="Account", fields=["Id"], query_filter=filter_expr
+            )
             assert filter_expr in query
 
 

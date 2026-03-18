@@ -5,7 +5,11 @@ from dlt.common.configuration import with_config
 from dlt.sources.helpers.requests import Session
 from simple_salesforce import Salesforce
 
-from .sfdriver_cache_manager import add_driver_to_cache, get_cache_key, get_driver_from_cache
+from .sfdriver_cache_manager import (
+    add_driver_to_cache,
+    get_cache_key,
+    get_driver_from_cache,
+)
 from .sfdriver_factory import make_salesforce_driver
 from .sfdriver_specs import (
     SalesforceCredentialsBase,
@@ -38,8 +42,8 @@ def get_salesforce_driver(
                 sf_credential = dlt.secrets[f"{credentials}"]
             except KeyError as e:
                 raise ValueError(
-                    f"Failed to load credentials for {credentials}, " f"exception: {e}"
-                )
+                    f"Failed to load credentials for {credentials}, exception: {e}"
+                ) from e
 
             # build driver and cache it
             driver = make_salesforce_driver(sf_credential, session, resolved_config)

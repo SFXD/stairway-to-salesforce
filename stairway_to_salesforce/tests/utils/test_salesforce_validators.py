@@ -91,7 +91,9 @@ class TestValidateSoqlFilter:
         """Test valid SOQL filters."""
         validate_soql_filter("Name = 'Acme'")
         validate_soql_filter("CreatedDate > 2025-01-01T00:00:00Z")
-        validate_soql_filter("IsDeleted = false AND (Status = 'Active' OR Type = 'Partner')")
+        validate_soql_filter(
+            "IsDeleted = false AND (Status = 'Active' OR Type = 'Partner')"
+        )
 
     def test_invalid_sql_injection(self):
         """Test filters with SQL injection patterns."""

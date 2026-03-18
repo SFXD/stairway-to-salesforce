@@ -11,6 +11,7 @@ from .common import get_bulk_client
 from .delete import exec_delete
 from .insert import exec_insert
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -46,7 +47,7 @@ def _query_all_ids(sf_driver, target_name: str) -> list[str]:
 
     # Bulk 2.0 query returns an iterator of CSV chunks
     # target_name was sanitized against soql injection
-    for chunk in client.query(f"SELECT Id FROM {target_name}"):  # nosec B608
+    for chunk in client.query(f"SELECT Id FROM {target_name}"):  # noqa: S608
         df = pd.read_csv(io.StringIO(chunk))
         if not df.empty:
             ids.extend(df["Id"].tolist())

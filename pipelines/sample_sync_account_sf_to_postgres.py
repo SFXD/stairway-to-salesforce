@@ -9,7 +9,7 @@ from typing import Any, Dict, Iterator
 import dlt
 
 from stairway_to_salesforce.components import BasePipeline
-from stairway_to_salesforce.sources import salesforce_bulk2_source
+from stairway_to_salesforce.sources import get_sf_bulk2_source
 
 
 class SampleSyncAccountSfToPostgresPipeline(BasePipeline):
@@ -52,7 +52,7 @@ class SampleSyncAccountSfToPostgresPipeline(BasePipeline):
                 "column_types": {"website": {"data_type": "text"}},
             }
         ]
-        source_resource = salesforce_bulk2_source(
+        source_resource = get_sf_bulk2_source(
             source_definition, credentials=self.sf_credential_path
         )
 

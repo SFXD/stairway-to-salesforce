@@ -10,7 +10,7 @@ def process_csv_result(chunk: Any) -> Iterable[TDataItem]:
     """
     Process a chunk of results from Salesforce Bulk API.
     """
-    df = []
+    df: pd.DataFrame = pd.DataFrame()
     # Handle different chunk types from Bulk API
     if isinstance(chunk, str):
         # CSV string response

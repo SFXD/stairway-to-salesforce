@@ -22,7 +22,7 @@ import dlt
 from dlt.sources.filesystem import filesystem, read_csv
 
 from stairway_to_salesforce.components import BasePipeline, SalesforceKeyResolver
-from stairway_to_salesforce.destinations import salesforce_bulk2
+from stairway_to_salesforce.destinations import get_sf_bulk2_destination
 
 
 class UpsertContactPipeline(BasePipeline):
@@ -37,7 +37,7 @@ class UpsertContactPipeline(BasePipeline):
         # Step 1: Init pipeline
         pipeline = dlt.pipeline(
             pipeline_name=self.pipeline_name,
-            destination=salesforce_bulk2(credentials=self.sf_credential_path),
+            destination=get_sf_bulk2_destination(credentials=self.sf_credential_path),
             dataset_name="contacts",
         )
 

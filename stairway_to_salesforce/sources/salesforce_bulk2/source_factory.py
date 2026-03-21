@@ -9,7 +9,7 @@ from .query_builder import fetch_data
 from .resource_builder import build_resource, validate_resource_configs
 
 
-def salesforce_bulk2_source(
+def get_sf_bulk2_source(
     resource_configs: list[dict[str, Any]],
     credentials: str = "",
     session: Session | None = None,

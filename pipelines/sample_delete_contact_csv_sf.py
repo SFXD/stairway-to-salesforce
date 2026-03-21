@@ -9,7 +9,7 @@ import dlt
 from dlt.sources.filesystem import filesystem, read_csv
 
 from stairway_to_salesforce.components import BasePipeline
-from stairway_to_salesforce.destinations import salesforce_bulk2
+from stairway_to_salesforce.destinations import get_sf_bulk2_destination
 
 
 class DeleteContactPipeline(BasePipeline):
@@ -17,7 +17,7 @@ class DeleteContactPipeline(BasePipeline):
         # Step 1: Init pipeline
         pipeline = dlt.pipeline(
             pipeline_name=f"{self.pipeline_name}",
-            destination=salesforce_bulk2(
+            destination=get_sf_bulk2_destination(
                 credentials=self.sf_credential_path
             ),  # specific to environment defined on runtime
             dataset_name="contacts",

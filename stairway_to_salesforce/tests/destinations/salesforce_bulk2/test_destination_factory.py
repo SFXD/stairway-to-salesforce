@@ -149,22 +149,22 @@ class TestDestinationWorkflow:
     """Tests for destination workflow and integration."""
 
     @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.cleanup_temp_file"
+        "stairway_to_salesforce.destinations.salesforce_bulk2.destination_factory.cleanup_temp_file"
     )
     @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.execute_job"
+        "stairway_to_salesforce.destinations.salesforce_bulk2.destination_factory.execute_job"
     )
     @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.prepare_data"
+        "stairway_to_salesforce.destinations.salesforce_bulk2.destination_factory.prepare_data"
     )
     @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.get_salesforce_key_resolver"  # noqa: E501
+        "stairway_to_salesforce.destinations.salesforce_bulk2.destination_factory.get_sf_key_resolver"  # noqa: E501
     )
     @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.get_salesforce_driver"
+        "stairway_to_salesforce.destinations.salesforce_bulk2.destination_factory.get_sf_driver"
     )
     @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.SalesforceDestinationConfig"  # noqa: E501
+        "stairway_to_salesforce.destinations.salesforce_bulk2.destination_factory.SalesforceDestinationConfig"  # noqa: E501
     )
     def test_destination_workflow_components(
         self,
@@ -212,19 +212,19 @@ class TestDataProcessorIntegration:
     """Tests for data processor integration."""
 
     @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.cleanup_temp_file"
+        "stairway_to_salesforce.destinations.salesforce_bulk2.destination_factory.cleanup_temp_file"
     )
     @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.execute_job"
+        "stairway_to_salesforce.destinations.salesforce_bulk2.destination_factory.execute_job"
     )
     @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.prepare_data"
+        "stairway_to_salesforce.destinations.salesforce_bulk2.destination_factory.prepare_data"
     )
     @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.get_salesforce_key_resolver"  # noqa: E501
+        "stairway_to_salesforce.destinations.salesforce_bulk2.destination_factory.get_sf_key_resolver"  # noqa: E501
     )
     @patch(
-        "stairway_to_salesforce.destinations.salesforce_bulk2.destination.get_salesforce_driver"
+        "stairway_to_salesforce.destinations.salesforce_bulk2.destination_factory.get_sf_driver"
     )
     def test_prepare_data_called_with_items(
         self,
@@ -433,12 +433,12 @@ class TestComponentFactories:
     """Tests for component factory functions."""
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver.make_salesforce_driver"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_factory.make_salesforce_driver"
     )
     @patch("dlt.secrets")
-    def test_get_salesforce_driver(self, mock_secrets, mock_make_driver):
-        """Test get_salesforce_driver factory."""
-        from stairway_to_salesforce.drivers import get_salesforce_driver
+    def test_get_sf_driver(self, mock_secrets, mock_make_driver):
+        """Test get_sf_driver factory."""
+        from stairway_to_salesforce.drivers import get_sf_driver
 
         mock_driver = Mock()
         mock_make_driver.return_value = mock_driver
@@ -448,23 +448,23 @@ class TestComponentFactories:
             "security_token": "token",
         }
 
-        result = get_salesforce_driver("salesforce.dev")
+        result = get_sf_driver("salesforce.dev")
 
         assert result is mock_driver
 
     @patch(
         "stairway_to_salesforce.components.salesforce_key_resolver.resolver.SalesforceKeyResolver"
     )
-    def test_get_salesforce_key_resolver(self, mock_resolver_class):
-        """Test get_salesforce_key_resolver factory."""
-        from stairway_to_salesforce.components import get_salesforce_key_resolver
+    def test_get_sf_key_resolver(self, mock_resolver_class):
+        """Test get_sf_key_resolver factory."""
+        from stairway_to_salesforce.components import get_sf_key_resolver
 
         mock_resolver = Mock()
         mock_resolver_class.return_value = mock_resolver
 
         # Call twice to test singleton pattern
-        result1 = get_salesforce_key_resolver(credentials="salesforce.dev")
-        result2 = get_salesforce_key_resolver(credentials="salesforce.dev")
+        result1 = get_sf_key_resolver(credentials="salesforce.dev")
+        result2 = get_sf_key_resolver(credentials="salesforce.dev")
 
         # Should return same instance (singleton)
         assert result1 is result2

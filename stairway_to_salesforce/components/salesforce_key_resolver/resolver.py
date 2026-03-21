@@ -4,8 +4,8 @@ Main Salesforce lookup resolver class.
 
 import logging
 
-from stairway_to_salesforce.drivers.salesforce_driver.sfdriver import (
-    get_salesforce_driver,
+from stairway_to_salesforce.drivers.salesforce_driver.driver_factory import (
+    get_sf_driver,
 )
 
 from .resolver_cache_manager import CacheManager
@@ -41,7 +41,7 @@ class SalesforceKeyResolver:
         self.sf_repository = SalesforceRepository()
 
         # init the driver if not pass through
-        self.sf_driver = get_salesforce_driver(credentials)
+        self.sf_driver = get_sf_driver(credentials)
 
     def _load_data(
         self,

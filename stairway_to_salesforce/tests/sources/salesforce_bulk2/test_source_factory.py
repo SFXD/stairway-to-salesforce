@@ -8,16 +8,16 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from stairway_to_salesforce.sources.salesforce_bulk2.source import (
-    salesforce_bulk2_source,
+from stairway_to_salesforce.sources.salesforce_bulk2.source_factory import (
+    get_sf_bulk2_source,
 )
 
 
 class TestSalesforceSourceCreation:
-    """Tests for salesforce_bulk2_source() function."""
+    """Tests for get_sf_bulk2_source() function."""
 
     @patch(
-        "stairway_to_salesforce.sources.salesforce_bulk2.source.validate_resource_configs"
+        "stairway_to_salesforce.sources.salesforce_bulk2.source_factory.validate_resource_configs"
     )
     def test_create_source_with_single_resource(self, mock_validate):
         """Test creating source with single resource configuration."""
@@ -30,7 +30,7 @@ class TestSalesforceSourceCreation:
             }
         ]
 
-        source = salesforce_bulk2_source(
+        source = get_sf_bulk2_source(
             resource_configs=resource_configs, credentials="salesforce.dev"
         )
 
@@ -41,7 +41,7 @@ class TestSalesforceSourceCreation:
         assert source is not None
 
     @patch(
-        "stairway_to_salesforce.sources.salesforce_bulk2.source.validate_resource_configs"
+        "stairway_to_salesforce.sources.salesforce_bulk2.source_factory.validate_resource_configs"
     )
     def test_create_source_with_multiple_resources(self, mock_validate):
         """Test creating source with multiple resource configurations."""
@@ -60,7 +60,7 @@ class TestSalesforceSourceCreation:
             },
         ]
 
-        source = salesforce_bulk2_source(
+        source = get_sf_bulk2_source(
             resource_configs=resource_configs, credentials="salesforce.dev"
         )
 
@@ -82,10 +82,10 @@ class TestSalesforceSourceCreation:
         ]
 
         with pytest.raises(ValueError, match="credentials must be provided"):
-            salesforce_bulk2_source(resource_configs=resource_configs, credentials=None)
+            get_sf_bulk2_source(resource_configs=resource_configs, credentials=None)
 
     @patch(
-        "stairway_to_salesforce.sources.salesforce_bulk2.source.validate_resource_configs"
+        "stairway_to_salesforce.sources.salesforce_bulk2.source_factory.validate_resource_configs"
     )
     def test_create_source_validation_error(self, mock_validate):
         """Test that validation errors are propagated."""
@@ -99,12 +99,12 @@ class TestSalesforceSourceCreation:
         mock_validate.side_effect = ValueError("Missing required fields")
 
         with pytest.raises(ValueError, match="Missing required fields"):
-            salesforce_bulk2_source(
+            get_sf_bulk2_source(
                 resource_configs=resource_configs, credentials="salesforce.dev"
             )
 
     @patch(
-        "stairway_to_salesforce.sources.salesforce_bulk2.source.validate_resource_configs"
+        "stairway_to_salesforce.sources.salesforce_bulk2.source_factory.validate_resource_configs"
     )
     def test_create_source_with_session(self, mock_validate):
         """Test creating source with custom session."""
@@ -119,7 +119,7 @@ class TestSalesforceSourceCreation:
 
         mock_session = Mock()
 
-        source = salesforce_bulk2_source(
+        source = get_sf_bulk2_source(
             resource_configs=resource_configs,
             credentials="salesforce.dev",
             session=mock_session,
@@ -129,7 +129,7 @@ class TestSalesforceSourceCreation:
         assert source is not None
 
     @patch(
-        "stairway_to_salesforce.sources.salesforce_bulk2.source.validate_resource_configs"
+        "stairway_to_salesforce.sources.salesforce_bulk2.source_factory.validate_resource_configs"
     )
     def test_create_source_with_string_credentials(self, mock_validate):
         """Test creating source with string credentials path."""
@@ -142,7 +142,7 @@ class TestSalesforceSourceCreation:
             }
         ]
 
-        source = salesforce_bulk2_source(
+        source = get_sf_bulk2_source(
             resource_configs=resource_configs, credentials="salesforce.production"
         )
 
@@ -150,7 +150,7 @@ class TestSalesforceSourceCreation:
         assert source is not None
 
     @patch(
-        "stairway_to_salesforce.sources.salesforce_bulk2.source.validate_resource_configs"
+        "stairway_to_salesforce.sources.salesforce_bulk2.source_factory.validate_resource_configs"
     )
     def test_create_source_with_dict_credentials(self, mock_validate):
         """Test creating source with dict credentials."""
@@ -169,7 +169,7 @@ class TestSalesforceSourceCreation:
             "security_token": "token",
         }
 
-        source = salesforce_bulk2_source(
+        source = get_sf_bulk2_source(
             resource_configs=resource_configs, credentials=cred_dict
         )
 
@@ -181,7 +181,7 @@ class TestSourceResourceBuilding:
     """Tests for resource building within source."""
 
     @patch(
-        "stairway_to_salesforce.sources.salesforce_bulk2.source.validate_resource_configs"
+        "stairway_to_salesforce.sources.salesforce_bulk2.source_factory.validate_resource_configs"
     )
     def test_source_builds_resources_with_fetch_data(self, mock_validate):
         """Test that source is created successfully."""
@@ -194,7 +194,7 @@ class TestSourceResourceBuilding:
             }
         ]
 
-        source = salesforce_bulk2_source(
+        source = get_sf_bulk2_source(
             resource_configs=resource_configs, credentials="salesforce.dev"
         )
 
@@ -202,7 +202,7 @@ class TestSourceResourceBuilding:
         assert source is not None
 
     @patch(
-        "stairway_to_salesforce.sources.salesforce_bulk2.source.validate_resource_configs"
+        "stairway_to_salesforce.sources.salesforce_bulk2.source_factory.validate_resource_configs"
     )
     def test_source_builds_each_resource_config(self, mock_validate):
         """Test that source handles multiple configs."""
@@ -227,7 +227,7 @@ class TestSourceResourceBuilding:
             },
         ]
 
-        source = salesforce_bulk2_source(
+        source = get_sf_bulk2_source(
             resource_configs=resource_configs, credentials="salesforce.dev"
         )
 
@@ -239,7 +239,7 @@ class TestSourceIntegration:
     """Integration tests for source creation and execution."""
 
     @patch(
-        "stairway_to_salesforce.sources.salesforce_bulk2.source.validate_resource_configs"
+        "stairway_to_salesforce.sources.salesforce_bulk2.source_factory.validate_resource_configs"
     )
     def test_source_full_workflow(self, mock_validate):
         """Test complete source creation workflow."""
@@ -255,7 +255,7 @@ class TestSourceIntegration:
         ]
 
         # Create source
-        source = salesforce_bulk2_source(
+        source = get_sf_bulk2_source(
             resource_configs=resource_configs, credentials="salesforce.dev"
         )
 
@@ -266,7 +266,7 @@ class TestSourceIntegration:
         mock_validate.assert_called_once()
 
     @patch(
-        "stairway_to_salesforce.sources.salesforce_bulk2.source.validate_resource_configs"
+        "stairway_to_salesforce.sources.salesforce_bulk2.source_factory.validate_resource_configs"
     )
     def test_source_with_incremental_resources(self, mock_validate):
         """Test source with incremental loading resources."""
@@ -280,7 +280,7 @@ class TestSourceIntegration:
             }
         ]
 
-        source = salesforce_bulk2_source(
+        source = get_sf_bulk2_source(
             resource_configs=resource_configs, credentials="salesforce.dev"
         )
 
@@ -288,7 +288,7 @@ class TestSourceIntegration:
         assert source is not None
 
     @patch(
-        "stairway_to_salesforce.sources.salesforce_bulk2.source.validate_resource_configs"
+        "stairway_to_salesforce.sources.salesforce_bulk2.source_factory.validate_resource_configs"
     )
     def test_source_with_filtered_resources(self, mock_validate):
         """Test source with query-filtered resources."""
@@ -302,7 +302,7 @@ class TestSourceIntegration:
             }
         ]
 
-        source = salesforce_bulk2_source(
+        source = get_sf_bulk2_source(
             resource_configs=resource_configs, credentials="salesforce.dev"
         )
 
@@ -314,7 +314,7 @@ class TestSourceEdgeCases:
     """Tests for edge cases in source creation."""
 
     @patch(
-        "stairway_to_salesforce.sources.salesforce_bulk2.source.validate_resource_configs"
+        "stairway_to_salesforce.sources.salesforce_bulk2.source_factory.validate_resource_configs"
     )
     def test_source_with_custom_objects(self, mock_validate):
         """Test source with custom Salesforce objects."""
@@ -327,14 +327,14 @@ class TestSourceEdgeCases:
             }
         ]
 
-        source = salesforce_bulk2_source(
+        source = get_sf_bulk2_source(
             resource_configs=resource_configs, credentials="salesforce.dev"
         )
 
         assert source is not None
 
     @patch(
-        "stairway_to_salesforce.sources.salesforce_bulk2.source.validate_resource_configs"
+        "stairway_to_salesforce.sources.salesforce_bulk2.source_factory.validate_resource_configs"
     )
     def test_source_with_relationship_fields(self, mock_validate):
         """Test source with relationship field notation."""
@@ -347,14 +347,14 @@ class TestSourceEdgeCases:
             }
         ]
 
-        source = salesforce_bulk2_source(
+        source = get_sf_bulk2_source(
             resource_configs=resource_configs, credentials="salesforce.dev"
         )
 
         assert source is not None
 
     @patch(
-        "stairway_to_salesforce.sources.salesforce_bulk2.source.validate_resource_configs"
+        "stairway_to_salesforce.sources.salesforce_bulk2.source_factory.validate_resource_configs"
     )
     def test_source_with_many_resources(self, mock_validate):
         """Test source with many resource configurations."""
@@ -369,7 +369,7 @@ class TestSourceEdgeCases:
             for i in range(10)
         ]
 
-        source = salesforce_bulk2_source(
+        source = get_sf_bulk2_source(
             resource_configs=resource_configs, credentials="salesforce.dev"
         )
 
@@ -377,7 +377,7 @@ class TestSourceEdgeCases:
         assert source is not None
 
     @patch(
-        "stairway_to_salesforce.sources.salesforce_bulk2.source.validate_resource_configs"
+        "stairway_to_salesforce.sources.salesforce_bulk2.source_factory.validate_resource_configs"
     )
     def test_source_preserves_config_order(self, mock_validate):
         """Test that source creation preserves resource config order."""
@@ -402,7 +402,7 @@ class TestSourceEdgeCases:
             },
         ]
 
-        source = salesforce_bulk2_source(
+        source = get_sf_bulk2_source(
             resource_configs=resource_configs, credentials="salesforce.dev"
         )
 
@@ -422,7 +422,7 @@ class TestSourceEdgeCases:
 
         # Empty string is allowed by the function, validation happens later in the driver
         # So we just verify the source is created
-        source = salesforce_bulk2_source(
+        source = get_sf_bulk2_source(
             resource_configs=resource_configs, credentials=""
         )
 
@@ -445,10 +445,10 @@ class TestSourceErrorHandling:
         ]
 
         with pytest.raises(ValueError, match="credentials must be provided"):
-            salesforce_bulk2_source(resource_configs=resource_configs, credentials=None)
+            get_sf_bulk2_source(resource_configs=resource_configs, credentials=None)
 
     @patch(
-        "stairway_to_salesforce.sources.salesforce_bulk2.source.validate_resource_configs"
+        "stairway_to_salesforce.sources.salesforce_bulk2.source_factory.validate_resource_configs"
     )
     def test_source_validation_errors_propagate(self, mock_validate):
         """Test that validation errors are propagated."""
@@ -457,7 +457,7 @@ class TestSourceErrorHandling:
         mock_validate.side_effect = ValueError("Invalid configuration")
 
         with pytest.raises(ValueError, match="Invalid configuration"):
-            salesforce_bulk2_source(
+            get_sf_bulk2_source(
                 resource_configs=resource_configs, credentials="salesforce.dev"
             )
 
@@ -466,7 +466,7 @@ class TestSourceDocumentation:
     """Tests to verify source follows DLT conventions."""
 
     @patch(
-        "stairway_to_salesforce.sources.salesforce_bulk2.source.validate_resource_configs"
+        "stairway_to_salesforce.sources.salesforce_bulk2.source_factory.validate_resource_configs"
     )
     def test_source_returns_callable(self, mock_validate):
         """Test that source returns a callable."""
@@ -479,7 +479,7 @@ class TestSourceDocumentation:
             }
         ]
 
-        source = salesforce_bulk2_source(
+        source = get_sf_bulk2_source(
             resource_configs=resource_configs, credentials="salesforce.dev"
         )
 
@@ -488,7 +488,7 @@ class TestSourceDocumentation:
         assert source is not None
 
     @patch(
-        "stairway_to_salesforce.sources.salesforce_bulk2.source.validate_resource_configs"
+        "stairway_to_salesforce.sources.salesforce_bulk2.source_factory.validate_resource_configs"
     )
     def test_source_has_name_attribute(self, mock_validate):
         """Test that source is created successfully."""
@@ -501,7 +501,7 @@ class TestSourceDocumentation:
             }
         ]
 
-        source = salesforce_bulk2_source(
+        source = get_sf_bulk2_source(
             resource_configs=resource_configs, credentials="salesforce.dev"
         )
 

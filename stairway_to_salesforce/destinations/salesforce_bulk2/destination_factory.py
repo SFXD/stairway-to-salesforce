@@ -11,8 +11,8 @@ import dlt
 from dlt.common.schema import TTableSchema
 from dlt.common.typing import TDataItems
 
-from stairway_to_salesforce.components import get_salesforce_key_resolver
-from stairway_to_salesforce.drivers import get_salesforce_driver
+from stairway_to_salesforce.components import get_sf_key_resolver
+from stairway_to_salesforce.drivers import get_sf_driver
 
 from .data_processor import cleanup_temp_file, prepare_data
 from .destination_config import SalesforceDestinationConfig
@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
     batch_size=10000,
     naming_convention="direct",
 )
-def salesforce_bulk2(items: TDataItems, table: TTableSchema, credentials: str = "") -> None:
+def get_sf_bulk2_destination(items: TDataItems, table: TTableSchema, credentials: str = "") -> None:
     """
     DLT destination for Salesforce Bulk API v2 using Service/Action pattern.
     """
@@ -37,8 +37,8 @@ def salesforce_bulk2(items: TDataItems, table: TTableSchema, credentials: str = 
     config = SalesforceDestinationConfig.from_table_schema(table)
 
     # 2. Component Initialization
-    driver = get_salesforce_driver(credentials)
-    key_resolver = get_salesforce_key_resolver(credentials=credentials)
+    driver = get_sf_driver(credentials)
+    key_resolver = get_sf_key_resolver(credentials=credentials)
 
     # 3. Preparation and Execution
     file_path = None

@@ -8,11 +8,11 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory import (
+from stairway_to_salesforce.drivers.salesforce_driver.driver_builder import (
     make_salesforce_driver,
     resolve_salesforce_credentials,
 )
-from stairway_to_salesforce.drivers.salesforce_driver.sfdriver_specs import (
+from stairway_to_salesforce.drivers.salesforce_driver.specs import (
     ConsumerKeySecretAuth,
     ConsumerKeySecretDomainAuth,
     InstanceAuth,
@@ -320,7 +320,7 @@ class TestMakeSalesforceDriver:
     """Tests for make_salesforce_driver() function."""
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_builder.Salesforce"
     )
     def test_make_driver_security_token_auth(self, mock_sf_class):
         """Test driver creation with SecurityTokenAuth."""
@@ -347,7 +347,7 @@ class TestMakeSalesforceDriver:
         assert "domain" in call_kwargs
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_builder.Salesforce"
     )
     def test_make_driver_organization_id_auth(self, mock_sf_class):
         """Test driver creation with OrganizationIdAuth."""
@@ -370,7 +370,7 @@ class TestMakeSalesforceDriver:
         assert call_kwargs["organizationId"] == "00Dxx0000000001"
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_builder.Salesforce"
     )
     def test_make_driver_instance_auth(self, mock_sf_class):
         """Test driver creation with InstanceAuth."""
@@ -389,7 +389,7 @@ class TestMakeSalesforceDriver:
         assert call_kwargs["instance"] == "na1.salesforce.com"
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_builder.Salesforce"
     )
     def test_make_driver_consumer_key_secret_auth(self, mock_sf_class):
         """Test driver creation with ConsumerKeySecretAuth."""
@@ -414,7 +414,7 @@ class TestMakeSalesforceDriver:
         assert call_kwargs["consumer_secret"] == "test_secret"
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_builder.Salesforce"
     )
     def test_make_driver_jwt_auth(self, mock_sf_class):
         """Test driver creation with JWTAuth."""
@@ -438,7 +438,7 @@ class TestMakeSalesforceDriver:
         assert call_kwargs["privatekey_file"] == "/path/to/key.pem"
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_builder.Salesforce"
     )
     def test_make_driver_consumer_key_secret_domain_auth(self, mock_sf_class):
         """Test driver creation with ConsumerKeySecretDomainAuth."""
@@ -460,7 +460,7 @@ class TestMakeSalesforceDriver:
         assert call_kwargs["domain"] == "test"
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_builder.Salesforce"
     )
     def test_make_driver_resolves_dict_credentials(self, mock_sf_class):
         """Test that make_salesforce_driver resolves dict credentials."""
@@ -481,7 +481,7 @@ class TestMakeSalesforceDriver:
         mock_sf_class.assert_called_once()
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_builder.Salesforce"
     )
     def test_make_driver_with_custom_session(self, mock_sf_class):
         """Test driver creation with custom session."""
@@ -504,7 +504,7 @@ class TestMakeSalesforceDriver:
         assert call_kwargs["session"] == mock_session
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_builder.Salesforce"
     )
     def test_make_driver_with_custom_config(self, mock_sf_class):
         """Test driver creation with custom configuration."""
@@ -530,7 +530,7 @@ class TestMakeSalesforceDriver:
         assert call_kwargs["client_id"] == "custom_client"
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_builder.Salesforce"
     )
     def test_make_driver_with_proxies(self, mock_sf_class):
         """Test driver creation with proxy configuration."""
@@ -559,7 +559,7 @@ class TestDriverFactoryEdgeCases:
     """Tests for edge cases in driver factory."""
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_builder.Salesforce"
     )
     def test_make_driver_preserves_credential_fields(self, mock_sf_class):
         """Test that all credential fields are passed to Salesforce()."""

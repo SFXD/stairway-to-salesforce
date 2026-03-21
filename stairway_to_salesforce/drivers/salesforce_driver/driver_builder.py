@@ -2,7 +2,7 @@ import dlt
 from dlt.sources.helpers.requests import Session
 from simple_salesforce import Salesforce
 
-from .sfdriver_specs import (
+from .specs import (
     ConsumerKeySecretAuth,
     ConsumerKeySecretDomainAuth,
     InstanceAuth,

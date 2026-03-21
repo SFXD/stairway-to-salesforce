@@ -7,7 +7,7 @@ from .resolver import SalesforceKeyResolver
 _resolver: SalesforceKeyResolver | None = None
 
 
-def get_salesforce_key_resolver(credentials=dlt.secrets.value) -> SalesforceKeyResolver:
+def get_sf_key_resolver(credentials=dlt.secrets.value) -> SalesforceKeyResolver:
     """
     Get or create the singleton resolver instance.
 

@@ -6,7 +6,7 @@ from typing import Any
 import dlt
 from dlt.sources.helpers.requests import Session
 
-from ...drivers.salesforce_driver.sfdriver import get_salesforce_driver
+from ...drivers.salesforce_driver.driver_factory import get_sf_driver
 
 
 def validate_resource_configs(configs: list[dict[str, Any]]) -> None:
@@ -108,7 +108,7 @@ def build_resource(
         """
         # Create driver using resolved credentials
         try:
-            driver = get_salesforce_driver(credentials, session)
+            driver = get_sf_driver(credentials, session)
         except Exception as e:
             raise RuntimeError(f"Failed to create Salesforce driver for {sobject}: {str(e)}") from e
 

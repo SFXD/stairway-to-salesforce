@@ -1,5 +1,5 @@
 """
-Unit tests for main Salesforce driver module (get_salesforce_driver).
+Unit tests for main Salesforce driver module (get_sf_driver).
 
 Tests the public API and integration of cache, factory, and configuration.
 """
@@ -8,10 +8,10 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from stairway_to_salesforce.drivers.salesforce_driver.sfdriver import (
-    get_salesforce_driver,
+from stairway_to_salesforce.drivers.salesforce_driver.driver_factory import (
+    get_sf_driver,
 )
-from stairway_to_salesforce.drivers.salesforce_driver.sfdriver_specs import (
+from stairway_to_salesforce.drivers.salesforce_driver.specs import (
     ConsumerKeySecretDomainAuth,
     SalesforceDriverConfiguration,
     SecurityTokenAuth,
@@ -19,18 +19,18 @@ from stairway_to_salesforce.drivers.salesforce_driver.sfdriver_specs import (
 
 
 class TestGetSalesforceDriver:
-    """Tests for get_salesforce_driver() public API."""
+    """Tests for get_sf_driver() public API."""
 
     def setup_method(self):
         """Clear cache before each test."""
-        from stairway_to_salesforce.drivers.salesforce_driver.sfdriver_cache_manager import (
+        from stairway_to_salesforce.drivers.salesforce_driver.cache import (
             clear_cache,
         )
 
         clear_cache()
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver.make_salesforce_driver"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_factory.make_salesforce_driver"
     )
     @patch("dlt.secrets")
     def test_get_driver_with_string_credentials_uses_cache(
@@ -48,10 +48,10 @@ class TestGetSalesforceDriver:
         mock_secrets.__getitem__.return_value = mock_creds_dict
 
         # First call - should create and cache
-        result1 = get_salesforce_driver("salesforce.dev")
+        result1 = get_sf_driver("salesforce.dev")
 
         # Second call - should return cached
-        result2 = get_salesforce_driver("salesforce.dev")
+        result2 = get_sf_driver("salesforce.dev")
 
         # Should return same instance
         assert result1 is result2
@@ -61,7 +61,7 @@ class TestGetSalesforceDriver:
         assert mock_make_driver.call_count == 1
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver.make_salesforce_driver"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_factory.make_salesforce_driver"
     )
     def test_get_driver_with_credential_object_no_cache(self, mock_make_driver):
         """Test that credential object bypasses cache."""
@@ -76,10 +76,10 @@ class TestGetSalesforceDriver:
         )
 
         # First call
-        result1 = get_salesforce_driver(creds)
+        result1 = get_sf_driver(creds)
 
         # Second call with same credentials
-        result2 = get_salesforce_driver(creds)
+        result2 = get_sf_driver(creds)
 
         # Should create new instances each time (no caching)
         assert result1 is mock_driver1
@@ -87,7 +87,7 @@ class TestGetSalesforceDriver:
         assert mock_make_driver.call_count == 2
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver.make_salesforce_driver"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_factory.make_salesforce_driver"
     )
     @patch("dlt.secrets")
     def test_get_driver_different_paths_different_cache(
@@ -111,8 +111,8 @@ class TestGetSalesforceDriver:
             },
         ]
 
-        result_dev = get_salesforce_driver("salesforce.dev")
-        result_prod = get_salesforce_driver("salesforce.prod")
+        result_dev = get_sf_driver("salesforce.dev")
+        result_prod = get_sf_driver("salesforce.prod")
 
         # Should be different instances
         assert result_dev is mock_driver_dev
@@ -121,7 +121,7 @@ class TestGetSalesforceDriver:
         assert mock_make_driver.call_count == 2
 
         @patch(
-            "stairway_to_salesforce.drivers.salesforce_driver.sfdriver.make_salesforce_driver"
+            "stairway_to_salesforce.drivers.salesforce_driver.driver_factory.make_salesforce_driver"
         )
         @patch("dlt.config")
         @patch("dlt.secrets")
@@ -142,7 +142,7 @@ class TestGetSalesforceDriver:
                 "domain": "test",
             }
 
-            result = get_salesforce_driver("salesforce.dev")
+            result = get_sf_driver("salesforce.dev")
 
             assert result is mock_driver
             call_args = mock_make_driver.call_args
@@ -151,15 +151,15 @@ class TestGetSalesforceDriver:
             assert cfg.version == "v58.0"
             assert cfg.domain == "test"
 
-        @patch("stairway_to_salesforce.drivers.salesforce_driver.sfdriver.with_config")
+        @patch("stairway_to_salesforce.drivers.salesforce_driver.driver.with_config")
         @patch(
-            "stairway_to_salesforce.drivers.salesforce_driver.sfdriver.make_salesforce_driver"
+            "stairway_to_salesforce.drivers.salesforce_driver.driver_factory.make_salesforce_driver"
         )
         @patch("dlt.secrets")
         def test_get_driver_with_custom_session(
             self, mock_secrets, mock_make_driver, mock_with_config
         ):
-            """Test get_salesforce_driver with custom session."""
+            """Test get_sf_driver with custom session."""
             mock_driver = Mock()
             mock_make_driver.return_value = mock_driver
             mock_session = Mock()
@@ -174,7 +174,7 @@ class TestGetSalesforceDriver:
                 "security_token": "token",
             }
 
-            result = get_salesforce_driver("salesforce.dev", session=mock_session)
+            result = get_sf_driver("salesforce.dev", session=mock_session)
 
             assert result is mock_driver
 
@@ -185,17 +185,17 @@ class TestGetSalesforceDriver:
     def test_get_driver_invalid_credentials_type_raises_error(self):
         """Test that invalid credentials type raises ValueError."""
         with pytest.raises(ValueError, match="incorrect credentials"):
-            get_salesforce_driver(12345)  # Invalid type
+            get_sf_driver(12345)  # Invalid type
 
         with pytest.raises(ValueError, match="incorrect credentials"):
-            get_salesforce_driver(["list", "of", "values"])
+            get_sf_driver(["list", "of", "values"])
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver.with_config",
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_factory.with_config",
         side_effect=lambda f: f,
     )
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver.make_salesforce_driver"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_factory.make_salesforce_driver"
     )
     @patch("dlt.secrets")
     def test_get_driver_with_dict_credentials(
@@ -211,7 +211,7 @@ class TestGetSalesforceDriver:
             "security_token": "token",
         }
 
-        result = get_salesforce_driver("salesforce.dev")
+        result = get_sf_driver("salesforce.dev")
 
         assert result is mock_driver
         mock_make_driver.assert_called_once()
@@ -222,14 +222,14 @@ class TestGetSalesforceDriverCaching:
 
     def setup_method(self):
         """Clear cache before each test."""
-        from stairway_to_salesforce.drivers.salesforce_driver.sfdriver_cache_manager import (
+        from stairway_to_salesforce.drivers.salesforce_driver.cache import (
             clear_cache,
         )
 
         clear_cache()
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver.make_salesforce_driver"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_factory.make_salesforce_driver"
     )
     @patch("dlt.secrets")
     def test_cache_hit_returns_same_instance(self, mock_secrets, mock_make_driver):
@@ -244,8 +244,8 @@ class TestGetSalesforceDriverCaching:
             "security_token": "token",
         }
 
-        result1 = get_salesforce_driver("salesforce.dev")
-        result2 = get_salesforce_driver("salesforce.dev")
+        result1 = get_sf_driver("salesforce.dev")
+        result2 = get_sf_driver("salesforce.dev")
 
         # Should be same object (identity check)
         assert result1 is result2
@@ -253,7 +253,7 @@ class TestGetSalesforceDriverCaching:
         assert result1.test_attr == "test_value"
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver.make_salesforce_driver"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_factory.make_salesforce_driver"
     )
     @patch("dlt.secrets")
     def test_cache_key_based_on_secrets_path(self, mock_secrets, mock_make_driver):
@@ -270,15 +270,15 @@ class TestGetSalesforceDriverCaching:
         }
         mock_secrets.__getitem__.side_effect = [same_creds, same_creds]
 
-        result1 = get_salesforce_driver("salesforce.path1")
-        result2 = get_salesforce_driver("salesforce.path2")
+        result1 = get_sf_driver("salesforce.path1")
+        result2 = get_sf_driver("salesforce.path2")
 
         # Different cache entries despite same credentials
         assert result1 is not result2
         assert mock_make_driver.call_count == 2
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver.make_salesforce_driver"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_factory.make_salesforce_driver"
     )
     @patch("dlt.secrets")
     def test_cache_multiple_environments(self, mock_secrets, mock_make_driver):
@@ -303,13 +303,13 @@ class TestGetSalesforceDriverCaching:
         ]
 
         # Create drivers for each env
-        results = [get_salesforce_driver(env) for env in envs]
+        results = [get_sf_driver(env) for env in envs]
 
         # All should be different
         assert len(set(id(r) for r in results)) == 4
 
         # Second access should use cache
-        results2 = [get_salesforce_driver(env) for env in envs]
+        results2 = [get_sf_driver(env) for env in envs]
 
         # Should be same instances
         for r1, r2 in zip(results, results2):
@@ -319,7 +319,7 @@ class TestGetSalesforceDriverCaching:
         assert mock_make_driver.call_count == 4
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver.make_salesforce_driver"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_factory.make_salesforce_driver"
     )
     def test_no_cache_for_credential_objects(self, mock_make_driver):
         """Test that credential objects always create new drivers."""
@@ -329,7 +329,7 @@ class TestGetSalesforceDriverCaching:
             user_name="test@example.com", password="password", security_token="token"
         )
 
-        results = [get_salesforce_driver(creds) for _ in range(5)]
+        results = [get_sf_driver(creds) for _ in range(5)]
 
         # All should be different instances
         assert len(set(id(r) for r in results)) == 5
@@ -341,14 +341,14 @@ class TestGetSalesforceDriverIntegration:
 
     def setup_method(self):
         """Clear cache before each test."""
-        from stairway_to_salesforce.drivers.salesforce_driver.sfdriver_cache_manager import (
+        from stairway_to_salesforce.drivers.salesforce_driver.cache import (
             clear_cache,
         )
 
         clear_cache()
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_builder.Salesforce"
     )
     @patch("dlt.secrets")
     def test_full_workflow_string_credentials(self, mock_secrets, mock_sf_class):
@@ -363,20 +363,20 @@ class TestGetSalesforceDriverIntegration:
         }
 
         # First call - creates driver and caches
-        result1 = get_salesforce_driver("salesforce.dev")
+        result1 = get_sf_driver("salesforce.dev")
 
         assert result1 is mock_sf_instance
         assert mock_sf_class.call_count == 1
 
         # Second call - uses cache
-        result2 = get_salesforce_driver("salesforce.dev")
+        result2 = get_sf_driver("salesforce.dev")
 
         assert result2 is mock_sf_instance
         assert result2 is result1
         assert mock_sf_class.call_count == 1  # Not called again
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver_factory.Salesforce"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_builder.Salesforce"
     )
     def test_full_workflow_credential_object(self, mock_sf_class):
         """Test complete workflow with credential object."""
@@ -390,8 +390,8 @@ class TestGetSalesforceDriverIntegration:
             security_token="test_token",
         )
 
-        result1 = get_salesforce_driver(creds)
-        result2 = get_salesforce_driver(creds)
+        result1 = get_sf_driver(creds)
+        result2 = get_sf_driver(creds)
 
         assert result1 is mock_sf_instance1
         assert result2 is mock_sf_instance2
@@ -400,7 +400,7 @@ class TestGetSalesforceDriverIntegration:
 
 
 class TestGetSalesforceDriverErrorHandling:
-    """Tests for error handling in get_salesforce_driver."""
+    """Tests for error handling in get_sf_driver."""
 
     @patch("dlt.secrets")
     def test_get_driver_missing_secrets_path(self, mock_secrets):
@@ -408,10 +408,10 @@ class TestGetSalesforceDriverErrorHandling:
         mock_secrets.__getitem__.side_effect = KeyError("Secret not found")
 
         with pytest.raises(ValueError, match="Failed to load credentials"):
-            get_salesforce_driver("salesforce.nonexistent")
+            get_sf_driver("salesforce.nonexistent")
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver.make_salesforce_driver"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_factory.make_salesforce_driver"
     )
     @patch("dlt.secrets")
     def test_get_driver_propagates_factory_errors(self, mock_secrets, mock_make_driver):
@@ -425,12 +425,12 @@ class TestGetSalesforceDriverErrorHandling:
         mock_make_driver.side_effect = RuntimeError("Connection failed")
 
         with pytest.raises(RuntimeError, match="Connection failed"):
-            get_salesforce_driver("salesforce.dev")
+            get_sf_driver("salesforce.dev")
 
     def test_get_driver_with_none_credentials(self):
         """Test that None credentials raises ValueError."""
         with pytest.raises(ValueError, match="incorrect credentials"):
-            get_salesforce_driver(None)
+            get_sf_driver(None)
 
 
 class TestGetSalesforceDriverEdgeCases:
@@ -438,18 +438,18 @@ class TestGetSalesforceDriverEdgeCases:
 
     def setup_method(self):
         """Clear cache before each test."""
-        from stairway_to_salesforce.drivers.salesforce_driver.sfdriver_cache_manager import (
+        from stairway_to_salesforce.drivers.salesforce_driver.cache import (
             clear_cache,
         )
 
         clear_cache()
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver.make_salesforce_driver"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_factory.make_salesforce_driver"
     )
     @patch("dlt.secrets")
     def test_get_driver_empty_string_path(self, mock_secrets, mock_make_driver):
-        """Test get_salesforce_driver with empty string path."""
+        """Test get_sf_driver with empty string path."""
         mock_driver = Mock()
         mock_make_driver.return_value = mock_driver
 
@@ -460,16 +460,16 @@ class TestGetSalesforceDriverEdgeCases:
         }
 
         # Should work (creates cache key from empty string)
-        result = get_salesforce_driver("")
+        result = get_sf_driver("")
 
         assert result is mock_driver
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver.make_salesforce_driver"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_factory.make_salesforce_driver"
     )
     @patch("dlt.secrets")
     def test_get_driver_unicode_path(self, mock_secrets, mock_make_driver):
-        """Test get_salesforce_driver with unicode in path."""
+        """Test get_sf_driver with unicode in path."""
         mock_driver = Mock()
         mock_make_driver.return_value = mock_driver
 
@@ -479,15 +479,15 @@ class TestGetSalesforceDriverEdgeCases:
             "security_token": "token",
         }
 
-        result = get_salesforce_driver("salesforce.日本語")
+        result = get_sf_driver("salesforce.日本語")
 
         assert result is mock_driver
 
     @patch(
-        "stairway_to_salesforce.drivers.salesforce_driver.sfdriver.make_salesforce_driver"
+        "stairway_to_salesforce.drivers.salesforce_driver.driver_factory.make_salesforce_driver"
     )
     def test_get_driver_with_all_credential_types(self, mock_make_driver):
-        """Test get_salesforce_driver works with all credential types."""
+        """Test get_sf_driver works with all credential types."""
         mock_make_driver.return_value = Mock()
 
         credential_types = [
@@ -500,5 +500,5 @@ class TestGetSalesforceDriverEdgeCases:
         ]
 
         for creds in credential_types:
-            result = get_salesforce_driver(creds)
+            result = get_sf_driver(creds)
             assert result is not None

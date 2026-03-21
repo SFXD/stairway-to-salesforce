@@ -14,7 +14,7 @@ from unittest.mock import Mock
 import pytest
 from simple_salesforce import Salesforce
 
-from stairway_to_salesforce.drivers.salesforce_driver.sfdriver_specs import (
+from stairway_to_salesforce.drivers.salesforce_driver.specs import (
     ConsumerKeySecretDomainAuth,
     SecurityTokenAuth,
 )

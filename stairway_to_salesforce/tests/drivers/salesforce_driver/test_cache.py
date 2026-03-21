@@ -9,7 +9,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from stairway_to_salesforce.drivers.salesforce_driver.sfdriver_cache_manager import (
+from stairway_to_salesforce.drivers.salesforce_driver.cache import (
     add_driver_to_cache,
     clear_cache,
     driver_cache,

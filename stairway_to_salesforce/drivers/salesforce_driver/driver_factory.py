@@ -5,13 +5,13 @@ from dlt.common.configuration import with_config
 from dlt.sources.helpers.requests import Session
 from simple_salesforce import Salesforce
 
-from .sfdriver_cache_manager import (
+from .cache import (
     add_driver_to_cache,
     get_cache_key,
     get_driver_from_cache,
 )
-from .sfdriver_factory import make_salesforce_driver
-from .sfdriver_specs import (
+from .driver_builder import make_salesforce_driver
+from .specs import (
     SalesforceCredentialsBase,
     SalesforceDriverAuth,
     SalesforceDriverConfiguration,
@@ -19,7 +19,7 @@ from .sfdriver_specs import (
 
 
 @with_config(spec=SalesforceDriverConfiguration)
-def get_salesforce_driver(
+def get_sf_driver(
     credentials: SalesforceDriverAuth | str,
     session: Session | None = None,
     config: SalesforceDriverConfiguration | None = None,

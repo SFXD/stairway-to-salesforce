@@ -7,7 +7,7 @@ Tests all credential types and validation logic defined in sfdriver_specs.py
 import pytest
 from dlt.common.configuration.exceptions import ConfigurationValueError
 
-from stairway_to_salesforce.drivers.salesforce_driver.sfdriver_specs import (
+from stairway_to_salesforce.drivers.salesforce_driver.specs import (
     ConsumerKeySecretAuth,
     ConsumerKeySecretDomainAuth,
     InstanceAuth,

@@ -36,6 +36,20 @@ class SalesforceCredentialsBase(CredentialsConfiguration):
 # All your @configspec credential classes here...
 @configspec
 class SecurityTokenAuth(SalesforceCredentialsBase):
+    """
+    Credentials for **Username-Password Flow with Security Token**.
+    
+    This is the traditional way to connect without a Connected App, using a 
+    combination of user password and a generated security token.
+
+    **Configuration example:**
+    ```toml
+    [salesforce.dev]
+    user_name = "user@example.com"
+    password = "your_password"
+    security_token = "your_token"
+    ```
+    """    
     user_name: str | None = None
     password: TSecretStrValue | None = None
     security_token: TSecretStrValue | None = None
@@ -44,9 +58,19 @@ class SecurityTokenAuth(SalesforceCredentialsBase):
 @configspec
 class OrganizationIdAuth(SalesforceCredentialsBase):
     """
-    This class is used to store credentials based on `Trusted IP Ranges` in Salesforce.
-    """
+    Credentials for **Trusted IP Ranges Authentication**.
+    
+    Used when your server's IP is allowlisted in Salesforce, requiring 
+    only the Organization ID instead of a security token.
 
+    **Configuration example:**
+    ```toml
+    [salesforce.dev]
+    user_name = "user@example.com"
+    password = "your_password"
+    organization_id = "00D..."
+    ```
+    """
     user_name: str | None = None
     password: TSecretStrValue | None = None
     organization_id: TSecretStrValue | None = None
@@ -55,9 +79,18 @@ class OrganizationIdAuth(SalesforceCredentialsBase):
 @configspec
 class InstanceAuth(SalesforceCredentialsBase):
     """
-    This class is used to store credentials for direct session access.
-    """
+    Credentials for **Direct Session Access**.
+    
+    Use this if you already have a valid `session_id` (access token) 
+    and want to bypass the authentication flow.
 
+    **Configuration example:**
+    ```toml
+    [salesforce.dev]
+    session_id = "your_access_token"
+    instance_url = "[https://yourorg.my.salesforce.com](https://yourorg.my.salesforce.com)"
+    ```
+    """
     session_id: str | None = None
     instance: TSecretStrValue | None = None
     instance_url: TSecretStrValue | None = None
@@ -73,8 +106,19 @@ class InstanceAuth(SalesforceCredentialsBase):
 @configspec
 class ConsumerKeySecretAuth(SalesforceCredentialsBase):
     """
-    This class is used to store 'OAuth 2.0 Username Password Flow Credentials'
-    based on a connected app.
+    Credentials for **OAuth 2.0 Username-Password Flow**.
+    
+    Requires a **Connected App** with `client_id` and `client_secret`. 
+    Ideal for legacy integrations that still require user context.
+
+    **Configuration example:**
+    ```toml
+    [salesforce.dev]
+    user_name = "user@example.com"
+    password = "your_password"
+    consumer_key = "your_client_id"
+    consumer_secret = "your_client_secret"
+    ```
     """
 
     user_name: str | None = None
@@ -86,7 +130,19 @@ class ConsumerKeySecretAuth(SalesforceCredentialsBase):
 @configspec
 class JWTAuth(SalesforceCredentialsBase):
     """
-    This class is used to store 'OAuth 2.0 JWT Bearer Flow Credentials'.
+    Credentials for **OAuth 2.0 JWT Bearer Flow**.
+    
+    The most secure server-to-server flow. It uses a private key to sign 
+    a JWT, avoiding the need to store passwords.
+
+    **Configuration example:**
+    ```toml
+    [salesforce.dev]
+    user_name = "user@example.com"
+    consumer_key = "your_client_id"
+    privatekey_file = "path/to/server.key"
+    instance_url = "[https://yourorg.my.salesforce.com](https://yourorg.my.salesforce.com)"
+    ```
     """
 
     user_name: str | None = None
@@ -106,7 +162,19 @@ class JWTAuth(SalesforceCredentialsBase):
 @configspec
 class ConsumerKeySecretDomainAuth(SalesforceCredentialsBase):
     """
-    This class is used to store 'OAuth 2.0 Client Credentials Flow'.
+    Credentials for **OAuth 2.0 Client Credentials Flow** (Recommended).
+    
+    The modern Salesforce standard for headless integrations. Uses an 
+    **External Client App** or Connected App configured for Client Credentials.
+
+    **Configuration example:**
+    ```toml
+    [salesforce.dev]
+    auth_type = "client_credentials" # Used by factory to route here
+    consumer_key = "your_client_id"
+    consumer_secret = "your_client_secret"
+    domain = "yourorg.my" # Optional domain prefix
+    ```
     """
 
     consumer_key: TSecretStrValue | None = None

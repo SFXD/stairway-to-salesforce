@@ -1,8 +1,9 @@
 """
-Salesforce lookup resolver for DLT pipelines.
+Module Drivers : Points d'entrée pour les connexions aux systèmes externes.
 
-This module provides utilities for mapping external keys to Salesforce IDs,
-with support for efficient caching and both REST and Bulk API queries.
+Ce package regroupe les drivers permettant d'interagir avec différentes APIs.
+Chaque sous-dossier (ex: salesforce_driver) gère sa propre logique 
+d'authentification et de session.
 """
 
 from .salesforce_driver.driver_factory import get_sf_driver

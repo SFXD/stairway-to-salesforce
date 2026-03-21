@@ -1,8 +1,9 @@
 """
-Salesforce lookup resolver for DLT pipelines.
+Module Components : Composants logiques et utilitaires métier.
 
-This module provides utilities for mapping external keys to Salesforce IDs,
-with support for efficient caching and both REST and Bulk API queries.
+Ce package regroupe les briques réutilisables du framework, notamment 
+le résolveur de clés Salesforce (SalesforceKeyResolver) pour mapper 
+les IDs externes, ainsi que les classes de base des pipelines.
 """
 
 from .base_pipeline.base_pipeline import BasePipeline

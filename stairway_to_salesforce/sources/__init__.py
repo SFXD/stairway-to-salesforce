@@ -1,10 +1,10 @@
 """
-Salesforce Bulk API v2 source for DLT.
+Module Sources : Points d'entrée pour l'extraction de données.
 
-This source provides dynamic, configuration-driven access to Salesforce data
-using the Bulk API v2 for efficient large-scale data extraction.
+Ce package contient les sources DLT permettant de récupérer des données 
+depuis Salesforce. Il utilise la Factory pour configurer les extractions 
+via l'API Bulk v2.
 """
-
 from .salesforce_bulk2.source_factory import get_sf_bulk2_source
 
 

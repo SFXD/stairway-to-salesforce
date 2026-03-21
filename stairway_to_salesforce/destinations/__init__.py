@@ -1,7 +1,9 @@
 """
-Salesforce Bulk API v2 destination for DLT.
+Module Destinations : Points d'entrée pour le chargement de données.
 
-Supports insert, upsert, and replace operations using Salesforce Bulk API v2.
+Ce package définit les destinations personnalisées pour dlt.
+Il inclut la destination Salesforce Bulk v2 capable de gérer les opérations 
+d'insert, update, upsert et delete de manière atomique.
 """
 
 from .salesforce_bulk2.destination_factory import get_sf_bulk2_destination

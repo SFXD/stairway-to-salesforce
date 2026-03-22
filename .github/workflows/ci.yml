@@ -75,3 +75,32 @@ jobs:
       with:
         name: python-package
         path: dist/
+        
+  docs:
+    needs: test
+    runs-on: ubuntu-latest
+    # Ne déploie la doc que sur la branche main après succès des tests
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    permissions:
+      contents: write  # Obligatoire pour pousser sur la branche gh-pages
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Utile pour mkdocs-git-revision-date-localized-plugin si utilisé
+
+    - name: Install UV
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+
+    - name: Set up Python
+      run: uv python install 3.12
+
+    - name: Install dependencies
+      # On installe tout car mkdocstrings a besoin d'importer ton code pour extraire la doc
+      run: uv sync --all-extras --dev
+
+    - name: Deploy to GitHub Pages
+      run: uv run mkdocs gh-deploy --force

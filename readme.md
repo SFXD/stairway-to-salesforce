@@ -83,9 +83,8 @@ class HelloSalesforcePipeline(BasePipeline):
             primary_key="...",
         )
 
-        # Step 5: Execute
-        load_info = pipeline.run(source_resource | transformer_resource)
-        print(f"Load details for {self.pipeline_name}:\n{load_info}")
+        # Step 5: Run the pipeline
+        self.run_pipeline(pipeline, source_resource | transformer_resource)
 
 if __name__ == "__main__":
     HelloSalesforcePipeline.main(

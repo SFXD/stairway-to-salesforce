@@ -75,7 +75,7 @@ jobs:
       with:
         name: python-package
         path: dist/
-        
+
   docs:
     needs: test
     runs-on: ubuntu-latest
@@ -100,7 +100,7 @@ jobs:
 
     - name: Install dependencies
       # On installe tout car mkdocstrings a besoin d'importer ton code pour extraire la doc
-      run: uv sync --all-extras --dev
-
+      run: uv sync --all-extras --group docs
+      
     - name: Deploy to GitHub Pages
       run: uv run mkdocs gh-deploy --force

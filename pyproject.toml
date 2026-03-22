@@ -42,9 +42,6 @@ dev = [
     "types-cachetools>=6.2.0.20251022",
     "pandas-stubs>=3.0.0.260204",
 ]
-doc = [
-    "pymdown-extensions>=10.20.1",
-]
 docs = [
     "mkdocs-material>=9.7.1",
     "mkdocstrings[python]>=1.0.3",

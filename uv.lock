@@ -2519,9 +2519,6 @@ dev = [
     { name = "ruff" },
     { name = "types-cachetools" },
 ]
-doc = [
-    { name = "pymdown-extensions" },
-]
 docs = [
     { name = "mkdocs-include-markdown-plugin" },
     { name = "mkdocs-material" },
@@ -2556,7 +2553,6 @@ dev = [
     { name = "ruff", specifier = ">=0.15.6" },
     { name = "types-cachetools", specifier = ">=6.2.0.20251022" },
 ]
-doc = [{ name = "pymdown-extensions", specifier = ">=10.20.1" }]
 docs = [
     { name = "mkdocs-include-markdown-plugin", specifier = ">=7.2.1" },
     { name = "mkdocs-material", specifier = ">=9.7.1" },

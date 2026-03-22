@@ -2,7 +2,7 @@
 Module Drivers : Points d'entrée pour les connexions aux systèmes externes.
 
 Ce package regroupe les drivers permettant d'interagir avec différentes APIs.
-Chaque sous-dossier (ex: salesforce_driver) gère sa propre logique 
+Chaque sous-dossier (ex: salesforce_driver) gère sa propre logique
 d'authentification et de session.
 """
 

@@ -2,7 +2,7 @@
 Module Destinations : Points d'entrée pour le chargement de données.
 
 Ce package définit les destinations personnalisées pour dlt.
-Il inclut la destination Salesforce Bulk v2 capable de gérer les opérations 
+Il inclut la destination Salesforce Bulk v2 capable de gérer les opérations
 d'insert, update, upsert et delete de manière atomique.
 """
 

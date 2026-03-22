@@ -38,8 +38,8 @@ class SalesforceCredentialsBase(CredentialsConfiguration):
 class SecurityTokenAuth(SalesforceCredentialsBase):
     """
     Credentials for **Username-Password Flow with Security Token**.
-    
-    This is the traditional way to connect without a Connected App, using a 
+
+    This is the traditional way to connect without a Connected App, using a
     combination of user password and a generated security token.
 
     **Configuration example:**
@@ -49,7 +49,8 @@ class SecurityTokenAuth(SalesforceCredentialsBase):
     password = "your_password"
     security_token = "your_token"
     ```
-    """    
+    """
+
     user_name: str | None = None
     password: TSecretStrValue | None = None
     security_token: TSecretStrValue | None = None
@@ -59,8 +60,8 @@ class SecurityTokenAuth(SalesforceCredentialsBase):
 class OrganizationIdAuth(SalesforceCredentialsBase):
     """
     Credentials for **Trusted IP Ranges Authentication**.
-    
-    Used when your server's IP is allowlisted in Salesforce, requiring 
+
+    Used when your server's IP is allowlisted in Salesforce, requiring
     only the Organization ID instead of a security token.
 
     **Configuration example:**
@@ -71,6 +72,7 @@ class OrganizationIdAuth(SalesforceCredentialsBase):
     organization_id = "00D..."
     ```
     """
+
     user_name: str | None = None
     password: TSecretStrValue | None = None
     organization_id: TSecretStrValue | None = None
@@ -80,8 +82,8 @@ class OrganizationIdAuth(SalesforceCredentialsBase):
 class InstanceAuth(SalesforceCredentialsBase):
     """
     Credentials for **Direct Session Access**.
-    
-    Use this if you already have a valid `session_id` (access token) 
+
+    Use this if you already have a valid `session_id` (access token)
     and want to bypass the authentication flow.
 
     **Configuration example:**
@@ -91,6 +93,7 @@ class InstanceAuth(SalesforceCredentialsBase):
     instance_url = "[https://yourorg.my.salesforce.com](https://yourorg.my.salesforce.com)"
     ```
     """
+
     session_id: str | None = None
     instance: TSecretStrValue | None = None
     instance_url: TSecretStrValue | None = None
@@ -107,8 +110,8 @@ class InstanceAuth(SalesforceCredentialsBase):
 class ConsumerKeySecretAuth(SalesforceCredentialsBase):
     """
     Credentials for **OAuth 2.0 Username-Password Flow**.
-    
-    Requires a **Connected App** with `client_id` and `client_secret`. 
+
+    Requires a **Connected App** with `client_id` and `client_secret`.
     Ideal for legacy integrations that still require user context.
 
     **Configuration example:**
@@ -131,8 +134,8 @@ class ConsumerKeySecretAuth(SalesforceCredentialsBase):
 class JWTAuth(SalesforceCredentialsBase):
     """
     Credentials for **OAuth 2.0 JWT Bearer Flow**.
-    
-    The most secure server-to-server flow. It uses a private key to sign 
+
+    The most secure server-to-server flow. It uses a private key to sign
     a JWT, avoiding the need to store passwords.
 
     **Configuration example:**
@@ -163,8 +166,8 @@ class JWTAuth(SalesforceCredentialsBase):
 class ConsumerKeySecretDomainAuth(SalesforceCredentialsBase):
     """
     Credentials for **OAuth 2.0 Client Credentials Flow** (Recommended).
-    
-    The modern Salesforce standard for headless integrations. Uses an 
+
+    The modern Salesforce standard for headless integrations. Uses an
     **External Client App** or Connected App configured for Client Credentials.
 
     **Configuration example:**

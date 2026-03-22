@@ -1,8 +1,8 @@
 """
 Module Components : Composants logiques et utilitaires métier.
 
-Ce package regroupe les briques réutilisables du framework, notamment 
-le résolveur de clés Salesforce (SalesforceKeyResolver) pour mapper 
+Ce package regroupe les briques réutilisables du framework, notamment
+le résolveur de clés Salesforce (SalesforceKeyResolver) pour mapper
 les IDs externes, ainsi que les classes de base des pipelines.
 """
 

@@ -2,7 +2,7 @@ import argparse
 import logging
 import sys
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 import dlt
 
@@ -18,8 +18,8 @@ class BasePipeline(ABC):
     def __init__(
         self,
         pipeline_base_name: str,
-        default_csv_path: Optional[str] = None,
-        default_env: Optional[str] = None,
+        default_csv_path: str | None = None,
+        default_env: str = "dev",
     ):
         self.pipeline_base_name = pipeline_base_name
         self.default_csv_path = default_csv_path
@@ -87,8 +87,8 @@ class BasePipeline(ABC):
     def main(
         cls,
         pipeline_base_name: str,
-        default_csv_path: Optional[str] = None,
-        default_env: Optional[str] = None,
+        default_csv_path: str | None = None,
+        default_env: str | None = None,
     ):
         """Standardized entry point for all pipeline scripts."""
         pipeline = cls(
@@ -118,7 +118,7 @@ class BasePipeline(ABC):
 
         parser.add_argument(
             "--env",
-            required=self.default_env is None,
+            required=False,
             default=self.default_env,
             help=f"Salesforce environment identifier (default: {self.default_env})",
         )

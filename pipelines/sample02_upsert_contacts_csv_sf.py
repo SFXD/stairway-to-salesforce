@@ -16,7 +16,8 @@ Process:
 
 """
 
-from typing import Any, Dict, Iterator
+from _collections_abc import Iterator
+from typing import Any
 
 import dlt
 from dlt.sources.filesystem import filesystem, read_csv
@@ -25,7 +26,13 @@ from stairway_to_salesforce.components import BasePipeline, SalesforceKeyResolve
 from stairway_to_salesforce.destinations import get_sf_bulk2_destination
 
 
-class UpsertContactPipeline(BasePipeline):
+# --- Pipeline configuration ---
+PIPELINE_NAME = "sample_upsert_contacts_csv_to_sf"
+DEFAULT_CSV_PATH = "pipelines/sample_data/updated_contacts.csv"
+# ---------------------------------
+
+
+class SamplePipeline(BasePipeline):
     """
     Defines the specific logic for upserting contacts from CSV to Salesforce.
     """
@@ -52,7 +59,7 @@ class UpsertContactPipeline(BasePipeline):
 
         # Step 3: Transform
         @dlt.transformer(name="transform_contacts_csv_to_sf")
-        def transformer(records: Any) -> Iterator[Dict[str, Any]]:
+        def transformer(records: Any) -> Iterator[dict[str, Any]]:
             # Ensure we are working with an iterable of records
             if isinstance(records, dict):
                 resolved_records = [records]
@@ -121,8 +128,7 @@ class UpsertContactPipeline(BasePipeline):
 
 
 if __name__ == "__main__":
-    UpsertContactPipeline.main(
-        pipeline_base_name="sample_upsert_contacts_csv_to_sf",
-        default_csv_path="sample_data/updated_contacts.csv",
-        default_env="dev",
+    SamplePipeline.main(
+        pipeline_base_name=PIPELINE_NAME,
+        default_csv_path=DEFAULT_CSV_PATH,
     )

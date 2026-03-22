@@ -12,7 +12,12 @@ from stairway_to_salesforce.components import BasePipeline
 from stairway_to_salesforce.sources import get_sf_bulk2_source
 
 
-class SampleSyncAccountSfToPostgresPipeline(BasePipeline):
+# --- Pipeline configuration ---
+PIPELINE_NAME = "sample_sync_accounts_sf_to_postgres"
+# ---------------------------------
+
+
+class SamplePipeline(BasePipeline):
     """
     Defines the logic to sync Salesforce SObjects to a PostgreSQL destination.
     """
@@ -90,6 +95,4 @@ class SampleSyncAccountSfToPostgresPipeline(BasePipeline):
 
 
 if __name__ == "__main__":
-    SampleSyncAccountSfToPostgresPipeline.main(
-        pipeline_base_name="sample_sync_accounts_sf_to_postgres", default_env="dev"
-    )
+    SamplePipeline.main(pipeline_base_name=PIPELINE_NAME)

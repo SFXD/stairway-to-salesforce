@@ -12,7 +12,13 @@ from stairway_to_salesforce.components import BasePipeline
 from stairway_to_salesforce.destinations import get_sf_bulk2_destination
 
 
-class DeleteContactPipeline(BasePipeline):
+# --- Pipeline configuration ---
+PIPELINE_NAME = "sample_delete_contacts_csv_to_sf"
+DEFAULT_CSV_PATH = "pipelines/sample_data/deleted_contacts.csv"
+# ---------------------------------
+
+
+class SamplePipeline(BasePipeline):
     def execute(self) -> None:
         # Step 1: Init pipeline
         pipeline = dlt.pipeline(
@@ -52,8 +58,7 @@ class DeleteContactPipeline(BasePipeline):
 
 
 if __name__ == "__main__":
-    DeleteContactPipeline.main(
-        pipeline_base_name="sample_delete_contacts_csv_to_sf",
-        default_csv_path="sample_data/deleted_contacts.csv",
-        default_env="dev",
+    SamplePipeline.main(
+        pipeline_base_name=PIPELINE_NAME,
+        default_csv_path=DEFAULT_CSV_PATH,
     )

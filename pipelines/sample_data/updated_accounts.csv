@@ -1,0 +1,24 @@
+AccountID,Name,Type,Industry,AnnualRevenue,NumberOfEmployees,BillingStreet,BillingCity,BillingPostalCode,BillingCountry,ShippingStreet,ShippingCity,Rating
+ACC001,"Stairway to Salesforce","Customer - Direct",Consulting,1000000,50,"123 Rue de la Paix",Paris,75002,France,"123 Rue de la Paix",Paris,Hot
+ACC002,"Poudre de Perlimpinpin SA",Prospect,Chemicals,50000,5,"Avenue des Songes",Imagiville,99000,France,"Avenue des Songes",Imagiville,Cold
+ACC003,"Les Fromages de Saturne","Customer - Channel",Agriculture,250000,12,"Cratère Nord",Annecy,74000,France,"Cratère Nord",Annecy,Warm
+ACC004,"Cyber-Choucroute Interactive",Prospect,Technology,850000,45,"Place de l'Espace",Strasbourg,67000,France,"Place de l'Espace",Strasbourg,Hot
+ACC005,"Manufacture de Nuages","Customer - Direct",Manufacturing,1200000,120,"Quai des Brumes",Clermont-Ferrand,63000,France,"Quai des Brumes",Clermont-Ferrand,Warm
+ACC006,"Licorne Logistique",Partner,Transportation,3000000,250,"Route Arc-en-ciel",Bordeaux,33000,France,"Route Arc-en-ciel",Bordeaux,Hot
+ACC007,"Énergie de l'Espace",Prospect,Energy,990000,30,"Boulevard Solaire",Montpellier,34000,France,"Boulevard Solaire",Montpellier,Warm
+ACC008,"Sardines Quantiques","Customer - Direct","Food & Beverage",45000,3,"Vieux Port",Marseille,13002,France,"Vieux Port",Marseille,Cold
+ACC009,"Aéronautique du Rêve",Prospect,Engineering,5500000,600,"Hangar 51",Toulouse,31000,France,"Hangar 51",Toulouse,Hot
+ACC010,"Bazar Intergalactique",Other,Retail,200000,15,"Rue du Commerce",Lille,59000,France,"Rue du Commerce",Lille,Warm
+ACC011,"Robots Rigolos","Customer - Direct",Technology,750000,25,"Allée des Circuits",Rennes,35000,France,"Allée des Circuits",Rennes,Warm
+ACC012,"Cristal de Roche SAS",Prospect,Construction,400000,10,"Sentier de Pierre",Limoges,87000,France,"Sentier de Pierre",Limoges,Cold
+ACC013,"Vortex Consulting","Customer - Direct",Consulting,2000000,80,"Boulevard du Vide",Paris,75008,France,"Boulevard du Vide",Paris,Hot
+ACC014,"Alchimie Moderne",Prospect,Healthcare,150000,8,"Impasse du Chaudron",Lyon,69000,France,"Impasse du Chaudron",Lyon,Warm
+ACC015,"Téléportation Directe",Partner,Transportation,12000000,1500,"Avenue Instantanée",Nantes,44000,France,"Avenue Instantanée",Nantes,Hot
+ACC016,"Châteaux de Sable Pro","Customer - Channel",Construction,30000,2,"Plage du Midi",Nice,06000,France,"Plage du Midi",Nice,Cold
+ACC017,"L'Atelier du Pixel",Prospect,Media,120000,14,"Rue de la Palette",Dijon,21000,France,"Rue de la Palette",Dijon,Warm
+ACC018,"Banque de l'Imaginaire","Customer - Direct",Finance,50000000,2000,"Place de la Fortune",Paris,75009,France,"Place de la Fortune",Paris,Hot
+ACC019,"Vins de Neptune","Customer - Channel","Food & Beverage",85000,4,"Quai de l'Eau",Angers,49000,France,"Quai de l'Eau",Angers,Cold
+ACC020,"Forages de l'Infini",Prospect,Energy,6000000,350,"Route du Noyau",Pau,64000,France,"Route du Noyau",Pau,Hot
+ACC021,"Textiles en Barbe à Papa",Prospect,Manufacturing,95000,11,"Chemin Sucré",Metz,57000,France,"Chemin Sucré",Metz,Warm
+ACC022,"Hôtel de la Voie Lactée","Customer - Direct",Hospitality,4500000,400,"Impasse des Étoiles",Grenoble,38000,France,"Impasse des Étoiles",Grenoble,Hot
+ACC023,"Laboratoire de Gravité Zéro",Other,Education,0,60,"Rue Flottante",Brest,29200,France,"Rue Flottante",Brest,Cold

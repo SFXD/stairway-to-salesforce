@@ -1,6 +1,18 @@
-External_ID,First_Name,Last_Name,Email
-ACC001,John,Doe,john.doe@acme.com
-ACC001,Jane,Doe,jane.doe@acme.com
-ACC002,Bob,Smith,bob.smith@global.com
-ACC003,Alice,Johnson,alice.j@techcorp.com
-ACC002,Charlie,Brown,charlie.brown@global.com
+AccountID,Salutation,FirstName,LastName,Email,Title,Department,Birthdate,LeadSource,HasOptedOutOfEmail,MailingStreet,MailingCity,MailingPostalCode,MailingCountry,MobilePhone
+ACC001,M.,Bertrand,Leymarios,bertrand.l@stairway-sf.com,CEO,Direction,1980-05-15,Web,false,"123 Rue de la Paix",Paris,75002,France,0601020304
+ACC001,M.,Geoffrey,Bessereau,geoffrey.b@stairway-sf.com,CTO,Technique,1985-11-20,"Partner Referral",false,"123 Rue de la Paix",Paris,75002,France,0605060708
+ACC002,Dr,Bob,Smith,bob.smith@perlimpinpin.test,"Mage Certifié",R&D,1970-01-01,Other,true,"Avenue des Songes",Imagiville,99000,France,0600000002
+ACC002,M.,Charlie,Brown,charlie.brown@perlimpinpin.test,Apprenti,Logistique,2000-10-10,Web,false,"Avenue des Songes",Imagiville,99000,France,0600000005
+ACC002,M.,Gandalf,Le-Gris,gandalf@perlimpinpin.test,"Consultant Senior",Magie,1000-01-01,Web,false,"Palais des Astres",Imagiville,99000,France,0600000030
+ACC003,Mme,Alice,Johnson,alice.j@saturne-cheese.test,"Affineuse Spatiale",Production,1990-03-22,"Phone Inquiry",false,"Cratère Nord",Annecy,74000,France,0600000003
+ACC004,M.,Jean,Choucroute,j.choucroute@cyber-choc.test,"Ingénieur Cabbage",Innovation,1982-06-30,Web,false,"Place de l'Espace",Strasbourg,67000,France,0600000006
+ACC004,Mme,Léa,Digital,l.digital@cyber-choc.test,"Data Scientist",R&D,1992-04-12,Web,false,"Avenue du Code",Strasbourg,67000,France,0600000031
+ACC007,Mme,Solène,Solaire,s.solaire@space-energy.fake,"Capteuse de Photons",Énergie,1988-08-08,"Phone Inquiry",false,"Boulevard Solaire",Montpellier,34000,France,0600000009
+ACC007,M.,Ray,On-De-Soleil,ray.on@space-energy.fake,"Technicien Maintenance",Maintenance,1995-12-25,Web,true,"Rue de l'Éclipse",Montpellier,34000,France,0600000032
+ACC009,M.,Icare,Volant,i.volant@dream-aero.fake,"Pilote d'Essai",Tests,1975-09-14,Other,false,"Hangar 51",Toulouse,31000,France,0600000011
+ACC009,Mme,Amelia,Earhart-Test,amelia@dream-aero.fake,"Chef de Projet Vol",Opérations,1897-07-24,Web,false,"Piste de Décollage",Toulouse,31000,France,0600000033
+ACC011,M.,Robo,Cop,r.cop@funny-bots.fake,"Médiateur",Support,2023-01-01,Web,false,"Allée des Circuits",Rennes,35000,France,0600000013
+ACC011,M.,Hal,Neuf-Mille,hal9000@funny-bots.fake,"Système de Bord",Technique,2001-01-01,Other,true,"Salle des Serveurs",Rennes,35000,France,0600000034
+ACC018,M.,Picsou,Balthazar,b.picsou@imaginary-bank.test,Trésorier,Finance,1867-12-01,Other,false,"Coffre Fort n°1",Paris,75009,France,0600000020
+ACC018,M.,Grippe,Sou,g.sou@imaginary-bank.test,"Comptable Junior",Finance,1990-03-14,Web,false,"Place de la Fortune",Paris,75009,France,0600000035
+ACC022,Mme,Stella,Nova,s.nova@milky-way-hotel.test,Réceptionniste,Accueil,1994-02-14,Web,false,"Impasse des Étoiles",Grenoble,38000,France,0600000024

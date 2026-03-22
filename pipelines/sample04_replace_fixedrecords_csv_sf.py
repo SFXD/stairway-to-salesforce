@@ -20,7 +20,8 @@ Process:
 - Fixed records are loaded to Salesforce with a replace operation
 """
 
-from typing import Any, Dict, Iterator
+from _collections_abc import Iterator
+from typing import Any
 
 import dlt
 from dlt.sources.filesystem import filesystem, read_csv
@@ -29,7 +30,13 @@ from stairway_to_salesforce.components import BasePipeline
 from stairway_to_salesforce.destinations import get_sf_bulk2_destination
 
 
-class ReplaceFixedRecordPipeline(BasePipeline):
+# --- Pipeline configuration ---
+PIPELINE_NAME = "sample_replace_fixedrecord_csv_to_sf"
+DEFAULT_CSV_PATH = "pipelines/sample_data/all_fixed_records.csv"
+# ---------------------------------
+
+
+class SamplePipeline(BasePipeline):
     def execute(self) -> None:
         """
         Implementation of the DLT pipeline steps.
@@ -52,7 +59,7 @@ class ReplaceFixedRecordPipeline(BasePipeline):
 
         # Step 3: Transform
         @dlt.transformer(name="transform_fixedrecords_csv_to_sf")
-        def transformer(records: Any) -> Iterator[Dict[str, Any]]:
+        def transformer(records: Any) -> Iterator[dict[str, Any]]:
             # Ensure we are working with an iterable of records
             if isinstance(records, dict):
                 resolved_records = [records]
@@ -88,8 +95,7 @@ class ReplaceFixedRecordPipeline(BasePipeline):
 
 
 if __name__ == "__main__":
-    ReplaceFixedRecordPipeline.main(
-        pipeline_base_name="sample_replace_fixedrecord_csv_to_sf",
-        default_csv_path="sample_data/all_fixed_records.csv",
-        default_env="dev",
+    SamplePipeline.main(
+        pipeline_base_name=PIPELINE_NAME,
+        default_csv_path=DEFAULT_CSV_PATH,
     )

@@ -19,18 +19,16 @@ class BasePipeline(ABC):
         self,
         pipeline_base_name: str,
         default_csv_path: str | None = None,
-        default_env: str = "dev",
     ):
         self.pipeline_base_name = pipeline_base_name
         self.default_csv_path = default_csv_path
-        self.default_env = default_env
         self.logger = logging.getLogger(__name__)
 
         # Parse CLI arguments first
         self.args = self._setup_and_parse_args()
 
         # Set naming and environment
-        self.env: str = self.args.env
+        self.env: str = self.args.env or self.default_env
         self.pipeline_name = f"{self.pipeline_base_name}_{self.env}"
 
         # Private storage for properties
@@ -88,13 +86,11 @@ class BasePipeline(ABC):
         cls,
         pipeline_base_name: str,
         default_csv_path: str | None = None,
-        default_env: str | None = None,
     ):
         """Standardized entry point for all pipeline scripts."""
         pipeline = cls(
             pipeline_base_name=pipeline_base_name,
             default_csv_path=default_csv_path,
-            default_env=default_env,
         )
         pipeline.run()
 
@@ -119,8 +115,8 @@ class BasePipeline(ABC):
         parser.add_argument(
             "--env",
             required=False,
-            default=self.default_env,
-            help=f"Salesforce environment identifier (default: {self.default_env})",
+            default="dev",
+            help="Salesforce environment identifier (default: dev)",
         )
 
         parser.add_argument(

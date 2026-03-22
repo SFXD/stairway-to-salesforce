@@ -40,11 +40,16 @@ dev = [
     "freezegun>=1.2.2",
     "faker>=19.3.0",
     "types-cachetools>=6.2.0.20251022",
+    "pandas-stubs>=3.0.0.260204",
+]
+doc = [
+    "pymdown-extensions>=10.20.1",
 ]
 docs = [
     "mkdocs-material>=9.7.1",
     "mkdocstrings[python]>=1.0.3",
     "mkdocs-include-markdown-plugin>=7.2.1",    
+    "pymdown-extensions>=10.20.1",
 ]
 
 [build-system]
@@ -90,3 +95,21 @@ max-complexity = 10
 force-single-line = false
 lines-after-imports = 2
 known-first-party = ["stairway_to_salesforce"]
+
+[tool.mypy]
+python_version = "3.12"
+# On désactive la vérification stricte des fonctions non typées pour l'instant
+check_untyped_defs = false 
+# On garde les rapports d'erreurs clairs
+show_error_codes = true
+warn_unused_ignores = true
+
+# Gestion des bibliothèques sans stubs (indispensable)
+[[tool.mypy.overrides]]
+module = [
+    "pyarrow.*",
+    "simple_salesforce.*",
+    "dlt.*",
+    "faker.*"
+]
+ignore_missing_imports = true

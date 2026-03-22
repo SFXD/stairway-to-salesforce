@@ -1,39 +1,58 @@
 # Stairway to Salesforce
 
+--8<-- [start:intro]
 [![CI](https://github.com/SFXD/stairway-to-salesforce/actions/workflows/ci.yml/badge.svg)](https://github.com/SFXD/stairway-to-salesforce/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/SFXD/stairway-to-salesforce/branch/main/graph/badge.svg)](https://codecov.io/gh/SFXD/stairway-to-salesforce)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/github/license/SFXD/stairway-to-salesforce)](LICENSE)
 
-A simple ETL Python Framework for Salesforce, built on DLT, featuring Bulk API v2 connectors and a Salesforce Key Resolver for external ID conversion.
+A simple ETL Python Framework for Salesforce, built on [DLT](https://dlthub.com/docs/intro), featuring Bulk API v2 connectors and utility components.
+
+---
+
+## The Value Proposition
+
+DLT is a powerful open-source data loading library, but it was missing key Salesforce components out of the box:
+
+- **Source & destination connectors** on standard Salesforce **Bulk API v2**
+- A **Key Resolver** to convert external IDs into Salesforce IDs
+
+Stairway to Salesforce fills that gap, while staying fully compatible with the DLT ecosystem.
+
+---
 
 ## Features
 
-- **Simple pipeline definition** using DLT framework 
+- **Simple pipeline definition** using the DLT framework
 - **Salesforce Bulk API v2** source and destination connectors
-- **Compatible with DLT connectors** both official and from the community
-- **Full compatibility with DLT functionalities** for credentials, schema validation, performance, memory...
-- **Salesforce Key Resolver** - Convert external IDs to Salesforce IDs (useful for lookup or delete based on external id)
-- **Simplified Salesforce environment management** to differenciate test environment credentials from production credentials
-- **Compatibility with Apache Airflow** for orchestration and scheduling
+- **Compatible with all DLT connectors**, both official and community
+- **Full DLT feature support** — credentials, schema validation, incremental loading, memory management
+- **Salesforce Key Resolver** — convert external IDs to Salesforce IDs for lookups and deletes
+- **Simplified environment management** — differentiate dev/test credentials from production
+- **Apache Airflow compatible** for orchestration and scheduling
+--8<-- [end:intro]
+
+---
 
 ## Quick Install
 
-For normal usage, and basic CSV sample pipelines
 ```bash
 pip install uv
-uv sync 
+uv sync
 ```
 
-If you want to test the sample pipeline Salesforce to Postgres, you have to add postgres dependency (dlt[postgres]) as follow 
+For the Salesforce to Postgres sample pipeline:
+
 ```bash
 uv sync --extra postgres
 ```
 
+---
+
 ## Quick Example
 
-The following example show the simple structure of a pipeline with 5 steps.
-Fully working samples can be found in pipelines folder.
+### Define the pipeline
+A pipeline follows a simple 5-step structure:
 
 ```python
 import dlt
@@ -42,40 +61,54 @@ from stairway_to_salesforce.components import BasePipeline
 class HelloSalesforcePipeline(BasePipeline):
 
     def execute(self) -> None:
-        # Step 1: Init pipeline with destination 
+        # Step 1: Init pipeline with destination
         pipeline = dlt.pipeline(
             pipeline_name=self.pipeline_name,
-            destination= ... using DLT connectors or Salesforce Bulk2 ...
+            destination= ... # Any destination from DLT or Salesforce Bulk2
             dataset_name="..."
-        )   
-
-        # Step 2: Source
-        source_resource = ... using DLT connectors or Salesforce Bulk2 ...
-
-        # Step 3: Transform 
-        @dlt.transformer(name="...")
-        def transformer(records: Iterator[Dict[str, Any]]) -> Iterator[Dict[str, Any]]:
-            ...
-            yield ... record by record with data transformation ...
-
-        # Step 4: Destination (by configuring the transformer)
-        transformer_resource = transformer
-        transformer_resource.apply_hints(            
-            table_name="... table or sobjectname for Salesforce Bulk2 ...",
-            primary_key="... key column /field ...",               
-            ...
         )
 
-        # Step 5: Execute pipeline
+        # Step 2: Source
+        source_resource = ... # Any source from DLT or Salesforce Bulk2
+
+        # Step 3: Transform
+        @dlt.transformer(name="...")
+        def transformer(records: Iterator[Dict[str, Any]]) -> Iterator[Dict[str, Any]]:
+            yield ... # record by record transformation
+
+        # Step 4: Configure destination hints
+        transformer_resource = transformer
+        transformer_resource.apply_hints(
+            table_name="...",
+            primary_key="...",
+        )
+
+        # Step 5: Execute
         load_info = pipeline.run(source_resource | transformer_resource)
         print(f"Load details for {self.pipeline_name}:\n{load_info}")
 
 if __name__ == "__main__":
     HelloSalesforcePipeline.main(
         pipeline_base_name="hello_salesforce",
-        default_env="dev"   # default environment if not specified on runtime
+        default_env="dev"
     )
 ```
+
+### Run the pipeline
+
+Run the pipeline on the default environment ( DEV normally )
+
+```bash
+uv run pipelines/hello-salesforce-pipeline.py
+```
+
+Run the pipeline on a specific environment
+
+```bash
+uv run pipelines/hello-salesforce-pipeline.py --env prod
+```
+
+---
 
 ## 📚 Full Documentation
 
@@ -87,7 +120,7 @@ if __name__ == "__main__":
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
+See [CONTRIBUTING.md](.github/contributing.md) for development setup and guidelines.
 
 ## License
 

@@ -1,24 +1,13 @@
 # What is DLT?
 
-[DLT](https://dlthub.com/docs/intro) (Data Load Tool) is the open-source Python library that powers Stairway to Salesforce under the hood. Understanding its core concepts will help you get the most out of this framework.
-
----
-
-## Overview
-
-DLT is an open-source Python library that loads data from various, often messy data sources into well-structured datasets. It provides lightweight Python interfaces to extract, normalize, transform, and load data — with minimal boilerplate.
-
-```bash
-pip install dlt
-```
+[DLT (Data Load Tool)](https://dlthub.com/docs/intro) is the open-source Python library that powers **Stairway to Salesforce**. It handles all the complex "plumbing" of ETL (Extract, Load, Transform) so you can focus on business logic.
 
 ---
 
 ## Core Concepts
 
-### Pipeline
-
-A pipeline is the top-level object that connects a source to a destination. It handles execution, state tracking, and schema management.
+### 1. Pipeline
+The pipeline is the central object. It acts as a bridge between a source and a destination. It manages execution, state tracking, and automatic schema management.
 
 ```python
 import dlt
@@ -30,11 +19,8 @@ pipeline = dlt.pipeline(
 )
 ```
 
-In Stairway to Salesforce, the pipeline destination is typically the **Salesforce Bulk2** connector, but any DLT-supported destination works.
-
-### Resource
-
-A resource is a Python generator or function decorated with `@dlt.resource`. It yields records one by one and is the primary unit of data extraction.
+### 2. Resource
+A resource is a function (often a generator) decorated with `@dlt.resource`. It is the basic unit for data extraction. It produces the data that will then be transformed or loaded.
 
 ```python
 @dlt.resource(table_name="accounts")
@@ -43,92 +29,51 @@ def get_accounts():
         yield record
 ```
 
-### Transformer
+### 3. Transformer
+A transformer is a special resource that receives data from another resource to modify it. In **Stairway to Salesforce**, this is where you perform field renamings or ID resolutions via the `KeyResolver`.
 
-A transformer is a special resource that receives records from another resource and applies transformations before loading. It is the key building block for the transformation step in Stairway to Salesforce pipelines.
+---
 
-```python
-@dlt.transformer(name="transformed_accounts")
-def transform_accounts(records: Iterator[Dict[str, Any]]) -> Iterator[Dict[str, Any]]:
-    for record in records:
-        record["Name"] = record["Name"].strip().upper()
-        yield record
-```
-
-Resources and transformers are chained using the pipe operator:
-
-```python
-pipeline.run(source_resource | transformer_resource)
-```
+## Advanced Features
 
 ### Write Disposition
+The "write disposition" defines how data is integrated into the destination:
 
-The write disposition controls how data is written to the destination table. DLT supports three modes:
-
-| Disposition | Behavior |
-|---|---|
-| `append` | Adds new records to the existing table |
-| `replace` | Truncates the table and reloads all data |
-| `merge` | Upserts records based on a primary key |
-
-In Stairway to Salesforce, the write disposition is combined with a custom `x-salesforce-operation` hint to drive the Bulk API v2 operation (insert, upsert, delete).
+* **Append**: Simply adds new records after existing ones (ideal for logs or history).
+* **Replace**: Empties the destination table and replaces it entirely with the newly provided data.
+* **Merge**: Updates existing records and inserts new ones (Upsert) based on a primary key (`primary_key`).
 
 ### Schema & Data Types
-
-DLT automatically infers schemas and data types from the data it processes. It handles nested structures by flattening them and tracks schema evolution over pipeline runs, avoiding manual schema maintenance.
+DLT inspects your data in real-time and automatically generates the database structure:
+* **Schema Evolution**: If you add a new field in your source (e.g., a column in a CSV), DLT will update the destination table automatically without manual intervention.
+* **Type Conversion**: It detects and converts data types (e.g., transforming an ISO string into a proper SQL `Timestamp` type).
 
 ### Incremental Loading
-
-DLT supports incremental loading out of the box, allowing pipelines to process only new or updated records since the last run. This is essential for production pipelines on large Salesforce orgs.
+This is one of DLT's major strengths. Using a `replication_key` (such as `LastModifiedDate`), the pipeline remembers the last processed record in its "state". During the next execution, it only retrieves data created or modified since that date.
 
 ```python
-@dlt.resource
-def get_contacts(
-    updated_at = dlt.sources.incremental("SystemModstamp")
+@dlt.resource(primary_key="Id", write_disposition="merge")
+def salesforce_accounts(
+    last_date=dlt.sources.incremental("LastModifiedDate")
 ):
-    ...
+    # DLT automatically manages the value of last_date between executions
+    yield from get_data_from_sf(since=last_date)
 ```
 
 ---
 
-## Supported Sources
+## Supported Ecosystem
 
-DLT can extract from a wide range of sources out of the box:
+### Sources
+DLT can extract data from various sources: REST APIs, SQL, S3, Google Sheets, etc. **Stairway to Salesforce** extends this ecosystem by adding support for the **Salesforce Bulk API v2**.
 
-- REST APIs
-- SQL databases (PostgreSQL, MySQL, SQLite, and more)
-- Cloud storage (S3, GCS, Azure Blob)
-- Python generators and data structures
-- [Verified community sources](https://dlthub.com/docs/dlt-ecosystem/verified-sources)
-
-Stairway to Salesforce adds **Salesforce Bulk API v2** as both a source and a destination on top of this ecosystem.
-
----
-
-## Supported Destinations
-
-DLT supports many popular destinations including Postgres, BigQuery, Snowflake, DuckDB, and Redshift. It also provides a custom destination interface, which is exactly what Stairway to Salesforce uses to implement the Salesforce Bulk2 destination.
+### Destinations
+All standard DLT destinations are supported (Postgres, BigQuery, Snowflake, DuckDB...). Our framework also uses DLT's custom destination interface to allow sending data *to* Salesforce.
 
 ---
 
 ## Deployment
-
-DLT pipelines run anywhere Python runs. Stairway to Salesforce is compatible with:
-
-- Local execution
-- **Apache Airflow** (built-in compatibility)
-- Serverless functions (AWS Lambda, Google Cloud Functions)
-- Any cloud environment
-
----
-
-## Further Reading
-
-For a deeper dive into DLT, refer to the official documentation:
-
-- [DLT Introduction](https://dlthub.com/docs/intro)
-- [Core Concepts](https://dlthub.com/docs/reference/explainers/how-dlt-works)
-- [Incremental Loading](https://dlthub.com/docs/general-usage/incremental-loading)
-- [Schema Evolution](https://dlthub.com/docs/general-usage/schema-evolution)
-- [Verified Sources](https://dlthub.com/docs/dlt-ecosystem/verified-sources)
-- [Destinations](https://dlthub.com/docs/dlt-ecosystem/destinations)
+Since pipelines are simple Python scripts, they integrate everywhere:
+* **Local / Cron**: For simple automations.
+* **Airflow / Dagster**: Via native operators for robust orchestration.
+* **GitHub Actions**: For lightweight and automated deployment directly from your repository.

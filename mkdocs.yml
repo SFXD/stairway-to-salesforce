@@ -1,4 +1,3 @@
-site_name: My Docs
 site_name: Stairway to Salesforce
 site_description: ETL Python Framework for Salesforce built on DLT
 site_author: SFXD
@@ -7,38 +6,62 @@ repo_name: SFXD/stairway-to-salesforce
 
 theme:
   name: material
+  language: en
   palette:
     primary: indigo
     accent: light blue
   features:
     - navigation.tabs
     - navigation.sections
+    - navigation.expand
     - navigation.top
     - search.suggest
+    - search.highlight
     - content.code.copy
+    - content.code.annotate
 
+validation:
+  links:
+    unrecognized_links: ignore
+    
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
-  - Examples: examples.md
-  - API Reference: api-reference.md
-  - Testing: testing.md
-  - Contributing: contributing.md
-
-markdown_extensions:
-  - admonition
-  - pymdownx.highlight:
-      anchor_linenums: true
-  - pymdownx.superfences
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
-  - pymdownx.tabbed:
-      alternate_style: true
-  - attr_list
-  - md_in_html
-  - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - Fundamentals:
+      - Architecture: architecture.md
+      - Salesforce Authentication: authentication.md      
+      - DLT Overview: dlt-overview.md
+  - Guides:
+      - Examples: examples.md
+      - Testing: testing.md
+  - Reference:
+      - API Reference: api-reference.md
+      - Contributing: contributing.md
+      - Code of Conduct: code-of-conduct.md
 
 plugins:
   - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: ["."]
+          options:
+            docstring_style: google
+            show_source: true
+            allow_inspection: false
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.snippets:
+      base_path: ["docs", "."]
+  - pymdownx.tabbed:
+      alternate_style: true      

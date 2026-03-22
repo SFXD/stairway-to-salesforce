@@ -28,7 +28,7 @@ class BasePipeline(ABC):
         self.args = self._setup_and_parse_args()
 
         # Set naming and environment
-        self.env: str = self.args.env or self.default_env
+        self.env: str = self.args.env
         self.pipeline_name = f"{self.pipeline_base_name}_{self.env}"
 
         # Private storage for properties

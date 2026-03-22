@@ -24,7 +24,6 @@ from _collections_abc import Iterator
 from typing import Any
 
 import dlt
-from dlt.sources.filesystem import filesystem, read_csv
 
 from stairway_to_salesforce.components import BasePipeline
 from stairway_to_salesforce.destinations import get_sf_bulk2_destination
@@ -33,14 +32,12 @@ from stairway_to_salesforce.destinations import get_sf_bulk2_destination
 # --- Pipeline configuration ---
 PIPELINE_NAME = "sample_replace_fixedrecord_csv_to_sf"
 DEFAULT_CSV_PATH = "pipelines/sample_data/all_fixed_records.csv"
+DEFAULT_VERBOSE = True
 # ---------------------------------
 
 
 class SamplePipeline(BasePipeline):
     def execute(self) -> None:
-        """
-        Implementation of the DLT pipeline steps.
-        """
         # Step 1: Init pipeline
         pipeline = dlt.pipeline(
             pipeline_name=self.pipeline_name,
@@ -48,14 +45,8 @@ class SamplePipeline(BasePipeline):
             dataset_name="fixedrecords",
         )
 
-        # Step 2: Source
-        source_resource = (
-            filesystem(
-                bucket_url=self.csv_path.rsplit("/", 1)[0],
-                file_glob=self.csv_path.rsplit("/", 1)[1],
-            )
-            | read_csv()  # noqa: W503
-        )
+        # Step 2: Source (from CSV file path given as input)
+        source_resource = self.build_csv_source()
 
         # Step 3: Transform
         @dlt.transformer(name="transform_fixedrecords_csv_to_sf")
@@ -89,13 +80,13 @@ class SamplePipeline(BasePipeline):
             write_disposition="replace",
         )
 
-        # Step 5: Run pipeline
-        load_info = pipeline.run(source_resource | transformer_resource)
-        print(f"Load details for {self.pipeline_name}:\n{load_info}")
+        # Step 5: Run the pipeline
+        self.run_pipeline(pipeline, source_resource | transformer_resource)
 
 
 if __name__ == "__main__":
     SamplePipeline.main(
         pipeline_base_name=PIPELINE_NAME,
         default_csv_path=DEFAULT_CSV_PATH,
+        default_verbose=DEFAULT_VERBOSE,
     )

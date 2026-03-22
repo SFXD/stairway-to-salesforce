@@ -20,7 +20,6 @@ from _collections_abc import Iterator
 from typing import Any
 
 import dlt
-from dlt.sources.filesystem import filesystem, read_csv
 
 from stairway_to_salesforce.components import BasePipeline, SalesforceKeyResolver
 from stairway_to_salesforce.destinations import get_sf_bulk2_destination
@@ -29,7 +28,8 @@ from stairway_to_salesforce.destinations import get_sf_bulk2_destination
 # --- Pipeline configuration ---
 PIPELINE_NAME = "sample_upsert_contacts_csv_to_sf"
 DEFAULT_CSV_PATH = "pipelines/sample_data/updated_contacts.csv"
-# ---------------------------------
+DEFAULT_VERBOSE = True
+# ------------------------------
 
 
 class SamplePipeline(BasePipeline):
@@ -45,17 +45,11 @@ class SamplePipeline(BasePipeline):
         pipeline = dlt.pipeline(
             pipeline_name=self.pipeline_name,
             destination=get_sf_bulk2_destination(credentials=self.sf_credential_path),
-            dataset_name="contacts",
+            dataset_name="contacts_data",
         )
 
-        # Step 2: Source
-        source_resource = (
-            filesystem(
-                bucket_url=self.csv_path.rsplit("/", 1)[0],
-                file_glob=self.csv_path.rsplit("/", 1)[1],
-            )
-            | read_csv()  # noqa: W503
-        )
+        # Step 2: Source (from CSV file path given as input)
+        source_resource = self.build_csv_source()
 
         # Step 3: Transform
         @dlt.transformer(name="transform_contacts_csv_to_sf")
@@ -66,45 +60,32 @@ class SamplePipeline(BasePipeline):
             else:
                 resolved_records = records
 
-            # Validate source schema
-            required_columns = [
-                "External_ID",
-                "First_Name",
-                "Last_Name",
-                "Email",
-            ]  # required columns to be updated with your csv structure
-            missing = [col for col in required_columns if col not in resolved_records[0]]
-            if missing:
-                raise ValueError(f"Missing required columns: {missing}")
-
             # Extract source external keys we need to convert into Salesforce Ids
             account_key_values = {
-                str(record["External_ID"])
-                for record in resolved_records
-                if record.get("External_ID")
+                str(record["AccountID"]) for record in resolved_records if record.get("AccountID")
             }
 
             # Init resolver ( with base pipeline credentials)
             resolver = SalesforceKeyResolver(credentials=self.sf_credential_path)
             account_sobject = "Account"
-            # For the sample, External_ID__c is an external key custom field on Account
-            account_key_field = "External_ID__c"
+            account_key_field = "ExternalID__c"  # sample custom field on Account
             resolver.set_definition(
                 sobject=account_sobject,
                 key_field=account_key_field,
-                key_values=list(account_key_values),
+                key_values=account_key_values,
             )
 
-            # Map fields
+            # Map CSV columns with SF field
+            # You could add additional csv column mapping (some are ignored)
             for record in resolved_records:
                 yield {
                     # Direct field mapping
-                    "FirstName": record["First_Name"],
-                    "LastName": record["Last_Name"],
+                    "FirstName": record["FirstName"],
+                    "LastName": record["LastName"],
                     "Email": record["Email"],
                     # Field mapping with External ID resolution
                     "AccountId": resolver.try_resolve(
-                        account_sobject, account_key_field, str(record["External_ID"])
+                        account_sobject, account_key_field, str(record["AccountID"])
                     ),
                 }
 
@@ -122,13 +103,13 @@ class SamplePipeline(BasePipeline):
             },
         )
 
-        # Step 5: Execute pipeline
-        load_info = pipeline.run(source_resource | transformer_resource)
-        print(f"Load details for {self.pipeline_name}:\n{load_info}")
+        # Step 5: Run the pipeline
+        self.run_pipeline(pipeline, source_resource | transformer_resource)
 
 
 if __name__ == "__main__":
     SamplePipeline.main(
         pipeline_base_name=PIPELINE_NAME,
         default_csv_path=DEFAULT_CSV_PATH,
+        default_verbose=DEFAULT_VERBOSE,
     )

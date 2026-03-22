@@ -14,6 +14,7 @@ from stairway_to_salesforce.sources import get_sf_bulk2_source
 
 # --- Pipeline configuration ---
 PIPELINE_NAME = "sample_sync_accounts_sf_to_postgres"
+DEFAULT_VERBOSE = True
 # ---------------------------------
 
 
@@ -89,10 +90,12 @@ class SamplePipeline(BasePipeline):
             write_disposition="merge",
         )
 
-        # Step 5: Run pipeline
-        load_info = pipeline.run(source_resource | transformer_resource)
-        print(f"Load details for {self.pipeline_name}:\n{load_info}")
+        # Step 5: Run the pipeline
+        self.run_pipeline(pipeline, source_resource | transformer_resource)
 
 
 if __name__ == "__main__":
-    SamplePipeline.main(pipeline_base_name=PIPELINE_NAME)
+    SamplePipeline.main(
+        pipeline_base_name=PIPELINE_NAME,
+        default_verbose=DEFAULT_VERBOSE,
+    )

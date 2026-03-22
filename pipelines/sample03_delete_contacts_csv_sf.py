@@ -6,7 +6,6 @@ The delete operation is resolving the email into Salesforce Id (necessary for th
 """
 
 import dlt
-from dlt.sources.filesystem import filesystem, read_csv
 
 from stairway_to_salesforce.components import BasePipeline
 from stairway_to_salesforce.destinations import get_sf_bulk2_destination
@@ -15,6 +14,7 @@ from stairway_to_salesforce.destinations import get_sf_bulk2_destination
 # --- Pipeline configuration ---
 PIPELINE_NAME = "sample_delete_contacts_csv_to_sf"
 DEFAULT_CSV_PATH = "pipelines/sample_data/deleted_contacts.csv"
+DEFAULT_VERBOSE = True
 # ---------------------------------
 
 
@@ -22,21 +22,13 @@ class SamplePipeline(BasePipeline):
     def execute(self) -> None:
         # Step 1: Init pipeline
         pipeline = dlt.pipeline(
-            pipeline_name=f"{self.pipeline_name}",
-            destination=get_sf_bulk2_destination(
-                credentials=self.sf_credential_path
-            ),  # specific to environment defined on runtime
-            dataset_name="contacts",
+            pipeline_name=self.pipeline_name,
+            destination=get_sf_bulk2_destination(credentials=self.sf_credential_path),
+            dataset_name="contact_deletion",
         )
 
-        # Step 2: Source
-        source_resource = (
-            filesystem(
-                bucket_url=self.csv_path.rsplit("/", 1)[0],  # folder path
-                file_glob=self.csv_path.rsplit("/", 1)[1],  # filename
-            )
-            | read_csv()  # noqa: W503
-        )
+        # Step 2: Source (from CSV file path given as input)
+        source_resource = self.build_csv_source()
 
         # Step 3: Transform
         # No transform needed
@@ -52,13 +44,13 @@ class SamplePipeline(BasePipeline):
             },
         )
 
-        # Step 5 : run pipeline
-        load_info = pipeline.run(source_resource)
-        print(f"Load details for {self.pipeline_name}:\n{load_info}")
+        # Step 5: Run the pipeline
+        self.run_pipeline(pipeline, source_resource)
 
 
 if __name__ == "__main__":
     SamplePipeline.main(
         pipeline_base_name=PIPELINE_NAME,
         default_csv_path=DEFAULT_CSV_PATH,
+        default_verbose=DEFAULT_VERBOSE,
     )

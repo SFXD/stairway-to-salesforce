@@ -12,7 +12,6 @@ requires-python = ">=3.12"
 keywords = ["salesforce", "dlt", "etl", "bulk-api", "data-pipeline"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: Apache Software License",
     "Topic :: Database",
     "Topic :: Software Development :: Libraries",
 ]
@@ -60,7 +59,29 @@ testpaths = ["stairway_to_salesforce/tests"]
 python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
-addopts = "--verbose --cov=stairway_to_salesforce"
+
+markers = [
+    "unit: Unit tests for library code",
+    "integration: Integration tests requiring Salesforce connection",
+    "pipeline: Tests for project-specific pipelines",
+    "slow: Slow running tests",
+    "requires_credentials: Tests requiring Salesforce credentials",
+]
+
+addopts = """
+    --verbose
+    --strict-markers
+    --cov=stairway_to_salesforce
+    --cov-report=term-missing
+    --cov-report=xml
+    --cov-report=html
+    --cov-fail-under=70
+"""
+
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
 
 [tool.ruff]
 line-length = 100

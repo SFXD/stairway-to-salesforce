@@ -1,6 +1,6 @@
 # Stairway to Salesforce
 
---8<-- [start:intro]
+<!-- --8<-- [start:intro]-->
 [![CI](https://github.com/SFXD/stairway-to-salesforce/actions/workflows/ci.yml/badge.svg)](https://github.com/SFXD/stairway-to-salesforce/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/SFXD/stairway-to-salesforce/branch/main/graph/badge.svg)](https://codecov.io/gh/SFXD/stairway-to-salesforce)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
@@ -8,7 +8,6 @@
 
 A simple ETL Python Framework for Salesforce, built on [DLT](https://dlthub.com/docs/intro), featuring Bulk API v2 connectors and utility components.
 
----
 
 ## The Value Proposition
 
@@ -19,7 +18,6 @@ DLT is a powerful open-source data loading library, but it was missing key Sales
 
 Stairway to Salesforce fills that gap, while staying fully compatible with the DLT ecosystem.
 
----
 
 ## Features
 
@@ -30,9 +28,8 @@ Stairway to Salesforce fills that gap, while staying fully compatible with the D
 - **Salesforce Key Resolver** — convert external IDs to Salesforce IDs for lookups and deletes
 - **Simplified environment management** — differentiate dev/test credentials from production
 - **Apache Airflow compatible** for orchestration and scheduling
---8<-- [end:intro]
+<!-- --8<-- [end:intro] -->
 
----
 
 ## Quick Install
 
@@ -46,8 +43,6 @@ For the Salesforce to Postgres sample pipeline:
 ```bash
 uv sync --extra postgres
 ```
-
----
 
 ## Quick Example
 
@@ -106,8 +101,6 @@ Run the pipeline on a specific environment
 ```bash
 uv run pipelines/hello-salesforce-pipeline.py --env prod
 ```
-
----
 
 ## 📚 Full Documentation
 

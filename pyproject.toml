@@ -7,11 +7,12 @@ authors = [
     {name = "Geoffrey Bessereau", email = "geoffrey@bessereau.eu"}
 ]
 readme = "readme.md"
+license = "Apache-2.0"
 requires-python = ">=3.12"
 keywords = ["salesforce", "dlt", "etl", "bulk-api", "data-pipeline"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
     "Topic :: Database",
     "Topic :: Software Development :: Libraries",
 ]

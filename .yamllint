@@ -1,0 +1,12 @@
+# .yamllint
+extends: default
+
+rules:
+  # Désactive l'erreur sur les tags !!python/name spécifiques à MkDocs
+  tags:
+    allow-unknown-tags: true
+
+  # Optionnel : augmente la limite de longueur de ligne si nécessaire
+  line-length:
+    max: 120
+    allow-non-breakable-words: true

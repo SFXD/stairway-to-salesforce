@@ -23,19 +23,18 @@ theme:
 validation:
   links:
     unrecognized_links: ignore
-    
+
 nav:
-  - Home: index.md
-  - Getting Started: getting-started.md
-  - Fundamentals:
-      - Architecture: architecture.md
-      - Salesforce Authentication: authentication.md      
-      - DLT Overview: dlt-overview.md
-  - Guides:
+  - Overview: index.md
+  - Quick Start: getting-started.md
+  - User Guide:
       - Examples: examples.md
       - Testing: testing.md
-  - Reference:
-      - API Reference: api-reference.md
+      - Architecture: architecture.md
+      - Salesforce Authentication: authentication.md
+      - DLT: dlt-overview.md
+  - API Reference: api-reference.md
+  - Community:
       - Contributing: contributing.md
       - Code of Conduct: code-of-conduct.md
 
@@ -52,6 +51,9 @@ plugins:
 
 markdown_extensions:
   - admonition
+  - pymdownx.emoji:
+      emoji_index: !!python/name:pymdownx.emoji.gemoji
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
   - toc:
       permalink: true
   - pymdownx.highlight:
@@ -64,4 +66,4 @@ markdown_extensions:
   - pymdownx.snippets:
       base_path: ["docs", "."]
   - pymdownx.tabbed:
-      alternate_style: true      
+      alternate_style: true

@@ -24,11 +24,6 @@ dependencies = [
     "cachetools>=5.0.0",
 ]
 
-[project.optional-dependencies]
-postgres = ["dlt[postgres]>=0.4.0"]
-duckdb   = ["dlt[duckdb]>=0.4.0"]
-bigquery = ["dlt[bigquery]>=0.4.0"]
-
 [dependency-groups]
 dev = [
     "ruff>=0.15.6",
@@ -42,6 +37,7 @@ dev = [
     "types-cachetools>=6.2.0.20251022",
     "pandas-stubs>=3.0.0.260204",
     "pre-commit>=4.5.1",
+    "types-requests>=2.33.0.20260402",
 ]
 docs = [
     "mkdocs-material>=9.7.1",

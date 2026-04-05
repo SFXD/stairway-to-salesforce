@@ -4,36 +4,34 @@ Thank you for your interest in contributing! We welcome all types of contributio
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Environment Setup
 
-1.  **Fork** the repository on GitHub.
-2.  **Clone** your fork locally:
-    ```bash
-    git clone https://github.com/YOUR_USERNAME/stairway-to-salesforce.git
-    cd stairway-to-salesforce
-    ```
-3.  **Set up the development environment** using **uv**:
-    ```bash
-    pip install uv
-    uv sync --all-groups
-    ```
-4.  **Create a feature branch**: `git checkout -b feat/your-feature-name`.
+1. Fork and Clone the repository.
+2. Run `make install-dev`. This will setup the environment and install git hooks.
+3. Verify your setup by running `make check-all`.
 
 ---
 
 ## 🛠 Development Workflow
 
 ### Code Quality & Style
-We use **Ruff** to maintain high code quality. It replaces Black, Isort, Flake8, and Bandit.
+We use **Ruff** via a standardized Makefile to maintain high code quality.
 
-* **Format and Lint**:
+* **Format and Auto-fix**:
     ```bash
-    uv run ruff format .
-    uv run ruff check --fix .
+    make fix-style
     ```
-* **Type Checking**:
+
+* **Verify Everything (Style, Types and Tests)**:
     ```bash
-    uv run mypy .
+    make check-all
+    ```
+
+* **Verify specific aspects**:
+    ```bash
+    make check-style
+    make check-type
+    make check-test
     ```
 
 ### Testing Requirements
@@ -42,7 +40,7 @@ No pull request will be merged without passing tests and maintaining coverage.
 * **Run all tests**: `uv run pytest`
 * **Check coverage** (Target: > 80%):
     ```bash
-    uv run pytest --cov=stairway_to_salesforce --cov-report=term
+    make check-test
     ```
 
 ---
@@ -51,7 +49,7 @@ No pull request will be merged without passing tests and maintaining coverage.
 
 ### 1. Before Submitting
 - [ ] Ensure all tests pass.
-- [ ] Code is formatted and linted with `ruff`.
+- [ ] Code is formatted and linted with `make fix-style`.
 - [ ] Documentation is updated (if applicable).
 - [ ] Type hints are used for all new functions.
 - [ ] **Pathlib** is used for all file path manipulations instead of `os.path`.

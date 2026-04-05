@@ -41,11 +41,12 @@ dev = [
     "faker>=19.3.0",
     "types-cachetools>=6.2.0.20251022",
     "pandas-stubs>=3.0.0.260204",
+    "pre-commit>=4.5.1",
 ]
 docs = [
     "mkdocs-material>=9.7.1",
     "mkdocstrings[python]>=1.0.3",
-    "mkdocs-include-markdown-plugin>=7.2.1",    
+    "mkdocs-include-markdown-plugin>=7.2.1",
     "pymdown-extensions>=10.20.1",
 ]
 
@@ -73,12 +74,12 @@ exclude = [
     "__pycache__",
     "build",
     "dist",
-    "stairway_to_salesforce/tests", 
+    "stairway_to_salesforce/tests",
 ]
 
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "S", "C90", "B", "E9", "F63", "F7", "F82"]
-ignore = ["E203"] 
+ignore = ["E203"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
@@ -96,7 +97,7 @@ known-first-party = ["stairway_to_salesforce"]
 [tool.mypy]
 python_version = "3.12"
 # On désactive la vérification stricte des fonctions non typées pour l'instant
-check_untyped_defs = false 
+check_untyped_defs = false
 # On garde les rapports d'erreurs clairs
 show_error_codes = true
 warn_unused_ignores = true

@@ -225,8 +225,10 @@ class TestResolveSalesforceCredentials:
         """Test error handling when loading from DLT secrets fails."""
         mock_secrets.__getitem__.side_effect = KeyError("Secret not found")
 
+        # Le regex doit correspondre à "Failed to load credentials from DLT path: ..."
+        # L'utilisation de "path" ici est cruciale car elle est présente dans ton builder.
         with pytest.raises(
-            ValueError, match="Failed to load credentials from DLT secrets path"
+            ValueError, match="Failed to load credentials from DLT path"
         ):
             resolve_salesforce_credentials("salesforce.nonexistent")
 

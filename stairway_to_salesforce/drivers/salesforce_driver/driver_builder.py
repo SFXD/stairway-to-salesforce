@@ -1,3 +1,6 @@
+import logging
+from typing import cast
+
 import dlt
 from dlt.sources.helpers.requests import Session
 from simple_salesforce import Salesforce
@@ -14,209 +17,205 @@ from .specs import (
 )
 
 
-def make_salesforce_driver(
-    credentials: SalesforceDriverAuth,
-    session: Session | None = None,
-    config: SalesforceDriverConfiguration | None = None,
-) -> Salesforce:
+logger = logging.getLogger(__name__)
 
-    # Consistency on config ( default if none )
-    resolved_config = config if config is not None else SalesforceDriverConfiguration()
+# ==========================================
+# SECTION 1: INTERNAL HELPERS (PRIVATE)
+# ==========================================
 
-    # Consistency on credentials
-    resolved_credentials = resolve_salesforce_credentials(credentials)
 
-    if isinstance(resolved_credentials, SecurityTokenAuth):
-        return Salesforce(
-            version=resolved_config.version,
-            domain=resolved_config.domain,
-            session=session,
-            proxies=resolved_config.get_proxies(),
-            username=resolved_credentials.user_name,
-            password=resolved_credentials.password,
-            security_token=resolved_credentials.security_token,
-            client_id=resolved_config.client_id,
+def _safe_instantiate(params: dict[str, object]) -> Salesforce:
+    """
+    Centralized instantiation with error handling for non-JSON responses.
+    Uses a targeted type ignore for the external library call.
+    """
+    try:
+        # Mypy requires an ignore here because it cannot verify that
+        # dict[str, object] matches the external Salesforce constructor.
+        return Salesforce(**params)  # type: ignore[arg-type]
+    except Exception as e:
+        # Import inside the block to handle specific network response errors
+        from requests.exceptions import JSONDecodeError as RequestsJSONDecodeError
+
+        if isinstance(e, RequestsJSONDecodeError):
+            logger.error(
+                "Salesforce returned a non-JSON response (empty or HTML). "
+                "This usually indicates a session timeout or proxy interference."
+            )
+            raise RuntimeError(
+                "Salesforce authentication failed: Invalid server response format."
+            ) from e
+        logger.error(f"Unexpected error during Salesforce driver instantiation: {e}")
+        raise
+
+
+# ==========================================
+# SECTION 2: CREDENTIAL RESOLUTION
+# ==========================================
+
+
+def _resolve_from_dict(cred_dict: dict[str, object]) -> SalesforceDriverAuth:
+    """
+    Identifies and instantiates the correct Auth spec from a dictionary.
+    Explicit mapping ensures strict typing (str | None) without 'Any'.
+    """
+    if "security_token" in cred_dict:
+        return SecurityTokenAuth(
+            user_name=cast(str | None, cred_dict.get("user_name")),
+            password=cast(str | None, cred_dict.get("password")),
+            security_token=cast(str | None, cred_dict.get("security_token")),
         )
 
-    elif isinstance(resolved_credentials, InstanceAuth):
-        return Salesforce(
-            version=resolved_config.version,
-            domain=resolved_config.domain,
-            session=session,
-            proxies=resolved_config.get_proxies(),
-            session_id=resolved_credentials.session_id,
-            instance=resolved_credentials.instance,
-            instance_url=resolved_credentials.instance_url,
+    if "organization_id" in cred_dict:
+        return OrganizationIdAuth(
+            user_name=cast(str | None, cred_dict.get("user_name")),
+            password=cast(str | None, cred_dict.get("password")),
+            organization_id=cast(str | None, cred_dict.get("organization_id")),
         )
 
-    elif isinstance(resolved_credentials, OrganizationIdAuth):
-        return Salesforce(
-            version=resolved_config.version,
-            domain=resolved_config.domain,
-            session=session,
-            proxies=resolved_config.get_proxies(),
-            username=resolved_credentials.user_name,
-            password=resolved_credentials.password,
-            organizationId=resolved_credentials.organization_id,
-            client_id=resolved_config.client_id,
+    if "session_id" in cred_dict:
+        return InstanceAuth(
+            session_id=cast(str | None, cred_dict.get("session_id")),
+            instance=cast(str | None, cred_dict.get("instance")),
+            instance_url=cast(str | None, cred_dict.get("instance_url")),
         )
 
-    elif isinstance(resolved_credentials, ConsumerKeySecretAuth):
-        return Salesforce(
-            version=resolved_config.version,
-            domain=resolved_config.domain,
-            session=session,
-            proxies=resolved_config.get_proxies(),
-            username=resolved_credentials.user_name,
-            password=resolved_credentials.password,
-            consumer_key=resolved_credentials.consumer_key,
-            consumer_secret=resolved_credentials.consumer_secret,
+    if "privatekey" in cred_dict or "privatekey_file" in cred_dict:
+        return JWTAuth(
+            user_name=cast(str | None, cred_dict.get("user_name")),
+            consumer_key=cast(str | None, cred_dict.get("consumer_key")),
+            privatekey_file=cast(str | None, cred_dict.get("privatekey_file")),
+            privatekey=cast(str | None, cred_dict.get("privatekey")),
+            instance_url=cast(str | None, cred_dict.get("instance_url")),
         )
 
-    elif isinstance(resolved_credentials, JWTAuth):
-        return Salesforce(
-            version=resolved_config.version,
-            domain=resolved_config.domain,
-            session=session,
-            proxies=resolved_config.get_proxies(),
-            username=resolved_credentials.user_name,
-            instance_url=resolved_credentials.instance_url,
-            consumer_key=resolved_credentials.consumer_key,
-            privatekey_file=resolved_credentials.privatekey_file,
-            privatekey=resolved_credentials.privatekey,
+    if "domain" in cred_dict and "consumer_key" in cred_dict:
+        return ConsumerKeySecretDomainAuth(
+            consumer_key=cast(str | None, cred_dict.get("consumer_key")),
+            consumer_secret=cast(str | None, cred_dict.get("consumer_secret")),
+            domain=cast(str | None, cred_dict.get("domain")),
         )
 
-    elif isinstance(resolved_credentials, ConsumerKeySecretDomainAuth):
-        # NOTE: For this authentication type,
-        # domain must be provided as part of the credentials set,
-        # we therefore get it from credentials, not config
-        return Salesforce(
-            version=resolved_config.version,
-            session=session,
-            proxies=resolved_config.get_proxies(),
-            consumer_key=resolved_credentials.consumer_key,
-            consumer_secret=resolved_credentials.consumer_secret,
-            domain=resolved_credentials.domain,
+    if "consumer_key" in cred_dict:
+        return ConsumerKeySecretAuth(
+            user_name=cast(str | None, cred_dict.get("user_name")),
+            password=cast(str | None, cred_dict.get("password")),
+            consumer_key=cast(str | None, cred_dict.get("consumer_key")),
+            consumer_secret=cast(str | None, cred_dict.get("consumer_secret")),
         )
 
+    raise ValueError("Could not determine Salesforce credential type from provided fields.")
 
-def resolve_salesforce_credentials(  # noqa: C901
-    credentials: SalesforceDriverAuth | dict | str,
+
+def resolve_salesforce_credentials(
+    credentials: SalesforceDriverAuth | dict[str, object] | str,
 ) -> SalesforceDriverAuth:
     """
-    Resolve and validate Salesforce credentials from various input formats.
-
-    This function handles:
-    - Already instantiated credential objects (returns as-is)
-    - Dictionary credentials (converts to appropriate class)
-    - String paths to DLT secrets (loads and converts)
-
-    Args:
-        credentials: Credentials in various formats:
-            - SalesforceDriverAuth instance: returned as-is
-            - dict: converted to appropriate credential class
-            - str: loaded from DLT secrets path (e.g., "salesforce.dev")
-
-    Returns:
-        Properly typed SalesforceDriverAuth instance
-
-    Raises:
-        ValueError: If credentials cannot be resolved or are invalid
-        TypeError: If credentials are in an unsupported format
+    Entry point to resolve credentials from various formats.
     """
-    # If it's a string, load from DLT secrets
-    if isinstance(credentials, str):
-        try:
-            credentials = dlt.secrets[credentials]
-        except Exception as e:
-            raise ValueError(
-                f"Failed to load credentials from DLT secrets path '{credentials}': {str(e)}"
-            ) from e
-
-    # If already a proper credential object, return it
     if isinstance(
         credentials,
         (
             SecurityTokenAuth,
             OrganizationIdAuth,
             InstanceAuth,
-            ConsumerKeySecretAuth,
             JWTAuth,
+            ConsumerKeySecretAuth,
             ConsumerKeySecretDomainAuth,
         ),
     ):
         return credentials
 
-    # Convert dict to proper credential class
-    if not isinstance(credentials, dict):
-        raise TypeError(
-            f"Credentials must be a SalesforceDriverAuth instance, dict, or string path. "
-            f"Got {type(credentials).__name__}"
+    if isinstance(credentials, str):
+        try:
+            cred_dict = cast(dict[str, object], dlt.secrets[credentials])
+            return _resolve_from_dict(cred_dict)
+        except KeyError as err:
+            raise ValueError(f"Failed to load credentials from DLT path: {credentials}") from err
+
+    if isinstance(credentials, dict):
+        return _resolve_from_dict(credentials)
+
+    raise TypeError("Credentials must be a SalesforceDriverAuth instance, a dict, or a string.")
+
+
+# ==========================================
+# SECTION 3: DRIVER FACTORY
+# ==========================================
+
+
+def make_salesforce_driver(
+    credentials: SalesforceDriverAuth,
+    session: Session | None = None,
+    config: SalesforceDriverConfiguration | None = None,
+) -> Salesforce:
+    """
+    Main factory function to create a Salesforce driver instance.
+    """
+    resolved_config = config if config is not None else SalesforceDriverConfiguration()
+    resolved_credentials = resolve_salesforce_credentials(credentials)
+
+    params: dict[str, object] = {
+        "version": resolved_config.version,
+        "domain": resolved_config.domain,
+        "session": session,
+        "proxies": resolved_config.get_proxies(),
+    }
+
+    if isinstance(resolved_credentials, SecurityTokenAuth):
+        params.update(
+            {
+                "username": resolved_credentials.user_name,
+                "password": resolved_credentials.password,
+                "security_token": resolved_credentials.security_token,
+                "client_id": resolved_config.client_id,
+            }
         )
-
-    # Determine credential type by checking which fields are present
-    # Priority order matches Salesforce authentication specificity
-
-    if "security_token" in credentials:
-        # OAuth 2.0 Username-Password Flow with Security Token
-        return SecurityTokenAuth(
-            user_name=credentials.get("user_name"),
-            password=credentials.get("password"),
-            security_token=credentials.get("security_token"),
+    elif isinstance(resolved_credentials, InstanceAuth):
+        params.update(
+            {
+                "session_id": resolved_credentials.session_id,
+                "instance": resolved_credentials.instance,
+                "instance_url": resolved_credentials.instance_url,
+            }
         )
-
-    elif "organization_id" in credentials:
-        # Trusted IP Ranges Authentication
-        return OrganizationIdAuth(
-            user_name=credentials.get("user_name"),
-            password=credentials.get("password"),
-            organization_id=credentials.get("organization_id"),
+    elif isinstance(resolved_credentials, OrganizationIdAuth):
+        params.update(
+            {
+                "username": resolved_credentials.user_name,
+                "password": resolved_credentials.password,
+                "organizationId": resolved_credentials.organization_id,
+                "client_id": resolved_config.client_id,
+            }
         )
-
-    elif "session_id" in credentials:
-        # Direct Session Access
-        return InstanceAuth(
-            session_id=credentials.get("session_id"),
-            instance=credentials.get("instance"),
-            instance_url=credentials.get("instance_url"),
+    elif isinstance(resolved_credentials, ConsumerKeySecretAuth):
+        params.update(
+            {
+                "username": resolved_credentials.user_name,
+                "password": resolved_credentials.password,
+                "consumer_key": resolved_credentials.consumer_key,
+                "consumer_secret": resolved_credentials.consumer_secret,
+            }
         )
-
-    elif "privatekey" in credentials or "privatekey_file" in credentials:
-        # OAuth 2.0 JWT Bearer Flow
-        return JWTAuth(
-            user_name=credentials.get("user_name"),
-            consumer_key=credentials.get("consumer_key"),
-            privatekey_file=credentials.get("privatekey_file"),
-            privatekey=credentials.get("privatekey"),
-            instance_url=credentials.get("instance_url"),
+    elif isinstance(resolved_credentials, JWTAuth):
+        params.update(
+            {
+                "username": resolved_credentials.user_name,
+                "instance_url": resolved_credentials.instance_url,
+                "consumer_key": resolved_credentials.consumer_key,
+                "privatekey_file": resolved_credentials.privatekey_file,
+                "privatekey": resolved_credentials.privatekey,
+            }
         )
-
-    elif all(k in credentials for k in ["consumer_key", "consumer_secret", "domain"]):
-        # OAuth 2.0 Client Credentials Flow
-        return ConsumerKeySecretDomainAuth(
-            consumer_key=credentials.get("consumer_key"),
-            consumer_secret=credentials.get("consumer_secret"),
-            domain=credentials.get("domain"),
+    elif isinstance(resolved_credentials, ConsumerKeySecretDomainAuth):
+        params.update(
+            {
+                "consumer_key": resolved_credentials.consumer_key,
+                "consumer_secret": resolved_credentials.consumer_secret,
+                "domain": resolved_credentials.domain,
+            }
         )
-
-    elif all(k in credentials for k in ["consumer_key", "consumer_secret", "user_name"]):
-        # OAuth 2.0 Username-Password Flow with Connected App
-        return ConsumerKeySecretAuth(
-            user_name=credentials.get("user_name"),
-            password=credentials.get("password"),
-            consumer_key=credentials.get("consumer_key"),
-            consumer_secret=credentials.get("consumer_secret"),
-        )
-
     else:
-        raise ValueError(
-            "Could not determine Salesforce credential type. "
-            f"Available fields: {list(credentials.keys())}. "
-            "Supported credential types require one of:\n"
-            "  - SecurityTokenAuth: user_name, password, security_token\n"
-            "  - OrganizationIdAuth: user_name, password, organization_id\n"
-            "  - InstanceAuth: session_id, (instance OR instance_url)\n"
-            "  - JWTAuth: user_name, consumer_key, (privatekey OR privatekey_file)\n"
-            "  - ConsumerKeySecretDomainAuth: consumer_key, consumer_secret, domain\n"
-            "  - ConsumerKeySecretAuth: user_name, password, consumer_key, consumer_secret"
-        )
+        raise ValueError(f"Unsupported credential type: {type(resolved_credentials)}")
+
+    return _safe_instantiate(params)

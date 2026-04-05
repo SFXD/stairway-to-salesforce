@@ -54,3 +54,14 @@ htmlcov/
 # Misc
 *.log
 .env
+
+# Coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*,cover
+.hypothesis/
+.pytest_cache/

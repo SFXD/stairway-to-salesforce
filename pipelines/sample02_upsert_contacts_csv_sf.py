@@ -72,7 +72,7 @@ class SamplePipeline(BasePipeline):
             resolver.set_definition(
                 sobject=account_sobject,
                 key_field=account_key_field,
-                key_values=account_key_values,
+                key_values=list(account_key_values),
             )
 
             # Map CSV columns with SF field

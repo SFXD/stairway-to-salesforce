@@ -1,4 +1,5 @@
 import logging
+from typing import cast
 
 import pandas as pd
 from simple_salesforce import (
@@ -60,14 +61,14 @@ class SalesforceRepository:
         Returns:
             DataFrame with Id and key_field columns
         """
-        all_data = []
+        all_data: list[pd.DataFrame] = []
         id_field = "Id"
         soql = self._build_query(sobject, key_field)
 
         try:
             bulk_handler = getattr(salesforce_driver.bulk2, sobject)
             for chunk in bulk_handler.query(soql):
-                df_chunk = process_csv_result(chunk)
+                df_chunk = cast(pd.DataFrame, process_csv_result(chunk))
                 all_data.append(df_chunk)
         except SalesforceResourceNotFound as ne:
             logger.error(f"Invalid sobject name : {sobject}, exception={ne}")
@@ -80,7 +81,7 @@ class SalesforceRepository:
             df = pd.DataFrame(columns=[id_field, key_field])
         else:
             # Combine all chunk
-            df = pd.concat(list(all_data), ignore_index=True)
+            df = pd.concat(all_data, ignore_index=True)
 
         return df[[id_field, key_field]]
 
@@ -114,7 +115,9 @@ class SalesforceRepository:
         try:
             rest_handler = getattr(salesforce_driver.bulk2, sobject)
             results = list(rest_handler.query_all(soql))
-            df_all = [process_csv_result(csv_str) for csv_str in results]
+            df_all: list[pd.DataFrame] = [
+                cast(pd.DataFrame, process_csv_result(csv_str)) for csv_str in results
+            ]
             df_result = pd.concat(df_all, ignore_index=True)
 
         except SalesforceResourceNotFound as ne:

@@ -13,7 +13,7 @@ class CacheManager:
     organized by sobject and key field.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize empty cache."""
         self._cache: dict[str, pd.DataFrame] = {}
 

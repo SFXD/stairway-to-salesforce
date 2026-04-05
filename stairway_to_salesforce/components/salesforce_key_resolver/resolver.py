@@ -95,8 +95,8 @@ class SalesforceKeyResolver:
                     df_new = self.sf_repository.fetch_with_keys(
                         self.sf_driver, sobject, key_field, missing_key_values
                     )
-
-            cache_size = self.cache_manager.update_cache(sobject, key_field, df_new)
+            if df_new is not None:
+                cache_size = self.cache_manager.update_cache(sobject, key_field, df_new)
         except Exception as e:
             logger.error(
                 f"Error while loading data (full_load = {full_load}) for {sobject}.{key_field}: {e}"

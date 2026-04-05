@@ -16,7 +16,7 @@
         <link rel="prev" href="..">
       
       
-        <link rel="next" href="../architecture/">
+        <link rel="next" href="../examples/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Getting Started - Stairway to Salesforce</title>
+        <title>Quick Start - Stairway to Salesforce</title>
       
     
     
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Getting Started
+              Quick Start
             
           </span>
         </div>
@@ -205,7 +205,7 @@
   
     
   
-  Home
+  Overview
 
       </a>
     </li>
@@ -226,30 +226,10 @@
   
     
   
-  Getting Started
+  Quick Start
 
       </a>
     </li>
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../architecture/" class="md-tabs__link">
-          
-  
-  
-  Fundamentals
-
-        </a>
-      </li>
-    
   
 
       
@@ -265,7 +245,7 @@
           
   
   
-  Guides
+  User Guide
 
         </a>
       </li>
@@ -278,14 +258,33 @@
   
   
   
+    <li class="md-tabs__item">
+      <a href="../api-reference/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  API Reference
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
     
     
       <li class="md-tabs__item">
-        <a href="../api-reference/" class="md-tabs__link">
+        <a href="../contributing/" class="md-tabs__link">
           
   
   
-  Reference
+  Community
 
         </a>
       </li>
@@ -352,7 +351,7 @@
   <span class="md-ellipsis">
     
   
-    Home
+    Overview
   
 
     
@@ -388,7 +387,7 @@
   <span class="md-ellipsis">
     
   
-    Getting Started
+    Quick Start
   
 
     
@@ -406,7 +405,7 @@
   <span class="md-ellipsis">
     
   
-    Getting Started
+    Quick Start
   
 
     
@@ -443,44 +442,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#1-installation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installation
+        1. Installation
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#salesforce-connection" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Salesforce connection
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#first-pipeline" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        First pipeline
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="First pipeline">
+    <nav class="md-nav" aria-label="1. Installation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#understanding-environments" class="md-nav__link">
+  <a href="#clone-repo" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Understanding environments
+        Clone repo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setup-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup environment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-additional-dlt-connectors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install additional DLT connectors
       
     </span>
   </a>
@@ -493,22 +492,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#note-for-security-if-the-env-is-not-specified-it-gets-the-dev-value-it-means-you-have-to-run-explicitly-env-production-to-have-a-production-pipeline" class="md-nav__link">
+  <a href="#2-salesforce-connection" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Note: For security, if the --env is not specified, it gets the dev value. It means you have to run explicitly --env production to have a production pipeline.
+        2. Salesforce connection
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Note: For security, if the --env is not specified, it gets the dev value. It means you have to run explicitly --env production to have a production pipeline.">
+    <nav class="md-nav" aria-label="2. Salesforce connection">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#5-using-sample-data-sample-data" class="md-nav__link">
+  <a href="#disclaimer" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Using Sample Data (Sample Data)
+        Disclaimer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
       
     </span>
   </a>
@@ -521,24 +531,52 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#uv-run-pipelinessample_delete_contact_csv_sfpy" class="md-nav__link">
+  <a href="#3-first-pipeline-upsert-accounts-from-csv-to-salesforce" class="md-nav__link">
     <span class="md-ellipsis">
       
-        uv run pipelines/sample_delete_contact_csv_sf.py
+        3. First pipeline: Upsert accounts from CSV to Salesforce
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. First pipeline: Upsert accounts from CSV to Salesforce">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#run-your-first-pipeline" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#run-the-pipeline" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Run your first Pipeline
+        Run the pipeline
       
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wrapping-it-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wrapping it up
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -593,7 +631,7 @@
   <span class="md-ellipsis">
     
   
-    Fundamentals
+    User Guide
   
 
     
@@ -609,11 +647,67 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Fundamentals
+    User Guide
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -685,7 +779,7 @@
   <span class="md-ellipsis">
     
   
-    DLT Overview
+    DLT
   
 
     
@@ -712,69 +806,15 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Guides
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Guides
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
-      <a href="../examples/" class="md-nav__link">
+      <a href="../api-reference/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Examples
+    API Reference
   
 
     
@@ -783,42 +823,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../testing/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Testing
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -855,7 +859,7 @@
   <span class="md-ellipsis">
     
   
-    Reference
+    Community
   
 
     
@@ -871,39 +875,11 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Reference
+    Community
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api-reference/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    API Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
             
               
                 
@@ -1006,44 +982,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#1-installation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installation
+        1. Installation
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#salesforce-connection" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Salesforce connection
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#first-pipeline" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        First pipeline
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="First pipeline">
+    <nav class="md-nav" aria-label="1. Installation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#understanding-environments" class="md-nav__link">
+  <a href="#clone-repo" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Understanding environments
+        Clone repo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setup-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup environment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-additional-dlt-connectors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install additional DLT connectors
       
     </span>
   </a>
@@ -1056,22 +1032,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#note-for-security-if-the-env-is-not-specified-it-gets-the-dev-value-it-means-you-have-to-run-explicitly-env-production-to-have-a-production-pipeline" class="md-nav__link">
+  <a href="#2-salesforce-connection" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Note: For security, if the --env is not specified, it gets the dev value. It means you have to run explicitly --env production to have a production pipeline.
+        2. Salesforce connection
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Note: For security, if the --env is not specified, it gets the dev value. It means you have to run explicitly --env production to have a production pipeline.">
+    <nav class="md-nav" aria-label="2. Salesforce connection">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#5-using-sample-data-sample-data" class="md-nav__link">
+  <a href="#disclaimer" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Using Sample Data (Sample Data)
+        Disclaimer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
       
     </span>
   </a>
@@ -1084,24 +1071,52 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#uv-run-pipelinessample_delete_contact_csv_sfpy" class="md-nav__link">
+  <a href="#3-first-pipeline-upsert-accounts-from-csv-to-salesforce" class="md-nav__link">
     <span class="md-ellipsis">
       
-        uv run pipelines/sample_delete_contact_csv_sf.py
+        3. First pipeline: Upsert accounts from CSV to Salesforce
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. First pipeline: Upsert accounts from CSV to Salesforce">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#run-your-first-pipeline" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#run-the-pipeline" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Run your first Pipeline
+        Run the pipeline
       
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wrapping-it-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wrapping it up
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1138,72 +1153,94 @@
 
 <h1 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h1>
 <p>This guide will walk you through the installation and initial configuration of <strong>Stairway to Salesforce</strong>.</p>
-<hr />
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Python 3.9</strong> or higher.</li>
 <li>API access to a Salesforce organization (Developer Edition, Sandbox, or Production).</li>
 <li>The <strong>uv</strong> tool installed on your machine. <a href="https://docs.astral.sh/uv/">uv official documentation</a></li>
+<li>Optional : <strong>Make</strong> installed (standard on Linux/macOS, available via Choco or WSL on Windows)</li>
 </ul>
-<hr />
-<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
+<h2 id="1-installation">1. Installation<a class="headerlink" href="#1-installation" title="Permanent link">&para;</a></h2>
+<h3 id="clone-repo">Clone repo<a class="headerlink" href="#clone-repo" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Clone the repository</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/SFXD/stairway-to-salesforce.git
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nb">cd</span><span class="w"> </span>stairway-to-salesforce
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># Install dependencies with uv</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>uv<span class="w"> </span>sync
 </code></pre></div>
-<p>To use the sample pipeline for PostgreSQL, add the specific connector:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>postgres
+<h3 id="setup-environment">Setup environment<a class="headerlink" href="#setup-environment" title="Permanent link">&para;</a></h3>
+<p>Choose the method that fits your workflow. Both methods install the framework and development tools (Ruff, Mypy).</p>
+<p><strong>Option A: Recommended (Fastest)</strong>
+If you have make installed:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Setup everything (dependencies + git hooks)</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>make<span class="w"> </span>install
+</code></pre></div></p>
+<p><strong>Option B: Manual setup</strong>
+If you prefer to run commands manually (without make):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>pip<span class="w"> </span>install<span class="w"> </span>uv
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>uv<span class="w"> </span>sync
+</code></pre></div></p>
+<h3 id="install-additional-dlt-connectors">Install additional DLT connectors<a class="headerlink" href="#install-additional-dlt-connectors" title="Permanent link">&para;</a></h3>
+<p>You can add additional DLT connectors such as postgres (useful for the sample pipeline 05 for example)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>uv<span class="w"> </span>add<span class="w"> </span><span class="s2">&quot;dlt[postgres]&quot;</span>
 </code></pre></div></p>
 <blockquote>
 <p><strong>Windows Note:</strong> If you encounter timezone-related errors with PyArrow, run <code>uv add tzdata</code> and set the <code>TZDIR</code> environment variable to the tzdata zoneinfo folder.</p>
 </blockquote>
-<hr />
-<h2 id="salesforce-connection">Salesforce connection<a class="headerlink" href="#salesforce-connection" title="Permanent link">&para;</a></h2>
+<h2 id="2-salesforce-connection">2. Salesforce connection<a class="headerlink" href="#2-salesforce-connection" title="Permanent link">&para;</a></h2>
 <p>To start simple, we are connecting an <strong>External App</strong> from a <strong>Salesforce sandbox</strong>, storing credentials in <strong>secret.toml file</strong>.
-This setup is a simple example to start with and can be adapted:
-- Credential storages, such as environment variables : <a href="https://dlthub.com/docs/general-usage/credentials/setup">DLT credential setup page</a>.
-- Authentication flows, such as JWT Auth flow : <a href="../authentication/">Authentication flows</a></p>
-<p><strong>Process:</strong>
-- Rename or copy <code>.dlt/secrets.toml.example</code> as <code>.dlt/secrets.toml</code>
-- Open it and identify the salesforce section [salesforce.dev]
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">[salesforce.dev]</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">auth_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;client_credentials&quot;</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">instance_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;https://yourorg.my.salesforce.com&quot;</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">client_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;your_client_id&quot;</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">client_secret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;your_client_secret&quot;</span>
-</code></pre></div>
-- Configure the external app within your Salesforce <strong>Sandbox</strong> : <a href="https://help.salesforce.com/s/articleView?id=xcloud.external_client_apps.htm&amp;type=5">Salesforce help</a>
-- Update the credentials within <code>.dlt/secrets.toml</code>.</p>
-<p>:bulb: <strong>You have configured a connection to a "dev" salesforce sandbox, that can be used both as source and as destination.</strong></p>
-<p>:warning: If you want to configure the connection with your production environment, do the same below [salesforce.production].
-<strong>We strongly recommend you to first connect to a sandbox and always test your pipeline against a non-production environment</strong></p>
-<hr />
-<h2 id="first-pipeline">First pipeline<a class="headerlink" href="#first-pipeline" title="Permanent link">&para;</a></h2>
-<p>The repository has sample pipelines for you to play with. </p>
-<h3 id="understanding-environments">Understanding environments<a class="headerlink" href="#understanding-environments" title="Permanent link">&para;</a></h3>
-<p>The suffix used in the file (e.g., <code>.dev</code> or <code>.production</code>) is linked to the <code>--env</code> argument passed during execution:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Uses [salesforce.production] in secrets.toml</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>uv<span class="w"> </span>run<span class="w"> </span>pipelines/my_pipeline.py<span class="w"> </span>--env<span class="w"> </span>production
-</code></pre></div>
-<h2 id="note-for-security-if-the-env-is-not-specified-it-gets-the-dev-value-it-means-you-have-to-run-explicitly-env-production-to-have-a-production-pipeline"><strong>Note:</strong> For security, if the --env is not specified, it gets the dev value. It means you have to run explicitly --env production to have a production pipeline.<a class="headerlink" href="#note-for-security-if-the-env-is-not-specified-it-gets-the-dev-value-it-means-you-have-to-run-explicitly-env-production-to-have-a-production-pipeline" title="Permanent link">&para;</a></h2>
-<h3 id="5-using-sample-data-sample-data">5. Using Sample Data (Sample Data)<a class="headerlink" href="#5-using-sample-data-sample-data" title="Permanent link">&para;</a></h3>
-<p>The repository includes a <code>sample_data/</code> folder containing pre-configured CSV files (e.g., <code>deleted_contacts.csv</code>). These files are used by default in demonstration pipelines to allow you to test features without preparing your own data.</p>
-<h2 id="uv-run-pipelinessample_delete_contact_csv_sfpy"><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>uv<span class="w"> </span>run<span class="w"> </span>pipelines/sample_delete_contact_csv_sf.py
-</code></pre></div><a class="headerlink" href="#uv-run-pipelinessample_delete_contact_csv_sfpy" title="Permanent link">&para;</a></h2>
-<h2 id="run-your-first-pipeline">Run your first Pipeline<a class="headerlink" href="#run-your-first-pipeline" title="Permanent link">&para;</a></h2>
-<p>Once your credentials are configured, test the connection with a simple example that extracts Salesforce accounts to a local file:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>uv<span class="w"> </span>run<span class="w"> </span>pipelines/sample_sync_account_sf_to_postgres.py
+This setup is a simple example to start with and can be adapted:</p>
+<ul>
+<li>Credential storages, such as environment variables : <a href="https://dlthub.com/docs/general-usage/credentials/setup">DLT credential setup page</a>.</li>
+<li>Authentication flows, such as JWT Auth flow : <a href="../authentication/">Authentication flows</a></li>
+</ul>
+<h3 id="disclaimer">Disclaimer<a class="headerlink" href="#disclaimer" title="Permanent link">&para;</a></h3>
+<p><strong>We strongly recommend you to first connect to a sandbox and always test your pipeline against a non-production environment</strong>
+In this section, we assume that you are working in a non-production environments, like a sandbox.</p>
+<p>If you want to configure the connection with your production environment, do the same below [salesforce.production].</p>
+<h3 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Rename or copy <code>.dlt/secrets.toml.example</code> as <code>.dlt/secrets.toml</code></li>
+<li>
+<p>Open it and identify the salesforce section [salesforce.dev]
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">[salesforce.dev]</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">auth_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;client_credentials&quot;</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">instance_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;https://yourorg.my.salesforce.com&quot;</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">client_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;your_client_id&quot;</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">client_secret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;your_client_secret&quot;</span>
+</code></pre></div></p>
+</li>
+<li>
+<p>Configure the external app within your Salesforce <strong>Sandbox</strong> : <a href="https://help.salesforce.com/s/articleView?id=xcloud.external_client_apps.htm&amp;type=5">Salesforce help</a></p>
+</li>
+<li>Update the credentials within <code>.dlt/secrets.toml</code>.</li>
+</ul>
+<h2 id="3-first-pipeline-upsert-accounts-from-csv-to-salesforce">3. First pipeline: Upsert accounts from CSV to Salesforce<a class="headerlink" href="#3-first-pipeline-upsert-accounts-from-csv-to-salesforce" title="Permanent link">&para;</a></h2>
+<p>In this section, we will execute the sample01 to upsert accounts from the CSV file 'pipelines/sample_data/updated_accounts.csv' to your 'dev' salesforce.
+It will create a few accounts into your org, based on the external id field "External_ID__c".</p>
+<h3 id="prerequisites_1">Prerequisites<a class="headerlink" href="#prerequisites_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Your salesforce sandbox is configured as salesforce.dev ( see previous section )</li>
+<li>Create a new text field "External_ID__c" on Account. You have to mark it as External Key and ideally as unique.</li>
+</ul>
+<h3 id="run-the-pipeline">Run the pipeline<a class="headerlink" href="#run-the-pipeline" title="Permanent link">&para;</a></h3>
+<p>Once your credentials are configured, test the connection with a simple example that upsert accounts from a CSV file (in Sample data) to your Salesforce environment</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>uv<span class="w"> </span>run<span class="w"> </span>pipelines/sample01_upsert_accounts_csv_sf.py<span class="w"> </span>--env<span class="w"> </span>dev<span class="w"> </span>--csv_file<span class="w"> </span>pipelines/sample_data/updated_accounts.csv
 </code></pre></div>
 <p>If the configuration is correct, you will see a load summary displayed in your console.</p>
+<p><strong>Notes</strong>: This commands defines explicitly the following parameters</p>
+<ul>
+<li><strong>--csv_file</strong> <path>: a sample csv file in pipelines/sample_data. If omitted, the default value is the sample file ( configurable in the pipeline itself )</li>
+<li><strong>--env</strong> dev: the target salesforce environment dev (as configured in your variables). If omitted, it will be dev by default ( by security ).</li>
+</ul>
+<p><img alt="💡" class="gemoji" src="https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/svg/1f4a1.svg" title=":bulb:" /> The repository has sample pipelines for you to play with.</p>
+<h3 id="wrapping-it-up">Wrapping it up<a class="headerlink" href="#wrapping-it-up" title="Permanent link">&para;</a></h3>
+<p>The repository has more sample pipelines for you to play with.  Please check <strong><a href="../examples/">Examples</a></strong>: Explore different pipeline types (Sync, Upsert, Delete).</p>
 <hr />
 <h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong><a href="../examples/">Examples</a></strong>: Explore different pipeline types (Sync, Upsert, Delete).</li>
 <li><strong><a href="../dlt-overview/">What is DLT?</a></strong>: Learn more about the engine powering this framework.</li>
 <li><strong><a href="../api-reference/">API Reference</a></strong>: Consult the detailed documentation for components.</li>
+<li><strong><a href="../contributing/">Contributing</a></strong>: If you want to improve the framework or add new features.</li>
 </ul>
 
 

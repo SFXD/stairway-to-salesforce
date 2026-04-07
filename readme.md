@@ -74,7 +74,11 @@ Use `uv` to execute the pre-built script:
 uv run pipelines/sample01_upsert_accounts_csv_sf.py --env dev
 ```
 
+### 5. Review
+
 The accounts defined in the sample csv file 'pipelines/sample_data/updated_accounts.csv' are now loaded in your sandbox.
+
+💡 **Loading accounts from a CSV file to Salesforce is only a quick way to show the pipeline in action. You can now adapt it to use any [DLT source](https://dlthub.com/docs/dlt-ecosystem/verified-sources) or any [DLT destination](https://dlthub.com/docs/dlt-ecosystem/destinations).**
 
 
 ## Build your own

@@ -31,22 +31,53 @@ Stairway to Salesforce fills that gap, while staying fully compatible with the D
 <!-- --8<-- [end:intro] -->
 
 
-## Quick Install
+## Quick try
+
+This section will cover how to quickly setup one of the sample pipeline to load accounts from a CSV file to your Salesforce sandbox.
+
+### 1. Install
 
 ```bash
+git clone [https://github.com/SFXD/stairway-to-salesforce.git](https://github.com/SFXD/stairway-to-salesforce.git)
+cd stairway-to-salesforce
 pip install uv
 uv sync
 ```
 
-For the Salesforce to Postgres sample pipeline:
+### 2. Prepare your Salesforce sandbox
 
-```bash
-uv sync --extra postgres
+1. Account External Key field on Account : Create a text custom field `External_ID__c` (Text, Unique, External ID) on the **Account** object.
+2. Integration user: configure the external user and make sur he can write accounts ( including the External_ID__c field).
+3. Configure an external app and keep the client id and client secret for the next step
+
+
+### 3. Connect your Salesforce Sandbox
+
+Stairway to Salesforce uses DLT's native secret management.
+For a quick connection, we are using secrets.toml file. (not recommended for production)
+
+1. Rename or copy `.dlt/secrets.toml.example` to `.dlt/secrets.toml`.
+2. Fill in your Salesforce credentials under the `[salesforce.dev]` section:
+
+```toml
+[salesforce.dev]
+client_id = "..."
+client_secret = "..."
+domain = "..."
 ```
 
-## Quick Example
+### 4. Run the pipeline
 
-### Define the pipeline
+Use `uv` to execute the pre-built script:
+
+```bash
+uv run pipelines/sample01_upsert_accounts_csv_sf.py --env dev
+```
+
+The accounts defined in the sample csv file 'pipelines/sample_data/updated_accounts.csv' are now loaded in your sandbox.
+
+
+## Build your own
 A pipeline follows a simple 5-step structure:
 
 ```python
@@ -88,20 +119,6 @@ if __name__ == "__main__":
     )
 ```
 
-### Run the pipeline
-
-Run the pipeline on the default environment ( DEV normally )
-
-```bash
-uv run pipelines/hello-salesforce-pipeline.py
-```
-
-Run the pipeline on a specific environment
-
-```bash
-uv run pipelines/hello-salesforce-pipeline.py --env prod
-```
-
 ## 📚 Full Documentation
 
 **Complete documentation available at: [https://sfxd.github.io/stairway-to-salesforce/](https://sfxd.github.io/stairway-to-salesforce/)**
@@ -116,7 +133,7 @@ See [CONTRIBUTING.md](.github/contributing.md) for development setup and guideli
 
 ## License
 
-See [LICENSE](LICENSE) file for details.
+Apache-2.0 -See [LICENSE](LICENSE) file for details.
 
 ## Troubleshooting
 

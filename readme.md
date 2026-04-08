@@ -35,26 +35,30 @@ Stairway to Salesforce fills that gap, while staying fully compatible with the D
 
 This section will show you how to run a complete prospecting pipeline: fetching live tech companies from the French Government API and upserting them directly into your Salesforce sandbox as Accounts. It’s the perfect way to test the framework's power with real-world data in seconds.
 
-### 1. Install
+### 0. Prerequisites
+
+* **Python 3.12+**: The framework leverages modern type hinting and syntax.
+* **uv**: (Highly recommended) Fast Python package manager. [Install it here](https://docs.astral.sh/uv/getting-started/installation/).
+* **Git**: To clone the repository (as the project is not yet on PyPI).
+* **Salesforce Sandbox/Org**: With API access enabled and an External App configured.
+
+### 1. Install the project
 
 ```bash
+# Clone the repository
 git clone https://github.com/SFXD/stairway-to-salesforce.git
 cd stairway-to-salesforce
-pip install uv
+
+# Sync dependencies and install the project in the local environment
 uv sync
 ```
 
 ### 2. Prepare your Salesforce sandbox
 
-1. Account External Key field on Account : Create a text custom field `External_ID__c` (Text, Unique, External ID) on the **Account** object.
-2. Integration user: configure the external user and make sur he can write accounts ( including the External_ID__c field).
-3. Configure an external app and keep the client id and client secret for the next step
-
+* **Account External Key field on Account** : Create a text custom field `ExternalId__c` (Text, Unique, External ID) on the **Account** object.
+* **Configure an external app** and keep the client id and client secret for the next step
 
 ### 3. Connect your Salesforce Sandbox
-
-Stairway to Salesforce uses DLT's native secret management.
-For a quick connection, we are using secrets.toml file. (not recommended for production)
 
 1. Rename or copy `.dlt/secrets.toml.example` to `.dlt/secrets.toml`.
 2. Fill in your Salesforce credentials under the `[salesforce.dev]` section:
@@ -66,9 +70,9 @@ client_secret = "..."
 domain = "..."
 ```
 
-### 4. Run the pipeline
+For other auth methods (JWT) or production storage, see [Full Documentation](https://sfxd.github.io/stairway-to-salesforce/getting-started/).
 
-Use `uv` to execute the pre-built script:
+### 4. Run the pipeline
 
 ```bash
 uv run pipelines/01_get_prospects_from_api.py --env dev
@@ -76,54 +80,13 @@ uv run pipelines/01_get_prospects_from_api.py --env dev
 
 ### 5. Review
 
-The tech companies fetched from the French Government API are now upserted into your Salesforce sandbox as Accounts. You can verify the results by searching for accounts with the Type "Prospect" or by checking the ExternalID__c field.
+The tech companies fetched from the French Government API are now upserted into your Salesforce sandbox as Accounts. You can verify the results by searching for accounts with the Type "Prospect" or by checking the ExternalId__c field.
 The data volume is limited to the first page (of the API) with a maximum of 25 records, limited to only public data, filtering out "Individual Entrepreneurs".
 
 💡 **This flagship sample demonstrates a complete "API-to-Salesforce" flow. You can now adapt this pattern to connect Salesforce with any [DLT verified source (SQL databases, REST APIs, Cloud Storage)](https://dlthub.com/docs/dlt-ecosystem/verified-sources) using the same standardized 5-step logic.**
 
 ⚠️ **Data Responsibility:** This sample fetches data from the Annuaire des Entreprises (INSEE/INPI). These records are provided under the Open Licence 2.0. While this pipeline includes GDPR filters (excluding non-public and individual entrepreneurs), you remain responsible for the compliance and legal usage of the data once stored in your Salesforce instance.
 
-## Build your own
-A pipeline follows a simple 5-step structure:
-
-```python
-import dlt
-from stairway_to_salesforce.components import BasePipeline
-
-class HelloSalesforcePipeline(BasePipeline):
-
-    def execute(self) -> None:
-        # Step 1: Init pipeline with destination
-        pipeline = dlt.pipeline(
-            pipeline_name=self.pipeline_name,
-            destination= ... # Any destination from DLT or Salesforce Bulk2
-            dataset_name="..."
-        )
-
-        # Step 2: Source
-        source_resource = ... # Any source from DLT or Salesforce Bulk2
-
-        # Step 3: Transform
-        @dlt.transformer(name="...")
-        def transformer(records: Iterator[Dict[str, Any]]) -> Iterator[Dict[str, Any]]:
-            yield ... # record by record transformation
-
-        # Step 4: Configure destination hints
-        transformer_resource = transformer
-        transformer_resource.apply_hints(
-            table_name="...",
-            primary_key="...",
-        )
-
-        # Step 5: Run the pipeline
-        self.run_pipeline(pipeline, source_resource | transformer_resource)
-
-if __name__ == "__main__":
-    HelloSalesforcePipeline.main(
-        pipeline_base_name="hello_salesforce",
-        default_env="dev"
-    )
-```
 
 ## 📚 Full Documentation
 
@@ -140,12 +103,3 @@ See [CONTRIBUTING.md](.github/contributing.md) for development setup and guideli
 ## License
 
 Apache-2.0 -See [LICENSE](LICENSE) file for details.
-
-## Troubleshooting
-
-### pyarrow timezone error (Windows)
-If you encounter timezone-related errors with pyarrow on Windows, run:
-    uv add tzdata
-
-Then set the following environment variable in your `.env` or shell :
-    TZDIR=<path_to_tzdata_zoneinfo>

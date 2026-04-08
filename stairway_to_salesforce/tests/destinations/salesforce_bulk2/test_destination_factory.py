@@ -40,13 +40,13 @@ class TestDestinationConfig:
             "name": "Account",
             "write_disposition": "append",
             "x-salesforce-operation": "upsert",
-            "primary_key": "External_ID__c",
+            "primary_key": "ExternalId__c",
         }
 
         config = SalesforceDestinationConfig.from_table_schema(table_schema)
 
         assert config.salesforce_operation == "upsert"
-        assert config.primary_key_field == "External_ID__c"
+        assert config.primary_key_field == "ExternalId__c"
 
     def test_config_from_replace_disposition(self):
         """Test config creation from replace disposition."""
@@ -123,13 +123,13 @@ class TestDestinationConfig:
             "name": "Account",
             "write_disposition": "append",
             "x-salesforce-operation": "upsert",
-            "primary_key": ["Id", "External_ID__c"],
+            "primary_key": ["Id", "ExternalId__c"],
         }
 
         config = SalesforceDestinationConfig.from_table_schema(table_schema)
 
         assert isinstance(config.primary_key_field, list)
-        assert config.primary_key_field == ["Id", "External_ID__c"]
+        assert config.primary_key_field == ["Id", "ExternalId__c"]
 
     def test_config_primary_key_from_columns(self):
         """Test config extracts primary key from columns metadata."""
@@ -306,7 +306,7 @@ class TestJobExecutorIntegration:
             sf_driver=mock_driver,
             target_name="Account",
             salesforce_operation="upsert",
-            primary_key="External_ID__c",
+            primary_key="ExternalId__c",
             file_path=temp_csv_file,
             key_resolver=None,
         )
@@ -405,14 +405,14 @@ class TestDestinationEdgeCases:
         table_schema = {
             "name": "Account",
             "write_disposition": "replace",
-            "primary_key": "External_ID__c",
+            "primary_key": "ExternalId__c",
         }
 
         config = SalesforceDestinationConfig.from_table_schema(table_schema)
 
         # Should create config with replace operation
         assert config.salesforce_operation == "replace"
-        assert config.primary_key_field == "External_ID__c"
+        assert config.primary_key_field == "ExternalId__c"
 
     def test_config_no_primary_key(self):
         """Test config without primary key for insert operation."""

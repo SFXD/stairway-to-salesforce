@@ -52,7 +52,7 @@ class TestExecuteJob:
             sf_driver=mock_driver,
             target_name="Account",
             salesforce_operation="upsert",
-            primary_key="External_ID__c",
+            primary_key="ExternalId__c",
             file_path=temp_csv_file,
             key_resolver=mock_resolver,
         )
@@ -62,7 +62,7 @@ class TestExecuteJob:
             sf_driver=mock_driver,
             target_name="Account",
             file_path=temp_csv_file,
-            primary_key="External_ID__c",
+            primary_key="ExternalId__c",
             key_resolver=mock_resolver,
         )
 
@@ -220,13 +220,13 @@ class TestExecuteJobEdgeCases:
             sf_driver=Mock(),
             target_name="Account",
             salesforce_operation="delete",
-            primary_key=["Id", "External_ID__c"],
+            primary_key=["Id", "ExternalId__c"],
             file_path=temp_csv_file,
             key_resolver=None,
         )
 
         # Should pass list as-is
-        assert mock_delete.call_args[1]["primary_key"] == ["Id", "External_ID__c"]
+        assert mock_delete.call_args[1]["primary_key"] == ["Id", "ExternalId__c"]
 
     def test_execute_job_case_sensitive_operation(self, temp_csv_file):
         """Test that operation matching is case-sensitive."""

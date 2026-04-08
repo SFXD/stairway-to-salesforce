@@ -1,105 +1,124 @@
 # Getting Started
 
-This guide will walk you through the installation and initial configuration of **Stairway to Salesforce**.
+This guide will walk you through the initial configuration of **Stairway to Salesforce** and the first run of a sample pipeline.
 
-## Prerequisites
-* **Python 3.9** or higher.
-* API access to a Salesforce organization (Developer Edition, Sandbox, or Production).
-* The **uv** tool installed on your machine. [uv official documentation](https://docs.astral.sh/uv/)
-* Optional : **Make** installed (standard on Linux/macOS, available via Choco or WSL on Windows)
+## 0. Prerequisites
+* **Python 3.12+**: The framework leverages modern type hinting and syntax.
+* **uv**: (Highly recommended) Fast Python package manager. [Install it here](https://docs.astral.sh/uv/getting-started/installation/).
+* **Git**: To clone the repository (as the project is not yet on PyPI).
 
-## 1. Installation
+## 1. Install the project
 
-### Clone repo
 ```bash
 # Clone the repository
 git clone https://github.com/SFXD/stairway-to-salesforce.git
 cd stairway-to-salesforce
-```
-### Setup environment
-Choose the method that fits your workflow. Both methods install the framework and development tools (Ruff, Mypy).
 
-**Option A: Recommended (Fastest)**
-If you have make installed:
-```bash
-# Setup everything (dependencies + git hooks)
-make install
-```
-
-**Option B: Manual setup**
-If you prefer to run commands manually (without make):
-```bash
-pip install uv
+# Setup the project
 uv sync
 ```
 
-### Install additional DLT connectors
-You can add additional DLT connectors such as postgres (useful for the sample pipeline 05 for example)
+:bulb: You can add additional [DLT verified source (SQL databases, REST APIs, Cloud Storage)](https://dlthub.com/docs/dlt-ecosystem/verified-sources)
 ```bash
+# Connector postgres
 uv add "dlt[postgres]"
 ```
 
 > **Windows Note:** If you encounter timezone-related errors with PyArrow, run `uv add tzdata` and set the `TZDIR` environment variable to the tzdata zoneinfo folder.
 
-## 2. Salesforce connection
-
-To start simple, we are connecting an **External App** from a **Salesforce sandbox**, storing credentials in **secret.toml file**.
-This setup is a simple example to start with and can be adapted:
-
-* Credential storages, such as environment variables : [DLT credential setup page](https://dlthub.com/docs/general-usage/credentials/setup).
-* Authentication flows, such as JWT Auth flow : [Authentication flows](authentication.md)
-
-### Disclaimer
+## 2. Prepare your Salesforce sandbox
 
 **We strongly recommend you to first connect to a sandbox and always test your pipeline against a non-production environment**
+
+Before to run the first pipeline, you need to configure a few things within your Salesforce :
+
+* **Account External Key field on Account** : Create a text custom field `ExternalId__c` (Text, Unique, External ID) on the **Account** object.
+* **Configure an external app** and keep the client id and client secret for the next step - [Salesforce help](https://help.salesforce.com/s/articleView?id=xcloud.external_client_apps.htm&type=5)
+
+## 3. Connect your Salesforce sandbox
+
 In this section, we assume that you are working in a non-production environments, like a sandbox.
-
 If you want to configure the connection with your production environment, do the same below [salesforce.production].
-
-### Configuration
 
 * Rename or copy `.dlt/secrets.toml.example` as `.dlt/secrets.toml`
 * Open it and identify the salesforce section [salesforce.dev]
 ```toml
 [salesforce.dev]
-auth_type = "client_credentials"
-instance_url = "https://yourorg.my.salesforce.com"
-client_id = "your_client_id"
-client_secret = "your_client_secret"
+client_id = "..."
+client_secret = "..."
+domain = "..."
 ```
-
-* Configure the external app within your Salesforce **Sandbox** : [Salesforce help](https://help.salesforce.com/s/articleView?id=xcloud.external_client_apps.htm&type=5)
 * Update the credentials within `.dlt/secrets.toml`.
 
-## 3. First pipeline: Upsert accounts from CSV to Salesforce
+:warning: This setup is not recommended for a production setup.
+* Credential storages, such as environment variables : [DLT credential setup page](https://dlthub.com/docs/general-usage/credentials/setup).
+* Authentication flows, such as JWT Auth flow : [Authentication flows](authentication.md)
 
-In this section, we will execute the sample01 to upsert accounts from the CSV file 'pipelines/sample_data/updated_accounts.csv' to your 'dev' salesforce.
-It will create a few accounts into your org, based on the external id field "External_ID__c".
+## 4. Run the pipeline
 
-### Prerequisites
-
-* Your salesforce sandbox is configured as salesforce.dev ( see previous section )
-* Create a new text field "External_ID__c" on Account. You have to mark it as External Key and ideally as unique.
-
-### Run the pipeline
-Once your credentials are configured, test the connection with a simple example that upsert accounts from a CSV file (in Sample data) to your Salesforce environment
+This pipeline will show you how to run a complete prospecting pipeline: fetching live tech companies from the French Government API and upserting them directly into your Salesforce sandbox as Accounts. It’s the perfect way to test the framework's power with real-world data in seconds.
 
 ```bash
-uv run pipelines/sample01_upsert_accounts_csv_sf.py --env dev --csv_file pipelines/sample_data/updated_accounts.csv
+uv run pipelines/01_get_prospects_from_api.py --env dev
 ```
 
-If the configuration is correct, you will see a load summary displayed in your console.
+**Notes**: This commands targets explicitly the dev environment through the --env parameter. Even if omitted, it will be dev by default ( by security ).
 
-**Notes**: This commands defines explicitly the following parameters
+⚠️ **Data Responsibility:** This sample fetches data from the Annuaire des Entreprises (INSEE/INPI). These records are provided under the Open Licence 2.0. While this pipeline includes GDPR filters (excluding non-public and individual entrepreneurs), you remain responsible for the compliance and legal usage of the data once stored in your Salesforce instance.
 
-* **--csv_file** <path>: a sample csv file in pipelines/sample_data. If omitted, the default value is the sample file ( configurable in the pipeline itself )
-* **--env** dev: the target salesforce environment dev (as configured in your variables). If omitted, it will be dev by default ( by security ).
 
-:bulb: The repository has sample pipelines for you to play with.
+### 5. Review
 
-### Wrapping it up
+The tech companies fetched from the French Government API are now upserted into your Salesforce sandbox as Accounts. You can verify the results by searching for accounts with the Type "Prospect" or by checking the ExternalId__c field.
+The data volume is limited to the first page (of the API) with a maximum of 25 records, limited to only public data, filtering out "Individual Entrepreneurs".
 
-The repository has more sample pipelines for you to play with.  Please check **[Examples](examples.md)**: Explore different pipeline types (Sync, Upsert, Delete).
+💡 **This flagship sample demonstrates a complete "API-to-Salesforce" flow. You can now adapt this pattern to connect Salesforce with any [DLT verified source (SQL databases, REST APIs, Cloud Storage)](https://dlthub.com/docs/dlt-ecosystem/verified-sources) using the same standardized 5-step logic.**
+
+⚠️ **Data Responsibility:** This sample fetches data from the Annuaire des Entreprises (INSEE/INPI). These records are provided under the Open Licence 2.0. While this pipeline includes GDPR filters (excluding non-public and individual entrepreneurs), you remain responsible for the compliance and legal usage of the data once stored in your Salesforce instance.
+
+:bulb: The repository has more sample pipelines for you to play with.  Please check **[Examples](examples.md)**.
+
+## 6. Build your own
+A pipeline follows a simple 5-step structure:
+
+```python
+import dlt
+from stairway_to_salesforce.components import BasePipeline
+
+class HelloSalesforcePipeline(BasePipeline):
+
+    def execute(self) -> None:
+        # Step 1: Init pipeline with destination
+        pipeline = dlt.pipeline(
+            pipeline_name=self.pipeline_name,
+            destination= ... # Any destination from DLT or Salesforce Bulk2
+            dataset_name="..."
+        )
+
+        # Step 2: Source
+        source_resource = ... # Any source from DLT or Salesforce Bulk2
+
+        # Step 3: Transform
+        @dlt.transformer(name="...")
+        def transformer(records: Iterator[Dict[str, Any]]) -> Iterator[Dict[str, Any]]:
+            yield ... # record by record transformation
+
+        # Step 4: Configure destination hints
+        transformer_resource = transformer
+        transformer_resource.apply_hints(
+            table_name="...",
+            primary_key="...",
+        )
+
+        # Step 5: Run the pipeline
+        self.run_pipeline(pipeline, source_resource | transformer_resource)
+
+if __name__ == "__main__":
+    HelloSalesforcePipeline.main(
+        pipeline_base_name="hello_salesforce",
+        default_env="dev"
+    )
+```
 
 ---
 

@@ -96,12 +96,12 @@ class TestExecUpsert:
             sf_driver=Mock(),
             target_name="Account",
             file_path=temp_csv_file,
-            primary_key="External_ID__c",
+            primary_key="ExternalId__c",
         )
 
         # Verify upsert was called with sanitized external ID
         mock_client.upsert.assert_called_once_with(
-            temp_csv_file, external_id_field="External_ID__c"
+            temp_csv_file, external_id_field="ExternalId__c"
         )
 
     @patch(
@@ -122,12 +122,12 @@ class TestExecUpsert:
             sf_driver=Mock(),
             target_name="Account",
             file_path=temp_csv_file,
-            primary_key=["External_ID__c", "Another_Field__c"],
+            primary_key=["ExternalId__c", "Another_Field__c"],
         )
 
         # Should use first key
         mock_client.upsert.assert_called_once_with(
-            temp_csv_file, external_id_field="External_ID__c"
+            temp_csv_file, external_id_field="ExternalId__c"
         )
 
     @patch(
@@ -212,7 +212,7 @@ class TestExecDelete:
         """Test delete with external ID requiring resolution."""
         # Create CSV with external IDs
         csv_file = temp_dir / "delete_data.csv"
-        df = pd.DataFrame({"External_ID__c": ["EXT001", "EXT002", "EXT003"]})
+        df = pd.DataFrame({"ExternalId__c": ["EXT001", "EXT002", "EXT003"]})
         df.to_csv(csv_file, index=False)
 
         # Mock key resolver
@@ -233,7 +233,7 @@ class TestExecDelete:
             sf_driver=Mock(),
             target_name="Account",
             file_path=str(csv_file),
-            primary_key="External_ID__c",
+            primary_key="ExternalId__c",
             key_resolver=mock_resolver,
         )
 
@@ -241,7 +241,7 @@ class TestExecDelete:
         mock_resolver.set_definition.assert_called_once()
         call_args = mock_resolver.set_definition.call_args
         assert call_args[1]["sobject"] == "Account"
-        assert call_args[1]["key_field"] == "External_ID__c"
+        assert call_args[1]["key_field"] == "ExternalId__c"
         assert call_args[1]["full_load"] is False
         assert len(call_args[1]["key_values"]) == 3
 
@@ -273,7 +273,7 @@ class TestExecDelete:
         """Test delete when external ID resolution fails."""
         # Create CSV
         csv_file = temp_dir / "delete_data.csv"
-        df = pd.DataFrame({"External_ID__c": ["EXT001", "EXT002"]})
+        df = pd.DataFrame({"ExternalId__c": ["EXT001", "EXT002"]})
         df.to_csv(csv_file, index=False)
 
         # Mock resolver that fails
@@ -293,7 +293,7 @@ class TestExecDelete:
             sf_driver=Mock(),
             target_name="Account",
             file_path=str(csv_file),
-            primary_key="External_ID__c",
+            primary_key="ExternalId__c",
             key_resolver=mock_resolver,
         )
 
@@ -471,7 +471,7 @@ class TestOperationsEdgeCases:
     def test_delete_cleans_up_temp_files(self, mock_get_client, mock_process, temp_dir):
         """Test that delete operation cleans up temporary files."""
         csv_file = temp_dir / "delete_data.csv"
-        df = pd.DataFrame({"External_ID__c": ["EXT001"]})
+        df = pd.DataFrame({"ExternalId__c": ["EXT001"]})
         df.to_csv(csv_file, index=False)
 
         mock_resolver = Mock()
@@ -486,7 +486,7 @@ class TestOperationsEdgeCases:
             sf_driver=Mock(),
             target_name="Account",
             file_path=str(csv_file),
-            primary_key="External_ID__c",
+            primary_key="ExternalId__c",
             key_resolver=mock_resolver,
         )
 

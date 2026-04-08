@@ -6,7 +6,7 @@ Thank you for your interest in contributing! We welcome all types of contributio
 ## 1. Environment Setup
 
 1. Fork and Clone the repository.
-2. Run `make install-dev`. This will setup the environment and install git hooks.
+2. Run `make setup-dev`. This will setup the environment and install git hooks.
 3. Verify your setup by running `make check-all`.
 
 

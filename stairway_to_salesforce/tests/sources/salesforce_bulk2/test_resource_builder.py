@@ -532,16 +532,16 @@ class TestResourceBuilderEdgeCases:
         """Test resource with composite primary key."""
         config = {
             "name": "accounts",
-            "primary_key": ["Id", "External_ID__c"],
+            "primary_key": ["Id", "ExternalId__c"],
             "sobject": "Account",
-            "fields": ["Id", "External_ID__c", "Name"],
+            "fields": ["Id", "ExternalId__c", "Name"],
         }
 
         mock_driver = Mock()
         mock_get_driver.return_value = mock_driver
 
         mock_fetch_fn = Mock()
-        mock_fetch_fn.return_value = iter([[{"Id": "001", "External_ID__c": "EXT001"}]])
+        mock_fetch_fn.return_value = iter([[{"Id": "001", "ExternalId__c": "EXT001"}]])
 
         resource = build_resource(
             config=config,

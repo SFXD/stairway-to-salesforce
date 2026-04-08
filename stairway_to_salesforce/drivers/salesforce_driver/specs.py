@@ -90,7 +90,7 @@ class InstanceAuth(SalesforceCredentialsBase):
     ```toml
     [salesforce.dev]
     session_id = "your_access_token"
-    instance_url = "[https://yourorg.my.salesforce.com](https://yourorg.my.salesforce.com)"
+    instance_url = "https://yourorg.my.salesforce.com"
     ```
     """
 
@@ -144,7 +144,7 @@ class JWTAuth(SalesforceCredentialsBase):
     user_name = "user@example.com"
     consumer_key = "your_client_id"
     privatekey_file = "path/to/server.key"
-    instance_url = "[https://yourorg.my.salesforce.com](https://yourorg.my.salesforce.com)"
+    instance_url = "https://yourorg.my.salesforce.com"
     ```
     """
 

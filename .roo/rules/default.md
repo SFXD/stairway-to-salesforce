@@ -25,7 +25,7 @@ Every code snippet must be ready to pass the following CI checks:
 - **Linting:** `flake8` compliant.
 - **Security:** `bandit` compliant. Avoid hardcoded credentials; use `dlt.secrets` or environment variables.
 - **Async/Performance:** Use dlt's streaming capabilities and generators (`yield`) to handle large datasets efficiently (OOM prevention).
-- **External ID Fields:** When dealing with Salesforce External ID fields, ensure consistency in naming, often following the `External_ID__c` pattern for custom fields.
+- **External ID Fields:** When dealing with Salesforce External ID fields, ensure consistency in naming, often following the `ExternalId__c` pattern for custom fields.
 
 ## 4. Testing Requirements
 - Use `pytest` for all tests.

@@ -76,13 +76,13 @@ class TestSalesforceDestinationConfig:
         table_schema = {
             "name": "Account",
             "write_disposition": "replace",
-            "primary_key": "External_ID__c",
+            "primary_key": "ExternalId__c",
         }
 
         config = SalesforceDestinationConfig.from_table_schema(table_schema)
 
         assert config.salesforce_operation == "replace"
-        assert config.primary_key_field == "External_ID__c"
+        assert config.primary_key_field == "ExternalId__c"
 
     def test_from_table_schema_primary_key_from_columns(self):
         """Test extracting primary key from columns definition."""
@@ -109,7 +109,7 @@ class TestSalesforceDestinationConfig:
             "x-salesforce-operation": "upsert",
             "columns": {
                 "Id": {"primary_key": True, "data_type": "text"},
-                "External_ID__c": {"primary_key": True, "data_type": "text"},
+                "ExternalId__c": {"primary_key": True, "data_type": "text"},
                 "Name": {"data_type": "text"},
             },
         }
@@ -121,7 +121,7 @@ class TestSalesforceDestinationConfig:
             config.primary_key_field, list
         ) or config.primary_key_field in [
             "Id",
-            "External_ID__c",
+            "ExternalId__c",
         ]
 
     def test_from_table_schema_primary_key_precedence(self):
@@ -130,17 +130,17 @@ class TestSalesforceDestinationConfig:
             "name": "Account",
             "write_disposition": "append",
             "x-salesforce-operation": "upsert",
-            "primary_key": "External_ID__c",
+            "primary_key": "ExternalId__c",
             "columns": {
                 "Id": {"primary_key": True, "data_type": "text"},
-                "External_ID__c": {"data_type": "text"},
+                "ExternalId__c": {"data_type": "text"},
             },
         }
 
         config = SalesforceDestinationConfig.from_table_schema(table_schema)
 
         # Top-level primary_key should win
-        assert config.primary_key_field == "External_ID__c"
+        assert config.primary_key_field == "ExternalId__c"
 
     def test_missing_sobject_name(self):
         """Test that missing SObject name raises error."""
@@ -222,13 +222,13 @@ class TestSalesforceDestinationConfigEdgeCases:
             "name": "Account",
             "write_disposition": "append",
             "x-salesforce-operation": "upsert",
-            "primary_key": ["Id", "External_ID__c"],
+            "primary_key": ["Id", "ExternalId__c"],
         }
 
         config = SalesforceDestinationConfig.from_table_schema(table_schema)
 
         assert isinstance(config.primary_key_field, list)
-        assert config.primary_key_field == ["Id", "External_ID__c"]
+        assert config.primary_key_field == ["Id", "ExternalId__c"]
 
     def test_empty_columns_dict(self):
         """Test handling of empty columns dictionary."""

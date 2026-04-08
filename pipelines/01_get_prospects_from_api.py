@@ -66,7 +66,7 @@ class ProspectsApiPipeline(BasePipeline):
                 siege = record.get("siege", {})
 
                 yield {
-                    "ExternalID__c": siren,
+                    "ExternalId__c": siren,
                     "AccountNumber": siren,
                     "Name": record.get("nom_complet"),
                     "Type": "Prospect",

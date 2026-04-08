@@ -3,8 +3,7 @@
 # Default target
 help:
 	@echo "Available commands:"
-	@echo "  make install       : Install core dependencies (for users)"
-	@echo "  make install-dev   : Install core + dev tools + git hooks (for contributors)"
+	@echo "  make setup-dev   	: setup core + dev tools + git hooks (for contributors)"
 	@echo "  make fix-style     : Format code and fix lint errors automatically"
 	@echo "  make check-style   : Verify code style and linting (read-only)"
 	@echo "  make check-type    : Verify static types with Mypy"
@@ -19,13 +18,8 @@ help:
 
 # --- Install  ---
 
-# For user
-install:
-	pip install uv
-	uv sync
-
 # For contributor
-install-dev:
+setup-dev:
 	pip install uv
 	uv sync --all-groups
 	uv run pre-commit install

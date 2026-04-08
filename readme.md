@@ -38,7 +38,7 @@ This section will cover how to quickly setup one of the sample pipeline to load 
 ### 1. Install
 
 ```bash
-git clone [https://github.com/SFXD/stairway-to-salesforce.git](https://github.com/SFXD/stairway-to-salesforce.git)
+git clone https://github.com/SFXD/stairway-to-salesforce.git
 cd stairway-to-salesforce
 pip install uv
 uv sync

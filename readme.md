@@ -33,7 +33,7 @@ Stairway to Salesforce fills that gap, while staying fully compatible with the D
 
 ## Quick try
 
-This section will cover how to quickly setup one of the sample pipeline to load accounts from a CSV file to your Salesforce sandbox.
+This section will show you how to run a complete prospecting pipeline: fetching live tech companies from the French Government API and upserting them directly into your Salesforce sandbox as Accounts. It’s the perfect way to test the framework's power with real-world data in seconds.
 
 ### 1. Install
 
@@ -71,15 +71,17 @@ domain = "..."
 Use `uv` to execute the pre-built script:
 
 ```bash
-uv run pipelines/sample01_upsert_accounts_csv_sf.py --env dev
+uv run pipelines/01_get_prospects_from_api.py --env dev
 ```
 
 ### 5. Review
 
-The accounts defined in the sample csv file 'pipelines/sample_data/updated_accounts.csv' are now loaded in your sandbox.
+The tech companies fetched from the French Government API are now upserted into your Salesforce sandbox as Accounts. You can verify the results by searching for accounts with the Type "Prospect" or by checking the ExternalID__c field.
+The data volume is limited to the first page (of the API) with a maximum of 25 records, limited to only public data, filtering out "Individual Entrepreneurs".
 
-💡 **Loading accounts from a CSV file to Salesforce is only a quick way to show the pipeline in action. You can now adapt it to use any [DLT source](https://dlthub.com/docs/dlt-ecosystem/verified-sources) or any [DLT destination](https://dlthub.com/docs/dlt-ecosystem/destinations).**
+💡 **This flagship sample demonstrates a complete "API-to-Salesforce" flow. You can now adapt this pattern to connect Salesforce with any [DLT verified source (SQL databases, REST APIs, Cloud Storage)](https://dlthub.com/docs/dlt-ecosystem/verified-sources) using the same standardized 5-step logic.**
 
+⚠️ **Data Responsibility:** This sample fetches data from the Annuaire des Entreprises (INSEE/INPI). These records are provided under the Open Licence 2.0. While this pipeline includes GDPR filters (excluding non-public and individual entrepreneurs), you remain responsible for the compliance and legal usage of the data once stored in your Salesforce instance.
 
 ## Build your own
 A pipeline follows a simple 5-step structure:

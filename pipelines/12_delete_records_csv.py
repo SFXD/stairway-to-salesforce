@@ -18,7 +18,7 @@ DEFAULT_VERBOSE = True
 # ---------------------------------
 
 
-class SamplePipeline(BasePipeline):
+class RecordDeletionPipeline(BasePipeline):
     def execute(self) -> None:
         # Step 1: Init pipeline
         pipeline = dlt.pipeline(
@@ -49,7 +49,7 @@ class SamplePipeline(BasePipeline):
 
 
 if __name__ == "__main__":
-    SamplePipeline.main(
+    RecordDeletionPipeline.main(
         pipeline_base_name=PIPELINE_NAME,
         default_csv_path=DEFAULT_CSV_PATH,
         default_verbose=DEFAULT_VERBOSE,

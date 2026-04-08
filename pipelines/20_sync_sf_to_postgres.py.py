@@ -18,7 +18,7 @@ DEFAULT_VERBOSE = True
 # ---------------------------------
 
 
-class SamplePipeline(BasePipeline):
+class SalesforceToPostgresPipeline(BasePipeline):
     """
     Defines the logic to sync Salesforce SObjects to a PostgreSQL destination.
     """
@@ -95,7 +95,7 @@ class SamplePipeline(BasePipeline):
 
 
 if __name__ == "__main__":
-    SamplePipeline.main(
+    SalesforceToPostgresPipeline.main(
         pipeline_base_name=PIPELINE_NAME,
         default_verbose=DEFAULT_VERBOSE,
     )

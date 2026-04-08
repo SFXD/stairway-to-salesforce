@@ -1,79 +1,85 @@
-# Examples
+# Examples & Tutorials
 
-This page presents the sample pipelines included in the pipelines folder.
-
-## Sample 1. CSV to Salesforce Upsert (simple)
-**Source Code:** [sample01_upsert_account_csv_sf.py](https://github.com/SFXD/stairway-to-salesforce/blob/main/pipelines/sample01_upsert_account_csv_sf.py)
-
-This example shows a simple upsert scenario. It processes a CSV of account and upsert them based on a custom external field "ExternalID__c".
-
-### How it works
-1. **Load CSV:** Reads contact data.
-2. **Bulk Upsert:** Sends the enriched data to Salesforce via Bulk API v2.
+This page lists the sample pipelines included in the `pipelines/` directory. Each example illustrates a specific capability of the framework.
 
 ---
 
-## Sample 2. CSV to Salesforce Upsert (with Key Resolver)
-**Source Code:** [sample02_upsert_contact_csv_sf.py](https://github.com/SFXD/stairway-to-salesforce/blob/main/pipelines/sample02_upsert_contact_csv_sf.py)
+## 🚀 Flagship Pipeline
 
-This example shows the power of the SalesforceKeyResolver. It processes a CSV of contacts where the "Account" is identified by an External ID, not a Salesforce ID.
+### [01_get_prospects_from_api.py](https://github.com/SFXD/stairway-to-salesforce/blob/main/pipelines/01_get_prospects_from_api.py)
+**Type:** REST API (Gov) ➡️ Salesforce (Bulk API v2)
 
-### How it works
-1. **Load CSV:** Reads contact data.
-2. **Resolve IDs:** The SalesforceKeyResolver queries Salesforce to find the real AccountId matching the External_ID provided in the CSV.
-3. **Bulk Upsert:** Sends the enriched data to Salesforce via Bulk API v2.
-
----
-
-## Sample 3. Mass Delete from Salesforce
-**Source Code:** [sample03_delete_contact_csv_sf.py](https://github.com/SFXD/stairway-to-salesforce/blob/main/pipelines/sample03_delete_contact_csv_sf.py)
-
-A specialized pipeline designed to delete records in bulk based on a list of identifiers (like Emails) provided in a CSV file.
-
-- **Note:** The SalesforceKeyResolver is used behind the scenes to find the mandatory Salesforce Id for the delete operation.
-- **Safety:** Always test with a small CSV first!
+The recommended starting point. It demonstrates how to fetch JSON data from a public API, transform it, and inject it into Salesforce using an **Upsert** operation.
+- **Transformation:** Mapping JSON fields to Salesforce SObject fields.
+- **Operation:** Upsert based on a custom SIREN field (`ExternalId__c`).
 
 ---
 
-## Sample . Full Data Replacement
-**Source Code:** [sample04_replace_fixedrecord_csv_sf.py](https://github.com/SFXD/stairway-to-salesforce/blob/main/pipelines/sample04_replace_fixedrecord_csv_sf.py)
+## 📥 Data Ingestion (CSV to Salesforce)
 
-Used for "wiping" a specific SObject and replacing its entire content with new data from a source file.
+### [10_import_accounts_csv.py](https://github.com/SFXD/stairway-to-salesforce/blob/main/pipelines/10_import_accounts_csv.py)
+**Type:** Local File ➡️ Salesforce
 
-**Warning:** The replace disposition will trigger a delete of all existing records in the target SObject before inserting the new ones.
+A classic bulk import scenario. It reads a CSV file containing company data and updates/creates the corresponding Accounts.
+- **Operation:** Bulk Upsert.
+- **Prerequisite:** `ExternalId__c` field on the Account object.
 
----
+### [11_import_contacts_with_lookup.py](https://github.com/SFXD/stairway-to-salesforce/blob/main/pipelines/11_import_contacts_with_lookup.py)
+**Type:** Complex Lookup using **SalesforceKeyResolver**
 
-## Sample 5. Salesforce to PostgreSQL Sync
-**Source Code:** [sample05_sync_account_sf_to_postgres.py](https://github.com/SFXD/stairway-to-salesforce/blob/main/pipelines/sample05_sync_account_sf_to_postgres.py)
-
-This pipeline performs an incremental synchronization of Salesforce Accounts to a PostgreSQL database.
-
-### Key Features
-- **Incremental logic:** Uses LastModifiedDate as a replication key.
-- **Merge Strategy:** Upserts records in Postgres based on the Salesforce Id.
-- **Field Mapping:** Demonstrates how to rename Salesforce fields (e.g., Owner.Name) to database-friendly columns (e.g., sf_owner).
+One of the framework's most powerful features. It demonstrates how to import Contacts linked to Accounts using only External IDs (instead of Salesforce 18-char IDs) thanks to the `SalesforceKeyResolver`.
+- **Transformation:** Dynamic ID resolution (External ID ➡️ AccountId).
 
 ---
 
-## Running the examples
+## 🛠️ Maintenance & Cleanup
 
-You can run any example using **uv**. All examples support the standard CLI arguments provided by BasePipeline.
+### [12_delete_records_csv.py](https://github.com/SFXD/stairway-to-salesforce/blob/main/pipelines/12_delete_records_csv.py)
+**Type:** Bulk Delete
 
-### Basic run
+Mass deletes Salesforce records based on a list of IDs or Emails provided in a CSV file.
+- **Operation:** Hard Delete / Delete via Bulk API v2.
+
+### [13_reset_custom_table_csv.py](https://github.com/SFXD/stairway-to-salesforce/blob/main/pipelines/13_reset_custom_table_csv.py)
+**Type:** Full Table Reset (**Replace**)
+
+Demonstrates the `replace` write disposition: all existing data in the target SObject is deleted and replaced by the new content from the source file.
+- **Use Case:** Reference tables, configuration settings.
+
+---
+
+## 📤 Extraction & Sync (Salesforce to ...)
+
+### [20_sync_sf_to_postgres.py](https://github.com/SFXD/stairway-to-salesforce/blob/main/pipelines/20_sync_sf_to_postgres.py)
+**Type:** Salesforce ➡️ PostgreSQL
+
+Synchronizes your Salesforce data to a relational database.
+- **Strategy:** Incremental (based on `LastModifiedDate`).
+- **Destination:** PostgreSQL (utilizing standard DLT connectors).
+
+### **Coming soon** 21_sync_sf_to_csv.py
+**Type:** Salesforce ➡️ Local CSV (Extraction)
+
+Extracts Salesforce data and saves it as timestamped CSV files.
+- **Use Case:** Local backups, data exports for third-party analysis.
+
+---
+
+## 💡 How to run the examples
+
+All examples are executed via `uv` and support the `--env` argument to switch between your `dev` and `prod` configurations defined in `.dlt/secrets.toml`.
 
 ```bash
-uv run pipelines/sample_sync_account_sf_to_postgres.py
+# Example: Run the account import
+uv run pipelines/10_import_accounts_csv.py --env dev
 ```
 
-### Specify an environment (Dev/Prod)
+## Pipeline Structure
 
-```bash
-uv run pipelines/sample_sync_account_sf_to_postgres.py --env prod
-```
+Every sample inherits from BasePipeline and follows the same 5-step logic:
 
-### Pass a specific CSV path
-
-```bash
-uv run pipelines/sample_upsert_contact_csv_sf.py "data/my_new_contacts.csv"
-```
+1. Init: Initialize the DLT pipeline with a destination.
+2. Source: Define the data source (API, CSV, DB).
+3. Transform: Clean and map data (Optional).
+4. Destination: Configure "hints" (Target SObject, operation type).
+5. Run: Execute the pipeline and display the load report.
